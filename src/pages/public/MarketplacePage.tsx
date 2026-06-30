@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Search, SlidersHorizontal, MapIcon, LayoutGrid, X,
-  Eye, Users, Clock, Building2, MapPin, ChevronDown,
+  Eye, Users, Clock, MapPin, ChevronDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -393,7 +393,7 @@ export default function MarketplacePage() {
                 ))}
               </div>
             ) : (
-              <div className="h-[600px] rounded-2xl bg-surface-2 border border-border flex items-center justify-center text-center">
+              <div className="h-150 rounded-2xl bg-surface-2 border border-border flex items-center justify-center text-center">
                 <div>
                   <MapIcon className="h-12 w-12 text-text-muted mx-auto mb-3" />
                   <p className="text-text-secondary font-medium">Map view</p>

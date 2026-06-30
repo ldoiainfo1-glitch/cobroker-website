@@ -66,7 +66,7 @@ export default function AdminLayout() {
                 <>
                   <span className="flex-1 truncate">{n.label}</span>
                   {n.badge && (
-                    <span className="text-[10px] font-bold bg-error text-white rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                    <span className="text-[10px] font-bold bg-error text-white rounded-full px-1.5 py-0.5 min-w-4.5 text-center">
                       {n.badge}
                     </span>
                   )}

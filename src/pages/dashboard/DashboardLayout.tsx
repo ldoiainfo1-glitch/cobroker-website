@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Outlet, Link } from 'react-router-dom'
 import {
-  LayoutDashboard, Building2, Search, GitBranch,
-  MessageSquare, Bell, Users, BarChart3, Settings,
+  LayoutDashboard, Building2, Search,
+  MessageSquare, Bell, BarChart3, Settings,
   ChevronLeft, ChevronRight, Plus, LogOut, Radio,
   UserCircle, Shield,
 } from 'lucide-react'
@@ -11,7 +11,9 @@ import { useAuthStore } from '@/stores/authStore'
 import { getInitials, cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
-const navSections = [
+type NavLink = { to: string; icon: React.ReactNode; label: string; badge?: number }
+
+const navSections: { title: string; links: NavLink[] }[] = [
   {
     title: 'Main',
     links: [
@@ -60,7 +62,7 @@ export default function DashboardLayout() {
       <aside
         className={cn(
           'flex flex-col bg-surface-1 border-r border-border transition-all duration-300 ease-in-out relative shrink-0',
-          collapsed ? 'w-[72px]' : 'w-[268px]',
+          collapsed ? 'w-18' : 'w-67',
         )}
       >
         {/* Logo */}

@@ -323,7 +323,7 @@ export default function ChatPage() {
         ) : (
           <>
             {/* Thread header */}
-            <div className="h-[65px] px-5 flex items-center justify-between border-b border-border bg-surface-1 shrink-0">
+            <div className="h-16.25 px-5 flex items-center justify-between border-b border-border bg-surface-1 shrink-0">
               <div className="flex items-center gap-3">
                 <Avatar
                   initial={selectedConv.type === 'group' ? selectedConv.groupInitial! : selectedConv.participants[0].avatarInitial}
