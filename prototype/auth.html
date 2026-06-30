@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — COBROKINGS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body class="auth-body">
+
+  <!-- Minimal navbar -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">COBROKINGS</span>
+      </a>
+      <div class="nav-actions" style="margin-left:auto;">
+        <a href="index.html" class="btn btn-ghost">← Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Auth layout -->
+  <div class="auth-layout">
+
+    <!-- Left panel — branding -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="al-tag">India's Largest Co-Broking Network</div>
+        <h2>Co-broke faster.<br />Close more deals.</h2>
+        <p>Join 12,400+ verified brokers already on the network. Post requirements, reach every broker in your city, and close more mandates.</p>
+
+        <div class="al-stats">
+          <div class="al-stat">
+            <span class="al-num">30k+</span>
+            <span class="al-lbl">Deals Closed</span>
+          </div>
+          <div class="al-stat">
+            <span class="al-num">12.4k+</span>
+            <span class="al-lbl">Brokers</span>
+          </div>
+          <div class="al-stat">
+            <span class="al-num">30+</span>
+            <span class="al-lbl">Cities</span>
+          </div>
+        </div>
+
+        <div class="al-testimonials">
+          <div class="al-testi">
+            <p>"Closed 3 deals in the first month. The broadcast feature is a game-changer."</p>
+            <div class="al-testi-author">
+              <div class="lc-avatar green" style="width:32px;height:32px;font-size:.75rem;border-radius:8px;">R</div>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;">Rajiv Mehta</div>
+                <div style="font-size:.72rem;color:var(--text-dim);">Broker, Mumbai</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel — form -->
+    <div class="auth-right">
+      <div class="auth-card">
+
+        <!-- Tab switcher -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabSignin">Sign In</button>
+          <button class="auth-tab" id="tabRegister">Register</button>
+        </div>
+
+        <!-- SIGN IN FORM -->
+        <form class="auth-form" id="signinForm" novalidate>
+          <div class="auth-form-title">Welcome back</div>
+          <div class="auth-form-sub">Sign in to your broker account</div>
+
+          <div class="form-group">
+            <label class="form-label">Mobile Number</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">+91</span>
+              <input type="tel" class="form-input" id="siPhone" placeholder="98765 43210" maxlength="10" />
+            </div>
+            <span class="form-error" id="siPhoneErr"></span>
+          </div>
+
+          <div class="form-group" id="siOtpGroup" style="display:none;">
+            <label class="form-label">Enter OTP</label>
+            <div class="otp-row" id="otpRow">
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+              <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+            </div>
+            <div class="otp-resend">Didn't get it? <a href="#" id="resendOtp">Resend in <span id="resendTimer">30</span>s</a></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-submit" id="siSubmit">Send OTP →</button>
+
+          <div class="auth-divider"><span>or continue with</span></div>
+
+          <button type="button" class="btn btn-outline auth-social" id="demoLogin">
+            <span>🎭</span> Demo Login (no KYC needed)
+          </button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form class="auth-form" id="registerForm" novalidate style="display:none;">
+          <div class="auth-form-title">Create your account</div>
+          <div class="auth-form-sub">Join India's largest broker network</div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="regName" placeholder="Rajiv Mehta" />
+            <span class="form-error" id="regNameErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mobile Number</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">+91</span>
+              <input type="tel" class="form-input" id="regPhone" placeholder="98765 43210" maxlength="10" />
+            </div>
+            <span class="form-error" id="regPhoneErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <select class="form-input" id="regCity">
+              <option value="">Select your city</option>
+              <option>Mumbai</option>
+              <option>Bengaluru</option>
+              <option>Delhi NCR</option>
+              <option>Pune</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+              <option>Kolkata</option>
+              <option>Ahmedabad</option>
+              <option>Goa</option>
+              <option>Jaipur</option>
+              <option>Gurgaon</option>
+              <option>Other</option>
+            </select>
+            <span class="form-error" id="regCityErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">RERA Number <span class="form-optional">(optional)</span></label>
+            <input type="text" class="form-input" id="regRera" placeholder="MH/RERA/A12345" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="role" value="broker" checked />
+                <span class="radio-custom"></span>
+                Broker / Agent
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="role" value="owner" />
+                <span class="radio-custom"></span>
+                Property Owner
+              </label>
+            </div>
+          </div>
+
+          <label class="cb-label" style="margin-bottom:4px;">
+            <input type="checkbox" id="regTerms" />
+            I agree to the <a href="terms.html" style="color:var(--gold);">Terms of Service</a> and <a href="privacy.html" style="color:var(--gold);">Privacy Policy</a>
+          </label>
+          <span class="form-error" id="regTermsErr"></span>
+
+          <button type="submit" class="btn btn-primary auth-submit">Create Account →</button>
+        </form>
+
+        <p class="auth-footer-note">
+          Protected by KYC verification · RERA compliant · Zero spam guarantee
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <h3 id="successTitle">OTP Sent!</h3>
+      <p id="successMsg">We've sent a 6-digit OTP to your mobile number.</p>
+      <button class="btn btn-primary" id="successClose">Continue</button>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

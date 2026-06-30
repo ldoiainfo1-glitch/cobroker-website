@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COBROKINGS — Find your next home from verified owners & agents</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ───────────── NAVBAR ───────────── -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">COBROKINGS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#circles">Area Circles</a>
+        <a href="#how">How it works</a>
+        <a href="#categories">Categories</a>
+        <a href="list-property.html">List your property</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-ghost">Demo login</a>
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#circles">Area Circles</a>
+      <a href="#how">How it works</a>
+      <a href="#categories">Categories</a>
+      <a href="list-property.html">List your property</a>
+      <div class="mobile-actions">
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ───────────── HERO ───────────── -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="badge-stars">★ 4.9</span>
+          <span class="badge-sep">·</span>
+          <span>12,400+ verified brokers</span>
+        </div>
+        <h1 class="hero-title">
+          India's Largest<br />
+          <span class="gradient-text">Co‑Broking Network</span>
+        </h1>
+        <p class="hero-sub">
+          From post to close, every broker in your city — connected.<br />
+          <strong>30,000+ Deals Co‑Broked &amp; Closed</strong>
+        </p>
+
+        <!-- Search bar -->
+        <div class="search-box">
+          <div class="search-tabs">
+            <button class="tab active" data-tab="buy">Buy</button>
+            <button class="tab" data-tab="sell">Sell</button>
+            <button class="tab" data-tab="rent">Rent</button>
+            <button class="tab" data-tab="lease">Lease</button>
+            <button class="tab" data-tab="pg">PG</button>
+            <button class="tab tab-new" data-tab="circles">Broker Circles <span class="new-badge">FREE</span></button>
+          </div>
+          <div class="search-row">
+            <select class="city-select">
+              <option value="">Select City</option>
+              <option>Mumbai</option>
+              <option>Bengaluru</option>
+              <option>Delhi NCR</option>
+              <option>Pune</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+              <option>Kolkata</option>
+              <option>Ahmedabad</option>
+              <option>Goa</option>
+              <option>Jaipur</option>
+              <option>Lucknow</option>
+              <option>Indore</option>
+              <option>Chandigarh</option>
+              <option>Kochi</option>
+              <option>Coimbatore</option>
+              <option>Mysuru</option>
+              <option>Surat</option>
+              <option>Nagpur</option>
+            </select>
+            <div class="search-divider"></div>
+            <input class="search-input" type="text" placeholder="Area, locality or landmark…" />
+            <button class="btn btn-ai" onclick="location.href='marketplace.html'">✦ Ask AI</button>
+            <button class="btn btn-search" onclick="location.href='marketplace.html'">Search</button>
+          </div>
+        </div>
+
+        <p class="owner-cta">
+          Are you a property owner?
+          <a href="list-property.html">List your property direct →</a>
+        </p>
+
+        <div class="popular-cities">
+          <span class="pop-label">Popular:</span>
+          <a href="#">Mumbai</a><span class="dot">·</span>
+          <a href="#">Bengaluru</a><span class="dot">·</span>
+          <a href="#">Delhi NCR</a><span class="dot">·</span>
+          <a href="#">Pune</a><span class="dot">·</span>
+          <a href="#">Hyderabad</a><span class="dot">·</span>
+          <a href="#">Chennai</a><span class="dot">·</span>
+          <a href="#">Goa</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-image-wrap">
+          <div class="hero-skyline">
+            <div class="skyline-buildings">
+              <div class="building b1"></div>
+              <div class="building b2"></div>
+              <div class="building b3"></div>
+              <div class="building b4"></div>
+              <div class="building b5"></div>
+              <div class="building b6"></div>
+              <div class="building b7"></div>
+            </div>
+            <div class="skyline-glow"></div>
+          </div>
+          <div class="floating-card fc1">
+            <div class="fc-dot green"></div>
+            <div>
+              <div class="fc-title">Lodha Capital</div>
+              <div class="fc-sub">BKC, Mumbai · 2 min ago</div>
+            </div>
+          </div>
+          <div class="floating-card fc2">
+            <div class="fc-dot amber"></div>
+            <div>
+              <div class="fc-title">KYC Verified</div>
+              <div class="fc-sub">12,400+ active brokers</div>
+            </div>
+          </div>
+          <div class="floating-card fc3">
+            <div class="fc-dot blue"></div>
+            <div>
+              <div class="fc-title">Deal Closed</div>
+              <div class="fc-sub">Bengaluru · 30k+ closes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── TRUST STRIP ───────────── -->
+  <div class="trust-strip">
+    <div class="trust-inner">
+      <div class="trust-item"><span class="t-num">30,000+</span><span class="t-label">Deals Closed</span></div>
+      <div class="trust-sep"></div>
+      <div class="trust-item"><span class="t-num">12,400+</span><span class="t-label">Verified Brokers</span></div>
+      <div class="trust-sep"></div>
+      <div class="trust-item"><span class="t-num">30+</span><span class="t-label">Cities Live</span></div>
+      <div class="trust-sep"></div>
+      <div class="trust-item"><span class="t-num">100%</span><span class="t-label">RERA Checked</span></div>
+      <div class="trust-sep"></div>
+      <div class="trust-item"><span class="t-num">Zero</span><span class="t-label">Spam Policy</span></div>
+    </div>
+  </div>
+
+  <!-- ───────────── FEATURES ───────────── -->
+  <section class="features" id="features">
+    <div class="section-inner">
+      <div class="section-tag">Why COBROKINGS</div>
+      <h2 class="section-title">REAL HOMES. REAL OWNERS.<br /><span class="gradient-text">ZERO SPAM.</span></h2>
+      <p class="section-sub">India's privacy-first home search — verified owners, RERA-checked agents, masked numbers.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feat-icon">🔐</div>
+          <h3>Brokers Only</h3>
+          <p>A closed network of verified, RERA-aware brokers. No buyers, no owners, no spam leads.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">📡</div>
+          <h3>Broadcast Circles</h3>
+          <p>Post once, reach every broker in your city + area circles. Like a co-broking WhatsApp group, but organised.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">💬</div>
+          <h3>Direct Chat</h3>
+          <p>See a matching requirement? Open chat instantly with the posting broker. Phone unmasks on mutual accept.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">✅</div>
+          <h3>KYC Verified</h3>
+          <p>Brokers get a green tick after KYC. Build your reputation with every closed deal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── HOW IT WORKS ───────────── -->
+  <section class="how-it-works" id="how">
+    <div class="section-inner">
+      <div class="section-tag">Simple process</div>
+      <h2 class="section-title">Post → Broadcast →<br /><span class="gradient-text">Co‑broke</span></h2>
+      <p class="section-sub">One closed broker network, organised by city and area. Post a buy/sell ask in plain text and reach every broker who can close it.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3>Post</h3>
+          <p>Pick a side — Buy, Sell, Rent or Lease — and type your requirement in plain text. No photos, no forms.</p>
+          <div class="step-arrow">→</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3>Broadcast</h3>
+          <p>Your post instantly reaches every broker in the city and area circles you've joined. Auto-join your city, opt into the areas you work.</p>
+          <div class="step-arrow">→</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3>Co‑broke</h3>
+          <p>Matching broker taps Chat. You message inside the app. Phone unmasks the moment both of you accept share.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── LIVE LISTINGS ───────────── -->
+  <section class="live-listings" id="listings">
+    <div class="section-inner">
+      <div class="section-tag">Real-time activity</div>
+      <h2 class="section-title">Live on the network</h2>
+      <p class="section-sub">Verified principals posting and seeking mandates right now.</p>
+
+      <!-- Filter tabs -->
+      <div class="listing-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="buy">Buy</button>
+            <button class="filter-btn" data-filter="sell">Sell</button>
+            <button class="filter-btn" data-filter="rent">Rent</button>
+            <button class="filter-btn" data-filter="lease">Lease</button>
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-city="all">All cities</button>
+            <button class="filter-btn" data-city="mumbai">Mumbai</button>
+            <button class="filter-btn" data-city="bengaluru">Bengaluru</button>
+            <button class="filter-btn" data-city="pune">Pune</button>
+            <button class="filter-btn" data-city="gurgaon">Gurgaon</button>
+            <button class="filter-btn" data-city="chennai">Chennai</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listings ticker -->
+      <div class="listings-ticker-wrap">
+        <div class="listings-ticker" id="listingsTicker">
+          <!-- col 1 -->
+          <div class="ticker-col">
+            <div class="listing-card" data-type="buy" data-city="mumbai">
+              <div class="lc-avatar amber">L</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">JV Mandate</span>
+                </div>
+                <div class="lc-title">Lodha Capital Partners</div>
+                <div class="lc-asset">Land · BKC, Mumbai</div>
+                <div class="lc-meta">Ticket Rs.200–250 Cr · 8–10 ac</div>
+              </div>
+              <div class="lc-time">2 min ago</div>
+            </div>
+            <div class="listing-card" data-type="buy" data-city="bengaluru">
+              <div class="lc-avatar blue">B</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">Acquisition</span>
+                </div>
+                <div class="lc-title">Brookfield India REIT</div>
+                <div class="lc-asset">Grade-A Office · Bengaluru</div>
+                <div class="lc-meta">Ticket Rs.1,500+ Cr · 1.5M sqft</div>
+              </div>
+              <div class="lc-time">5 min ago</div>
+            </div>
+            <div class="listing-card" data-type="buy" data-city="mumbai">
+              <div class="lc-avatar green">G</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">Redev DM</span>
+                </div>
+                <div class="lc-title">Godrej Properties</div>
+                <div class="lc-asset">Society Redev · Andheri W</div>
+                <div class="lc-meta">4.2 FSI · Tier-1 dev</div>
+              </div>
+              <div class="lc-time">8 min ago</div>
+            </div>
+            <div class="listing-card" data-type="buy" data-city="pune">
+              <div class="lc-avatar red">H</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">Equity</span>
+                </div>
+                <div class="lc-title">HDFC Capital</div>
+                <div class="lc-asset">Residential Platform · Pune</div>
+                <div class="lc-meta">Mid-income · 5-yr horizon</div>
+              </div>
+              <div class="lc-time">12 min ago</div>
+            </div>
+            <div class="listing-card" data-type="buy" data-city="bengaluru">
+              <div class="lc-avatar purple">P</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">Land</span>
+                </div>
+                <div class="lc-title">Prestige Group</div>
+                <div class="lc-asset">Whitefield, Bengaluru</div>
+                <div class="lc-meta">10–15 ac · Group Housing</div>
+              </div>
+              <div class="lc-time">15 min ago</div>
+            </div>
+          </div>
+          <!-- col 2 -->
+          <div class="ticker-col">
+            <div class="listing-card" data-type="sell" data-city="mumbai">
+              <div class="lc-avatar orange">V</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type sell">sell</span>
+                  <span class="lc-tag">Redev RFP</span>
+                </div>
+                <div class="lc-title">Vijayanagar CHS</div>
+                <div class="lc-asset">Society · Dadar E</div>
+                <div class="lc-meta">3.5 FSI · 96 flats · OC 1984</div>
+              </div>
+              <div class="lc-time">1 min ago</div>
+            </div>
+            <div class="listing-card" data-type="sell" data-city="mumbai">
+              <div class="lc-avatar teal">S</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type sell">sell</span>
+                  <span class="lc-tag">Land Sale</span>
+                </div>
+                <div class="lc-title">Sunteck Landholdings</div>
+                <div class="lc-asset">TDR-loaded · Goregaon</div>
+                <div class="lc-meta">2.8 ac · Clear title</div>
+              </div>
+              <div class="lc-time">4 min ago</div>
+            </div>
+            <div class="listing-card" data-type="sell" data-city="mumbai">
+              <div class="lc-avatar coral">C</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type sell">sell</span>
+                  <span class="lc-tag">JV</span>
+                </div>
+                <div class="lc-title">Coastal Realty LLP</div>
+                <div class="lc-asset">Beachfront · Alibaug</div>
+                <div class="lc-meta">18 ac · Resort licence</div>
+              </div>
+              <div class="lc-time">10 min ago</div>
+            </div>
+            <div class="listing-card" data-type="sell" data-city="gurgaon">
+              <div class="lc-avatar sky">T</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type sell">sell</span>
+                  <span class="lc-tag">Co-develop</span>
+                </div>
+                <div class="lc-title">Tata Housing JV Desk</div>
+                <div class="lc-asset">Mixed-use · Gurgaon</div>
+                <div class="lc-meta">9.2 ac · Approvals in place</div>
+              </div>
+              <div class="lc-time">16 min ago</div>
+            </div>
+            <div class="listing-card" data-type="sell" data-city="gurgaon">
+              <div class="lc-avatar indigo">D</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type sell">sell</span>
+                  <span class="lc-tag">Land</span>
+                </div>
+                <div class="lc-title">DLF Land Bank</div>
+                <div class="lc-asset">NH8 · Gurgaon</div>
+                <div class="lc-meta">70 ac · Sector land</div>
+              </div>
+              <div class="lc-time">22 min ago</div>
+            </div>
+          </div>
+          <!-- col 3 -->
+          <div class="ticker-col">
+            <div class="listing-card" data-type="rent" data-city="mumbai">
+              <div class="lc-avatar lime">W</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type rent">rent</span>
+                  <span class="lc-tag">Rental</span>
+                </div>
+                <div class="lc-title">WeWork India</div>
+                <div class="lc-asset">Coworking floor · Powai</div>
+                <div class="lc-meta">40k sqft · 5-yr lease</div>
+              </div>
+              <div class="lc-time">3 min ago</div>
+            </div>
+            <div class="listing-card" data-type="rent" data-city="bengaluru">
+              <div class="lc-avatar pink">U</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type rent">rent</span>
+                  <span class="lc-tag">Rental</span>
+                </div>
+                <div class="lc-title">Urban Co-living</div>
+                <div class="lc-asset">Residential block · HSR</div>
+                <div class="lc-meta">120 keys · 3-yr lease</div>
+              </div>
+              <div class="lc-time">11 min ago</div>
+            </div>
+            <div class="listing-card" data-type="lease" data-city="gurgaon">
+              <div class="lc-avatar yellow">Z</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type lease">lease</span>
+                  <span class="lc-tag">Office</span>
+                </div>
+                <div class="lc-title">Zomato HQ Expansion</div>
+                <div class="lc-asset">Grade-A · Gurugram</div>
+                <div class="lc-meta">1.2L sqft · 9-yr lease</div>
+              </div>
+              <div class="lc-time">6 min ago</div>
+            </div>
+            <div class="listing-card" data-type="lease" data-city="mumbai">
+              <div class="lc-avatar red">F</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type lease">lease</span>
+                  <span class="lc-tag">Logistics</span>
+                </div>
+                <div class="lc-title">Flipkart Warehousing</div>
+                <div class="lc-asset">Bhiwandi · MMR</div>
+                <div class="lc-meta">300k sqft · Built-to-suit</div>
+              </div>
+              <div class="lc-time">9 min ago</div>
+            </div>
+            <div class="listing-card" data-type="buy" data-city="chennai">
+              <div class="lc-avatar amber">M</div>
+              <div class="lc-body">
+                <div class="lc-top">
+                  <span class="lc-type buy">buy</span>
+                  <span class="lc-tag">Township</span>
+                </div>
+                <div class="lc-title">Mahindra Lifespaces</div>
+                <div class="lc-asset">OMR · Chennai</div>
+                <div class="lc-meta">20–30 ac · Plotted</div>
+              </div>
+              <div class="lc-time">21 min ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="see-all-wrap">
+        <a href="marketplace.html" class="btn btn-outline-lg">See all mandates →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CATEGORIES ───────────── -->
+  <section class="categories" id="categories">
+    <div class="section-inner">
+      <div class="section-tag">Property types</div>
+      <h2 class="section-title">Browse by property type</h2>
+      <p class="section-sub">From a first 1BHK rental to a sea-facing villa — every type of home, only from verified sources.</p>
+      <div class="cat-grid">
+        <a href="#" class="cat-card">
+          <div class="cat-icon">🏢</div>
+          <h4>Apartments</h4>
+          <ul><li>1 BHK</li><li>2 BHK</li><li>3 BHK</li><li>4 BHK</li><li>Penthouse</li><li>Studio</li></ul>
+        </a>
+        <a href="#" class="cat-card">
+          <div class="cat-icon">🏠</div>
+          <h4>Independent Homes</h4>
+          <ul><li>Villas</li><li>Row Houses</li><li>Bungalows</li><li>Builder Floors</li></ul>
+        </a>
+        <a href="#" class="cat-card">
+          <div class="cat-icon">🌿</div>
+          <h4>Plots &amp; Land</h4>
+          <ul><li>Residential</li><li>Farmhouse</li><li>Gated</li><li>NA Plots</li></ul>
+        </a>
+        <a href="#" class="cat-card">
+          <div class="cat-icon">🔑</div>
+          <h4>Rentals</h4>
+          <ul><li>Long-term</li><li>Furnished</li><li>Semi-furnished</li><li>Short-stay</li></ul>
+        </a>
+        <a href="#" class="cat-card">
+          <div class="cat-icon">💎</div>
+          <h4>Premium &amp; Luxury</h4>
+          <ul><li>Sea-facing</li><li>Branded Residences</li><li>Luxury Villas</li></ul>
+        </a>
+        <a href="#" class="cat-card">
+          <div class="cat-icon">🏗️</div>
+          <h4>Commercial</h4>
+          <ul><li>Office</li><li>Retail</li><li>Warehouse</li><li>Pre-leased</li></ul>
+        </a>
+      </div>
+
+      <!-- USP pills -->
+      <div class="usp-row">
+        <div class="usp-pill"><span>🔐</span> Brokers Only</div>
+        <div class="usp-pill"><span>🏙️</span> 30+ Cities</div>
+        <div class="usp-pill"><span>📍</span> Area-wise Broadcast</div>
+        <div class="usp-pill"><span>📝</span> Text Only, No Clutter</div>
+        <div class="usp-pill"><span>✅</span> KYC Verified</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CTA BANNER ───────────── -->
+  <section class="cta-banner" id="list">
+    <div class="cta-inner">
+      <div class="cta-tag">Get started today</div>
+      <h2>FIND YOUR NEXT HOME —<br /><span class="gradient-text">VERIFIED, DIRECT, SPAM-FREE</span></h2>
+      <a href="marketplace.html" class="btn btn-primary btn-lg">START SEARCHING →</a>
+    </div>
+  </section>
+
+  <!-- ───────────── CITIES ───────────── -->
+  <section class="cities-section" id="circles">
+    <div class="section-inner">
+      <div class="section-tag">Coverage</div>
+      <h2 class="section-title">Popular Cities</h2>
+      <div class="cities-grid">
+        <a href="#" class="city-chip">Mumbai</a>
+        <a href="#" class="city-chip">Bengaluru</a>
+        <a href="#" class="city-chip">Delhi NCR</a>
+        <a href="#" class="city-chip">Pune</a>
+        <a href="#" class="city-chip">Hyderabad</a>
+        <a href="#" class="city-chip">Chennai</a>
+        <a href="#" class="city-chip">Kolkata</a>
+        <a href="#" class="city-chip">Ahmedabad</a>
+        <a href="#" class="city-chip">Goa</a>
+        <a href="#" class="city-chip">Jaipur</a>
+        <a href="#" class="city-chip">Lucknow</a>
+        <a href="#" class="city-chip">Indore</a>
+        <a href="#" class="city-chip">Chandigarh</a>
+        <a href="#" class="city-chip">Kochi</a>
+        <a href="#" class="city-chip">Coimbatore</a>
+        <a href="#" class="city-chip">Mysuru</a>
+        <a href="#" class="city-chip">Surat</a>
+        <a href="#" class="city-chip">Nagpur</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FOOTER ───────────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <span class="logo-icon">⬡</span>
+            <span class="logo-text">COBROKINGS</span>
+          </a>
+          <p>India's privacy-first co-broking network for verified real estate professionals.</p>
+          <p class="footer-copy">© 2026 COBROKINGS Pvt. Ltd.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h5>Platform</h5>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="#circles">Broker Circles</a>
+            <a href="auth.html">KYC &amp; Verification</a>
+            <a href="#circles">Area Circles</a>
+          </div>
+          <div class="footer-col">
+            <h5>Company</h5>
+            <a href="#">About Us</a>
+            <a href="#">RERA Protocol</a>
+            <a href="#">Contact</a>
+            <a href="#">Careers</a>
+          </div>
+          <div class="footer-col">
+            <h5>Legal</h5>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="list-property.html">List Property</a>
+            <a href="#">Refund Policy</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-nav">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="list-property.html">List Property</a>
+          <a href="#">RERA</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-tagline">Made in India 🇮🇳 · Real homes. Real owners. Zero spam.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ───────────── COOKIE BANNER ───────────── -->
+  <div class="cookie-banner" id="cookieBanner">
+    <span>🍪 We use essential cookies for authentication and optional analytics to improve COBROKINGS.</span>
+    <div class="cookie-actions">
+      <button class="btn btn-ghost" id="cookieReject">Reject</button>
+      <button class="btn btn-primary" id="cookieAccept">Accept</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

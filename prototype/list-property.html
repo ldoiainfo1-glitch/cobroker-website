@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>List Your Property — COBROKINGS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="list-property.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">COBROKINGS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html#circles">Area Circles</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#categories">Categories</a>
+        <a href="list-property.html" style="color:var(--gold);">List your property</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-ghost">Demo login</a>
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#circles">Area Circles</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#categories">Categories</a>
+      <div class="mobile-actions">
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div class="lp-page-header">
+    <div class="lp-ph-inner">
+      <div class="section-tag">Direct listing</div>
+      <h1>List Your Property<br /><span class="gradient-text">Direct to Verified Brokers</span></h1>
+      <p>Skip the spam. Your listing goes directly to RERA-verified brokers in your city. No fake calls, no junk leads.</p>
+      <div class="lp-benefits">
+        <span class="lp-benefit">✓ Zero brokerage charged to you</span>
+        <span class="lp-benefit">✓ Reaches 12,400+ verified brokers</span>
+        <span class="lp-benefit">✓ Your number stays masked</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="lp-layout">
+
+    <!-- STEPPER -->
+    <div class="lp-stepper">
+      <div class="step-indicator active" data-step="1">
+        <div class="si-num">1</div>
+        <div class="si-label">Property Details</div>
+      </div>
+      <div class="si-line"></div>
+      <div class="step-indicator" data-step="2">
+        <div class="si-num">2</div>
+        <div class="si-label">Location</div>
+      </div>
+      <div class="si-line"></div>
+      <div class="step-indicator" data-step="3">
+        <div class="si-num">3</div>
+        <div class="si-label">Pricing</div>
+      </div>
+      <div class="si-line"></div>
+      <div class="step-indicator" data-step="4">
+        <div class="si-num">4</div>
+        <div class="si-label">Contact</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form class="lp-form" id="lpForm" novalidate>
+
+      <!-- STEP 1: Property Details -->
+      <div class="form-step active" id="step1">
+        <div class="step-title">Property Details</div>
+        <div class="step-sub">Tell brokers what type of property you have.</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Transaction Type *</label>
+            <div class="pill-select" id="transactionType">
+              <button type="button" class="pill-option active" data-val="sell">Sell</button>
+              <button type="button" class="pill-option" data-val="rent">Rent</button>
+              <button type="button" class="pill-option" data-val="lease">Lease</button>
+              <button type="button" class="pill-option" data-val="jv">JV / Redev</button>
+            </div>
+            <span class="form-error" id="transErr"></span>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Property Category *</label>
+            <select class="form-input" id="propCategory">
+              <option value="">Select category</option>
+              <option>Residential</option>
+              <option>Commercial</option>
+              <option>Industrial</option>
+              <option>Land / Plot</option>
+              <option>Hospitality</option>
+            </select>
+            <span class="form-error" id="catErr"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Property Type *</label>
+            <select class="form-input" id="propType">
+              <option value="">Select type</option>
+              <option>Apartment / Flat</option>
+              <option>Independent House</option>
+              <option>Villa</option>
+              <option>Plot</option>
+              <option>Office</option>
+              <option>Retail / Shop</option>
+              <option>Warehouse</option>
+              <option>Society (Redev)</option>
+              <option>Land</option>
+            </select>
+            <span class="form-error" id="typeErr"></span>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Carpet / Built-up Area</label>
+            <div class="input-unit-wrap">
+              <input type="number" class="form-input" id="propArea" placeholder="e.g. 1200" min="1" />
+              <select class="unit-select" id="areaUnit">
+                <option>sqft</option>
+                <option>sqm</option>
+                <option>acres</option>
+                <option>guntha</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Configuration</label>
+            <div class="pill-select" id="bhkConfig">
+              <button type="button" class="pill-option" data-val="studio">Studio</button>
+              <button type="button" class="pill-option" data-val="1bhk">1 BHK</button>
+              <button type="button" class="pill-option" data-val="2bhk">2 BHK</button>
+              <button type="button" class="pill-option" data-val="3bhk">3 BHK</button>
+              <button type="button" class="pill-option" data-val="4bhk">4+ BHK</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Possession Status</label>
+            <select class="form-input" id="possession">
+              <option value="">Select status</option>
+              <option>Ready to Move</option>
+              <option>Under Construction</option>
+              <option>OC Received</option>
+              <option>Immediate</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Furnishing</label>
+            <select class="form-input" id="furnishing">
+              <option value="">Select</option>
+              <option>Unfurnished</option>
+              <option>Semi-furnished</option>
+              <option>Fully Furnished</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Short Description</label>
+          <textarea class="form-input form-textarea" id="propDesc" placeholder="e.g. Sea-facing 3BHK in Worli with open terrace, clear title, OC received…" rows="3"></textarea>
+          <div class="char-count"><span id="descCount">0</span> / 300 characters</div>
+        </div>
+
+        <div class="step-nav">
+          <span></span>
+          <button type="button" class="btn btn-primary" id="step1Next">Next: Location →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Location -->
+      <div class="form-step" id="step2">
+        <div class="step-title">Location</div>
+        <div class="step-sub">Help brokers find your property in the right area circle.</div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <select class="form-input" id="city">
+              <option value="">Select city</option>
+              <option>Mumbai</option>
+              <option>Bengaluru</option>
+              <option>Delhi NCR</option>
+              <option>Pune</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+              <option>Kolkata</option>
+              <option>Ahmedabad</option>
+              <option>Goa</option>
+              <option>Jaipur</option>
+              <option>Gurgaon</option>
+            </select>
+            <span class="form-error" id="cityErr"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Area / Locality *</label>
+            <input type="text" class="form-input" id="locality" placeholder="e.g. Bandra West, Koramangala…" />
+            <span class="form-error" id="localityErr"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Landmark (optional)</label>
+          <input type="text" class="form-input" id="landmark" placeholder="e.g. Near Bandstand, opp. Forum Mall…" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pin Code</label>
+          <input type="text" class="form-input" id="pincode" placeholder="400050" maxlength="6" style="max-width:200px;" />
+        </div>
+
+        <!-- Map placeholder -->
+        <div class="map-placeholder">
+          <div class="map-inner">
+            <div class="map-pin">📍</div>
+            <p>Interactive map — drop a pin to set exact location</p>
+            <button type="button" class="btn btn-outline">Set Location on Map</button>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-ghost" id="step2Back">← Back</button>
+          <button type="button" class="btn btn-primary" id="step2Next">Next: Pricing →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Pricing -->
+      <div class="form-step" id="step3">
+        <div class="step-title">Pricing</div>
+        <div class="step-sub">Set your expected price range. Brokers with matching requirements will reach out.</div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Expected Price *</label>
+            <div class="input-unit-wrap">
+              <span class="input-prefix" style="border-right:1px solid var(--border);">₹</span>
+              <input type="number" class="form-input" id="priceMin" placeholder="e.g. 2.5" step="0.1" min="0" />
+              <select class="unit-select" id="priceUnit">
+                <option>Cr</option>
+                <option>L</option>
+                <option>K / month</option>
+              </select>
+            </div>
+            <span class="form-error" id="priceErr"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Price Negotiable?</label>
+            <div class="pill-select" id="negotiable">
+              <button type="button" class="pill-option active" data-val="yes">Yes</button>
+              <button type="button" class="pill-option" data-val="no">Fixed</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Stamp Duty / Registration</label>
+          <div class="pill-select" id="stampDuty">
+            <button type="button" class="pill-option" data-val="included">Included</button>
+            <button type="button" class="pill-option active" data-val="extra">Extra</button>
+            <button type="button" class="pill-option" data-val="na">N/A</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">RERA Registration Number (if applicable)</label>
+          <input type="text" class="form-input" id="reraNum" placeholder="MH/RERA/A12345" />
+        </div>
+
+        <div class="pricing-summary" id="priceSummary" style="display:none;">
+          <div class="ps-title">Listing Summary</div>
+          <div class="ps-row"><span>Price</span><span id="psSummaryPrice">—</span></div>
+          <div class="ps-row"><span>Negotiable</span><span id="psSummaryNeg">—</span></div>
+          <div class="ps-row"><span>Stamp Duty</span><span id="psSummaryStamp">—</span></div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn btn-ghost" id="step3Back">← Back</button>
+          <button type="button" class="btn btn-primary" id="step3Next">Next: Contact →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Contact -->
+      <div class="form-step" id="step4">
+        <div class="step-title">Your Contact Details</div>
+        <div class="step-sub">Your number stays masked from buyers. Brokers contact via secure in-app chat first.</div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" id="ownerName" placeholder="Your full name" />
+            <span class="form-error" id="ownerNameErr"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile Number *</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">+91</span>
+              <input type="tel" class="form-input" id="ownerPhone" placeholder="98765 43210" maxlength="10" />
+            </div>
+            <span class="form-error" id="ownerPhoneErr"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">You are the *</label>
+          <div class="radio-group" style="flex-wrap:wrap;gap:12px;">
+            <label class="radio-label">
+              <input type="radio" name="ownerType" value="owner" checked />
+              <span class="radio-custom"></span>
+              Property Owner
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="ownerType" value="builder" />
+              <span class="radio-custom"></span>
+              Builder / Developer
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="ownerType" value="broker" />
+              <span class="radio-custom"></span>
+              Broker with mandate
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Preferred Contact Time</label>
+          <div class="pill-select" id="contactTime">
+            <button type="button" class="pill-option" data-val="morning">Morning (9–12)</button>
+            <button type="button" class="pill-option active" data-val="afternoon">Afternoon (12–5)</button>
+            <button type="button" class="pill-option" data-val="evening">Evening (5–8)</button>
+            <button type="button" class="pill-option" data-val="anytime">Anytime</button>
+          </div>
+        </div>
+
+        <div class="privacy-notice">
+          <span>🔒</span>
+          <p>Your contact number is never displayed publicly. Brokers must request access through our secure chat. You can decline any connection request.</p>
+        </div>
+
+        <label class="cb-label" style="margin-bottom:4px;">
+          <input type="checkbox" id="lpTerms" />
+          I confirm this property is genuine and I agree to the <a href="terms.html" style="color:var(--gold);">Terms of Service</a>
+        </label>
+        <span class="form-error" id="lpTermsErr"></span>
+
+        <div class="step-nav" style="margin-top:24px;">
+          <button type="button" class="btn btn-ghost" id="step4Back">← Back</button>
+          <button type="submit" class="btn btn-primary" id="lpSubmit" style="padding:13px 40px;">
+            Post My Property →
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- SIDEBAR INFO -->
+    <aside class="lp-info-sidebar">
+      <div class="lp-info-card">
+        <div class="li-icon">📡</div>
+        <h4>Broadcast to Circles</h4>
+        <p>Your listing reaches every broker in your city + area circle automatically.</p>
+      </div>
+      <div class="lp-info-card">
+        <div class="li-icon">🔒</div>
+        <h4>Number Stays Masked</h4>
+        <p>Brokers can only see your details after you accept their chat request.</p>
+      </div>
+      <div class="lp-info-card">
+        <div class="li-icon">✅</div>
+        <h4>Verified Network Only</h4>
+        <p>Only KYC-verified, RERA-checked brokers can view and respond to your listing.</p>
+      </div>
+      <div class="lp-info-card highlight">
+        <div class="li-icon">⚡</div>
+        <h4>Goes Live in &lt; 2 min</h4>
+        <p>After submission, your listing is reviewed and live within 2 minutes.</p>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="lp-success" id="lpSuccess">
+    <div class="lps-inner">
+      <div class="lps-icon">🎉</div>
+      <h2>Your Property is Live!</h2>
+      <p>It's now visible to <strong>12,400+ verified brokers</strong> in your city and area circle.</p>
+      <div class="lps-actions">
+        <a href="marketplace.html" class="btn btn-primary btn-lg">Browse Marketplace →</a>
+        <a href="index.html" class="btn btn-outline btn-lg">Back to Home</a>
+      </div>
+      <div class="lps-note">Brokers will reach out via secure in-app chat. You'll get notified.</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="list-property.js"></script>
+</body>
+</html>

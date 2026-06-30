@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace — COBROKINGS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="marketplace.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">COBROKINGS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html#circles">Area Circles</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#categories">Categories</a>
+        <a href="list-property.html">List your property</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-ghost">Demo login</a>
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#circles">Area Circles</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#categories">Categories</a>
+      <a href="list-property.html">List your property</a>
+      <div class="mobile-actions">
+        <a href="auth.html" class="btn btn-outline">Sign in</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="ph-inner">
+      <h1>Marketplace</h1>
+      <p>Live mandates from verified brokers across India. Browse, filter, and co-broke.</p>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="mp-layout">
+
+    <!-- SIDEBAR FILTERS -->
+    <aside class="mp-sidebar">
+      <div class="sidebar-section">
+        <h4>Transaction Type</h4>
+        <label class="cb-label"><input type="checkbox" checked /> Buy</label>
+        <label class="cb-label"><input type="checkbox" checked /> Sell</label>
+        <label class="cb-label"><input type="checkbox" checked /> Rent</label>
+        <label class="cb-label"><input type="checkbox" checked /> Lease</label>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>City</h4>
+        <label class="cb-label"><input type="checkbox" checked /> Mumbai</label>
+        <label class="cb-label"><input type="checkbox" checked /> Bengaluru</label>
+        <label class="cb-label"><input type="checkbox" /> Delhi NCR</label>
+        <label class="cb-label"><input type="checkbox" /> Pune</label>
+        <label class="cb-label"><input type="checkbox" /> Hyderabad</label>
+        <label class="cb-label"><input type="checkbox" /> Chennai</label>
+        <label class="cb-label"><input type="checkbox" /> Goa</label>
+        <label class="cb-label"><input type="checkbox" /> Gurgaon</label>
+        <a href="#" class="show-more">+12 more cities</a>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Asset Type</h4>
+        <label class="cb-label"><input type="checkbox" checked /> Residential</label>
+        <label class="cb-label"><input type="checkbox" checked /> Commercial</label>
+        <label class="cb-label"><input type="checkbox" /> Industrial</label>
+        <label class="cb-label"><input type="checkbox" /> Land</label>
+        <label class="cb-label"><input type="checkbox" /> Hospitality</label>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Ticket Size (₹ Cr)</h4>
+        <div class="range-row">
+          <input type="range" min="0" max="1000" value="0" class="range-slider" id="minPrice" />
+          <input type="range" min="0" max="1000" value="1000" class="range-slider" id="maxPrice" />
+        </div>
+        <div class="range-labels">
+          <span id="minLabel">₹0 Cr</span>
+          <span id="maxLabel">₹1000+ Cr</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Verified Only</h4>
+        <label class="toggle-label">
+          <input type="checkbox" checked class="toggle-input" id="verifiedToggle" />
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span>KYC Verified brokers</span>
+        </label>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">Apply Filters</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;">Reset</button>
+    </aside>
+
+    <!-- LISTINGS AREA -->
+    <main class="mp-main">
+      <!-- Top bar -->
+      <div class="mp-topbar">
+        <div class="mp-count"><span id="countNum">24</span> mandates found</div>
+        <div class="mp-topbar-right">
+          <select class="sort-select">
+            <option>Newest first</option>
+            <option>Oldest first</option>
+            <option>Ticket: Low to High</option>
+            <option>Ticket: High to Low</option>
+          </select>
+          <div class="view-toggle">
+            <button class="vt-btn active" id="gridView" title="Grid view">▦</button>
+            <button class="vt-btn" id="listView" title="List view">☰</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search bar inline -->
+      <div class="mp-search-row">
+        <input class="mp-search-input" type="text" placeholder="Search by company, area, asset type…" id="mpSearchInput" />
+        <button class="btn btn-search" id="mpSearchBtn">Search</button>
+      </div>
+
+      <!-- Listing cards grid -->
+      <div class="mp-grid" id="mpGrid">
+
+        <div class="mp-card" data-type="buy" data-city="mumbai">
+          <div class="mpc-header">
+            <div class="lc-avatar amber" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">L</div>
+            <div>
+              <div class="mpc-name">Lodha Capital Partners</div>
+              <div class="mpc-loc">BKC, Mumbai</div>
+            </div>
+            <span class="lc-type buy mpc-badge">buy</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">JV Mandate</span>
+            <span class="mpc-tag">Land</span>
+            <span class="verified-tick" title="KYC Verified">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Ticket</span><span class="mpc-dv">₹200–250 Cr</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Area</span><span class="mpc-dv">8–10 acres</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Land</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">2 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Lodha Capital Partners')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="buy" data-city="bengaluru">
+          <div class="mpc-header">
+            <div class="lc-avatar blue" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">B</div>
+            <div>
+              <div class="mpc-name">Brookfield India REIT</div>
+              <div class="mpc-loc">Bengaluru</div>
+            </div>
+            <span class="lc-type buy mpc-badge">buy</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Acquisition</span>
+            <span class="mpc-tag">Grade-A Office</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Ticket</span><span class="mpc-dv">₹1,500+ Cr</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Area</span><span class="mpc-dv">1.5M sqft</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Commercial</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">5 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Brookfield India REIT')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="buy" data-city="mumbai">
+          <div class="mpc-header">
+            <div class="lc-avatar green" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">G</div>
+            <div>
+              <div class="mpc-name">Godrej Properties</div>
+              <div class="mpc-loc">Andheri W, Mumbai</div>
+            </div>
+            <span class="lc-type buy mpc-badge">buy</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Redev DM</span>
+            <span class="mpc-tag">Society Redev</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">FSI</span><span class="mpc-dv">4.2</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Type</span><span class="mpc-dv">Tier-1 dev</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Residential</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">8 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Godrej Properties')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="sell" data-city="mumbai">
+          <div class="mpc-header">
+            <div class="lc-avatar orange" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">V</div>
+            <div>
+              <div class="mpc-name">Vijayanagar CHS</div>
+              <div class="mpc-loc">Dadar E, Mumbai</div>
+            </div>
+            <span class="lc-type sell mpc-badge">sell</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Redev RFP</span>
+            <span class="mpc-tag">Society</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">FSI</span><span class="mpc-dv">3.5</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Flats</span><span class="mpc-dv">96</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">OC Year</span><span class="mpc-dv">1984</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">1 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Vijayanagar CHS')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="sell" data-city="gurgaon">
+          <div class="mpc-header">
+            <div class="lc-avatar sky" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">T</div>
+            <div>
+              <div class="mpc-name">Tata Housing JV Desk</div>
+              <div class="mpc-loc">Gurgaon</div>
+            </div>
+            <span class="lc-type sell mpc-badge">sell</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Co-develop</span>
+            <span class="mpc-tag">Mixed-use</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Area</span><span class="mpc-dv">9.2 acres</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Status</span><span class="mpc-dv">Approvals in place</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Commercial</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">16 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Tata Housing JV Desk')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="rent" data-city="mumbai">
+          <div class="mpc-header">
+            <div class="lc-avatar lime" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">W</div>
+            <div>
+              <div class="mpc-name">WeWork India</div>
+              <div class="mpc-loc">Powai, Mumbai</div>
+            </div>
+            <span class="lc-type rent mpc-badge">rent</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Rental</span>
+            <span class="mpc-tag">Coworking</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Area</span><span class="mpc-dv">40k sqft</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Lease</span><span class="mpc-dv">5-yr</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Commercial</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">3 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('WeWork India')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="lease" data-city="gurgaon">
+          <div class="mpc-header">
+            <div class="lc-avatar yellow" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">Z</div>
+            <div>
+              <div class="mpc-name">Zomato HQ Expansion</div>
+              <div class="mpc-loc">Gurugram</div>
+            </div>
+            <span class="lc-type lease mpc-badge">lease</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Office</span>
+            <span class="mpc-tag">Grade-A</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Area</span><span class="mpc-dv">1.2L sqft</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Lease</span><span class="mpc-dv">9-yr</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Commercial</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">6 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('Zomato HQ Expansion')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+        <div class="mp-card" data-type="buy" data-city="pune">
+          <div class="mpc-header">
+            <div class="lc-avatar red" style="width:48px;height:48px;font-size:1.1rem;border-radius:12px;">H</div>
+            <div>
+              <div class="mpc-name">HDFC Capital</div>
+              <div class="mpc-loc">Pune</div>
+            </div>
+            <span class="lc-type buy mpc-badge">buy</span>
+          </div>
+          <div class="mpc-tag-row">
+            <span class="mpc-tag">Equity</span>
+            <span class="mpc-tag">Residential</span>
+            <span class="verified-tick">✓ Verified</span>
+          </div>
+          <div class="mpc-details">
+            <div class="mpc-detail"><span class="mpc-dl">Segment</span><span class="mpc-dv">Mid-income</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Horizon</span><span class="mpc-dv">5 years</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Asset</span><span class="mpc-dv">Residential</span></div>
+            <div class="mpc-detail"><span class="mpc-dl">Posted</span><span class="mpc-dv">12 min ago</span></div>
+          </div>
+          <div class="mpc-footer">
+            <button class="btn btn-primary mpc-btn" onclick="openChatModal('HDFC Capital')">Chat</button>
+            <button class="btn btn-outline mpc-btn">Save</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pagination -->
+      <div class="mp-pagination">
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <span class="pg-dots">…</span>
+        <button class="pg-btn">12</button>
+        <button class="pg-next">Next →</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- CHAT MODAL -->
+  <div class="modal-overlay" id="chatModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="chatModalTitle">Chat with broker</div>
+          <div class="modal-sub">Phone number unmasks on mutual accept</div>
+        </div>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-chat-messages" id="chatMessages">
+        <div class="chat-msg system">🔒 This is a private broker-to-broker channel. Your phone number is masked until both parties accept share.</div>
+      </div>
+      <div class="modal-chat-input-row">
+        <input type="text" class="modal-input" id="chatInput" placeholder="Type a message…" />
+        <button class="btn btn-primary" id="chatSend">Send</button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="acceptShare">✓ Accept &amp; Share Number</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="marketplace.js"></script>
+</body>
+</html>

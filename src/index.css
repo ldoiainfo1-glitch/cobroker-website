@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  /* COBROKINGS Design Tokens */
+  --color-brand-gold: #D4A017;
+  --color-brand-gold-light: #E8B84B;
+  --color-brand-gold-dark: #A07810;
+
+  --color-surface-0: #080808;
+  --color-surface-1: #111111;
+  --color-surface-2: #1A1A1A;
+  --color-surface-3: #222222;
+
+  --color-border: #2A2A2A;
+  --color-border-muted: #1E1E1E;
+
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #9A9A9A;
+  --color-text-muted: #555555;
+
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #F5F5F5;
+  background-color: #080808;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #D4A017; }
+
+/* Gold gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #D4A017 0%, #E8B84B 50%, #D4A017 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
