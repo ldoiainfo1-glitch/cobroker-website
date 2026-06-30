@@ -85,15 +85,14 @@ export default function RegisterPage() {
         {/* Left panel */}
         <div className="hidden lg:flex lg:w-5/12 xl:w-2/5 flex-col justify-center px-12 xl:px-16 py-12 border-r border-border">
           <div className="mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-medium mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
-              Join 12,400+ verified brokers
-            </div>
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-gold mb-4">
+              Verified Property Marketplace
+            </p>
             <h2 className="text-3xl xl:text-4xl font-bold text-text-primary leading-tight mb-4">
               Grow your business<br />
               <span className="gradient-text">on COBROKINGS</span>
             </h2>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary text-sm">
               Get verified, post mandates, and co-broke with trusted real estate companies across India.
             </p>
           </div>
@@ -168,6 +167,23 @@ export default function RegisterPage() {
                     </Link>
                   </p>
                 </div>
+
+                {/* Role selector — matching reference site */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-text-muted mb-2 uppercase tracking-wider">I am a</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['Authorised Agent', 'Buyer / Tenant'] as const).map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        className="px-3 py-2.5 rounded-xl border text-sm font-medium transition-all border-brand-gold bg-brand-gold/10 text-brand-gold first:border-brand-gold first:bg-brand-gold/10 last:border-border last:bg-transparent last:text-text-secondary"
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <form onSubmit={submit1(onStep1)} className="flex flex-col gap-4">
                   <Input
                     label="Full name"
@@ -339,3 +355,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+

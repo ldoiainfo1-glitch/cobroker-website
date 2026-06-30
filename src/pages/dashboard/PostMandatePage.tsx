@@ -137,7 +137,7 @@ export default function PostMandatePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+    <div className="flex-1 overflow-y-auto flex flex-col gap-6 max-w-3xl mx-auto p-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Post a Mandate</h1>
@@ -239,7 +239,7 @@ export default function PostMandatePage() {
                       )}
                     >
                       {cat.icon}
-                      <span className="text-[10px] font-medium leading-tight">{cat.label}</span>
+                      <span className="text-xs font-medium leading-tight">{cat.label}</span>
                     </button>
                   ))}
                 </div>
@@ -551,3 +551,5 @@ export default function PostMandatePage() {
     </div>
   )
 }
+
+

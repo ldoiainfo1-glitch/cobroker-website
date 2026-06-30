@@ -158,14 +158,14 @@ export default function BrokerProfilePage() {
   ] as const
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6">
       {showReviewModal && (
         <ReviewModal onClose={() => setShowReviewModal(false)} brokerName={profile.fullName} />
       )}
 
       {/* Back */}
       <Button variant="ghost" size="sm" className="mb-4 -ml-2" asChild>
-        <Link to="/dashboard/connections"><ArrowLeft className="h-4 w-4" /> Back</Link>
+        <Link to="/dashboard"><ArrowLeft className="h-4 w-4" /> Back</Link>
       </Button>
 
       {/* Profile card */}
@@ -177,7 +177,7 @@ export default function BrokerProfilePage() {
               <div className="w-20 h-20 rounded-full bg-brand-gold/20 border-2 border-brand-gold/40 flex items-center justify-center text-2xl font-bold text-brand-gold">
                 {profile.avatarInitial}
               </div>
-              <div className={cn('text-[10px] font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
+              <div className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
                 {tierConfig[profile.tier].label}
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function BrokerProfilePage() {
                   {profile.badges.map((b) => {
                     const cfg = badgeConfig[b]
                     return cfg ? (
-                      <div key={b} className="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-2 border border-border text-[10px] font-medium">
+                      <div key={b} className="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-2 border border-border text-xs font-medium">
                         <span className={cfg.color}>{cfg.icon}</span>
                         <span className="text-text-secondary">{cfg.label}</span>
                       </div>
@@ -269,7 +269,7 @@ export default function BrokerProfilePage() {
                   <div key={s.label} className="text-center">
                     <div className="flex justify-center mb-1">{s.icon}</div>
                     <div className="text-xl font-bold text-text-primary">{s.value}</div>
-                    <div className="text-[11px] text-text-muted">{s.label}</div>
+                    <div className="text-xs text-text-muted">{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -387,7 +387,7 @@ export default function BrokerProfilePage() {
                 <p className="text-sm text-text-secondary mb-3 leading-relaxed">{r.body}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {r.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20">
+                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20">
                       {tagLabel[tag]}
                     </span>
                   ))}
@@ -421,7 +421,7 @@ export default function BrokerProfilePage() {
                     </div>
                     <div>
                       <div className="text-xs font-medium text-text-primary">{e.endorserName}</div>
-                      <div className="text-[10px] text-text-muted">{e.endorserCompany}</div>
+                      <div className="text-xs text-text-muted">{e.endorserCompany}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 text-sm font-bold text-brand-gold">
@@ -448,3 +448,5 @@ export default function BrokerProfilePage() {
     </div>
   )
 }
+
+

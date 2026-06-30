@@ -372,3 +372,130 @@ export interface KYCDocument {
   reviewedAt?: string
 }
 
+// ─── Chat & Messaging (Phase 4) ──────────────────────────────────────────────
+export type ChatMessageType = 'text' | 'mandate_share' | 'system' | 'deal_update' | 'file'
+
+export interface ConvParticipant {
+  id: string
+  name: string
+  company: string
+  avatarInitial: string
+  isVerified: boolean
+  isOnline: boolean
+  lastSeen?: string
+}
+
+export interface ChatMandateCard {
+  id: string
+  title: string
+  mandateType: string
+  budget: string
+  city: string
+  propertyType: string
+}
+
+export interface ChatMessage {
+  id: string
+  conversationId: string
+  senderId: string
+  senderName: string
+  senderInitial: string
+  type: ChatMessageType
+  text?: string
+  mandateCard?: ChatMandateCard
+  fileName?: string
+  fileSize?: string
+  systemText?: string
+  sentAt: string
+  isRead: boolean
+  isMine: boolean
+}
+
+export interface Conversation {
+  id: string
+  type: 'direct' | 'group'
+  participants: ConvParticipant[]
+  lastMessage: string
+  lastMessageAt: string
+  lastMessageType: ChatMessageType
+  unreadCount: number
+  isPinned?: boolean
+  linkedDealId?: string
+  linkedIntroId?: string
+  groupName?: string
+  groupInitial?: string
+}
+
+export interface ChatNotification {
+  id: string
+  type: NotificationType
+  title: string
+  body: string
+  isRead: boolean
+  createdAt: string
+  actionUrl?: string
+  avatarInitial?: string
+}
+
+// ─── Owner Listings (Phase 5) ────────────────────────────────────────────────
+export type OwnerListingType = 'sell' | 'rent' | 'lease'
+export type OwnerPropertyType = 'apartment' | 'villa' | 'office' | 'shop' | 'plot' | 'warehouse' | 'farmhouse' | 'studio'
+export type OwnerListingStatus = 'active' | 'represented' | 'closed'
+export type FurnishedStatus = 'furnished' | 'semi-furnished' | 'unfurnished'
+
+export interface OwnerProfile {
+  id: string
+  displayName: string         // "Rajesh K." — first name + last initial only
+  city: string
+  state: string
+  isVerifiedOwner: boolean
+  memberSince: string
+  responseTime: string        // "Usually within 2 hours"
+  totalListings: number
+  avatarInitial: string
+}
+
+export interface OwnerListing {
+  id: string
+  listingType: OwnerListingType
+  propertyType: OwnerPropertyType
+  title: string
+  description: string
+  area: number
+  areaUnit: 'sqft' | 'sqm' | 'acres'
+  floor?: number
+  totalFloors?: number
+  bedrooms?: number
+  bathrooms?: number
+  parking?: number
+  facing?: string
+  ageYears?: number
+  furnished?: FurnishedStatus
+  amenities: string[]
+  askingPrice: number
+  priceNegotiable: boolean
+  maintenanceCharges?: number
+  city: string
+  state: string
+  locality: string
+  landmark?: string
+  owner: OwnerProfile
+  status: OwnerListingStatus
+  claimsCount: number
+  claimedByMe: boolean
+  claimants: { initial: string; name: string; company: string }[]
+  views: number
+  isFeatured?: boolean
+  isVerifiedListing: boolean
+  postedAt: string
+  expiresAt: string
+}
+
+export interface ListingClaim {
+  id: string
+  listingId: string
+  brokerMessage: string
+  status: 'pending' | 'accepted' | 'rejected'
+  claimedAt: string
+}
+

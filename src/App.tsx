@@ -17,14 +17,14 @@ import DashboardLayout from '@/pages/dashboard/DashboardLayout'
 import DashboardHome from '@/pages/dashboard/DashboardHome'
 import MandatesPage from '@/pages/dashboard/MandatesPage'
 import PostMandatePage from '@/pages/dashboard/PostMandatePage'
-import IntroductionsPage from '@/pages/dashboard/IntroductionsPage'
-import DealsPage from '@/pages/dashboard/DealsPage'
 import CirclesPage from '@/pages/dashboard/CirclesPage'
 import CircleDetailPage from '@/pages/dashboard/CircleDetailPage'
 import ProfilePage from '@/pages/dashboard/ProfilePage'
 import BrokerProfilePage from '@/pages/dashboard/BrokerProfilePage'
 import KYCPage from '@/pages/dashboard/KYCPage'
-import ConnectionsPage from '@/pages/dashboard/ConnectionsPage'
+import ChatPage from '@/pages/dashboard/ChatPage'
+import NotificationsPage from '@/pages/dashboard/NotificationsPage'
+import ListPropertyPage from '@/pages/public/ListPropertyPage'
 
 // Placeholder for not-yet-built pages
 function ComingSoon({ title }: { title: string }) {
@@ -51,6 +51,9 @@ export default function App() {
       <Route path="/marketplace" element={<MarketplacePage />} />
       <Route path="/marketplace/:id" element={<MandateDetailPage />} />
 
+      {/* List property — public, no auth required */}
+      <Route path="/list-property" element={<ListPropertyPage />} />
+
       {/* Auth routes (guests only) */}
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
@@ -65,16 +68,14 @@ export default function App() {
           <Route path="mandates" element={<MandatesPage />} />
           <Route path="mandates/new" element={<PostMandatePage />} />
           <Route path="mandates/:id/edit" element={<PostMandatePage />} />
-          <Route path="introductions" element={<IntroductionsPage />} />
-          <Route path="deals" element={<DealsPage />} />
           <Route path="circles" element={<CirclesPage />} />
           <Route path="circles/:id" element={<CircleDetailPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="kyc" element={<KYCPage />} />
-          <Route path="connections" element={<ConnectionsPage />} />
           <Route path="brokers/:id" element={<BrokerProfilePage />} />
-          <Route path="chat" element={<ComingSoon title="Messages" />} />
-          <Route path="notifications" element={<ComingSoon title="Notifications" />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="chat/:conversationId" element={<ChatPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
           <Route path="company" element={<ComingSoon title="Company Profile" />} />
           <Route path="analytics" element={<ComingSoon title="Analytics" />} />
           <Route path="settings" element={<ComingSoon title="Settings" />} />
@@ -87,4 +88,5 @@ export default function App() {
     </Routes>
   )
 }
+
 

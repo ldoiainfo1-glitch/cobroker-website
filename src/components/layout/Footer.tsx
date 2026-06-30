@@ -20,7 +20,6 @@ const footerLinks = {
     { label: 'Marketplace', href: '/marketplace' },
     { label: 'Post Mandate', href: '/dashboard/mandates/new' },
     { label: 'Member Directory', href: '/directory' },
-    { label: 'Deal Pipeline', href: '/dashboard/deals' },
     { label: 'Pricing', href: '/pricing' },
   ],
   Company: [
@@ -119,7 +118,7 @@ export function Footer() {
             {['RERA Compliant', 'ISO 27001', 'GST Registered'].map((badge) => (
               <span
                 key={badge}
-                className="px-2 py-0.5 rounded text-[10px] bg-surface-2 border border-border text-text-muted"
+                className="px-2 py-0.5 rounded text-xs bg-surface-2 border border-border text-text-muted"
               >
                 {badge}
               </span>
@@ -130,3 +129,4 @@ export function Footer() {
     </footer>
   )
 }
+

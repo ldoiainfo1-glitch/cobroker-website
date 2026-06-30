@@ -124,7 +124,7 @@ function DocRow({ doc }: { doc: KYCDocument }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-semibold text-text-primary">{doc.label}</span>
-            {doc.required && <span className="text-[10px] text-error">Required</span>}
+            {doc.required && <span className="text-xs text-error">Required</span>}
           </div>
           {doc.fileName && (
             <p className="text-xs text-text-muted mt-0.5 truncate">{doc.fileName} · {doc.fileSize}</p>
@@ -156,7 +156,7 @@ function DocRow({ doc }: { doc: KYCDocument }) {
           )}
 
           {doc.uploadedAt && (
-            <p className="text-[11px] text-text-muted mb-3">
+            <p className="text-xs text-text-muted mb-3">
               Uploaded: {new Date(doc.uploadedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
               {doc.reviewedAt && ` · Reviewed: ${new Date(doc.reviewedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`}
             </p>
@@ -217,7 +217,7 @@ export default function KYCPage() {
   const optionalDocs = docs.filter((d) => !d.required)
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -246,7 +246,7 @@ export default function KYCPage() {
               return (
                 <div key={s} className={cn('text-center p-3 rounded-lg border', cfg.bg, cfg.border)}>
                   <div className={cn('text-lg font-bold', cfg.color)}>{count}</div>
-                  <div className="text-[10px] text-text-muted mt-0.5">{cfg.label}</div>
+                  <div className="text-xs text-text-muted mt-0.5">{cfg.label}</div>
                 </div>
               )
             })}
@@ -285,3 +285,5 @@ export default function KYCPage() {
     </div>
   )
 }
+
+

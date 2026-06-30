@@ -51,16 +51,10 @@ const stats = [
 
 const recentActivity = [
   {
-    type: 'intro_received',
-    text: 'Raj Properties requested an introduction to your Bandra Buy mandate',
+    type: 'mandate_view',
+    text: 'Raj Properties viewed your Bandra Buy mandate',
     time: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-    action: { label: 'Respond', href: '/dashboard/introductions' },
-  },
-  {
-    type: 'deal_update',
-    text: 'Deal #104 moved to Negotiation stage by Suresh Mehta',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    action: { label: 'View deal', href: '/dashboard/deals' },
+    action: null,
   },
   {
     type: 'mandate_view',
@@ -79,7 +73,7 @@ const recentActivity = [
 const quickActions = [
   { label: 'Post Mandate', icon: <Plus className="h-4 w-4" />, href: '/dashboard/mandates/new', variant: 'primary' as const },
   { label: 'Browse Marketplace', icon: <Building2 className="h-4 w-4" />, href: '/marketplace', variant: 'secondary' as const },
-  { label: 'View Deals', icon: <GitBranch className="h-4 w-4" />, href: '/dashboard/deals', variant: 'secondary' as const },
+  { label: 'Explore Circles', icon: <GitBranch className="h-4 w-4" />, href: '/dashboard/circles', variant: 'secondary' as const },
 ]
 
 const activityIcons: Record<string, React.ReactNode> = {
@@ -93,7 +87,7 @@ export default function DashboardHome() {
   const { user } = useAuthStore()
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
@@ -184,8 +178,8 @@ export default function DashboardHome() {
                     <MapPin className="h-3 w-3 text-text-muted group-hover:text-brand-gold transition-colors" />
                     <span className="text-xs font-semibold text-text-primary truncate">{c.name}</span>
                   </div>
-                  <p className="text-[10px] text-text-muted">{c.membersCount} brokers</p>
-                  <p className="text-[10px] text-brand-gold font-medium">{c.dealsCount} deals closed</p>
+                  <p className="text-xs text-text-muted">{c.membersCount} brokers</p>
+                  <p className="text-xs text-brand-gold font-medium">{c.dealsCount} deals closed</p>
                 </Link>
               ))}
             </div>
@@ -235,15 +229,15 @@ export default function DashboardHome() {
 
         {/* Right panel */}
         <div className="flex flex-col gap-6">
-          {/* Pending Introductions */}
+          {/* Active Circles */}
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-text-primary">Pending Intros</h3>
+                <h3 className="text-sm font-semibold text-text-primary">Active Circles</h3>
                 <Badge variant="warning" dot>3 new</Badge>
               </div>
               <div className="flex flex-col gap-3">
-                {['Raj Properties', 'Skyline Realty', 'Prime Homes'].map((name) => (
+                {['BKC Commercial', 'South Mumbai Resi', 'Pune IT Corridor'].map((name) => (
                   <div key={name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-surface-3 flex items-center justify-center text-xs text-text-secondary font-medium">
@@ -251,14 +245,14 @@ export default function DashboardHome() {
                       </div>
                       <span className="text-sm text-text-primary">{name}</span>
                     </div>
-                    <Link to="/dashboard/introductions" className="text-xs text-brand-gold hover:text-brand-gold-light">
-                      Review →
+                    <Link to="/dashboard/circles" className="text-xs text-brand-gold hover:text-brand-gold-light">
+                      View →
                     </Link>
                   </div>
                 ))}
               </div>
               <Button variant="outline" size="sm" className="w-full mt-4" asChild>
-                <Link to="/dashboard/introductions">View all introductions</Link>
+                <Link to="/dashboard/circles">View all circles</Link>
               </Button>
             </CardContent>
           </Card>
@@ -301,3 +295,5 @@ export default function DashboardHome() {
     </div>
   )
 }
+
+

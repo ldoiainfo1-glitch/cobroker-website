@@ -98,9 +98,9 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
             <Badge variant={m.type === 'joint_venture' ? 'gold' : m.type} className="capitalize">
               {MANDATE_TYPES[m.type]}
             </Badge>
-            <Badge variant="default" className="text-[10px]">{m.category}</Badge>
+            <Badge variant="default" className="text-xs">{m.category}</Badge>
           </div>
-          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] text-white flex items-center gap-1">
+          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-white flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {timeAgo(m.postedAt)}
           </div>
@@ -121,11 +121,11 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
           {/* Budget + Area */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-[10px] text-text-muted mb-0.5">Budget</p>
+              <p className="text-xs text-text-muted mb-0.5">Budget</p>
               <p className="text-sm font-bold text-text-primary">{budgetLabel}</p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] text-text-muted mb-0.5">Area</p>
+              <p className="text-xs text-text-muted mb-0.5">Area</p>
               <p className="text-sm font-medium text-text-secondary">
                 {m.area?.toLocaleString('en-IN')} {m.areaUnit}
               </p>
@@ -135,19 +135,19 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
           {/* Footer */}
           <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-[10px] font-bold text-brand-gold">
+              <div className="w-6 h-6 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-xs font-bold text-brand-gold">
                 {m.company[0]}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-medium text-text-primary truncate max-w-28">{m.company}</p>
                 {m.verified && (
-                  <p className="text-[10px] text-success flex items-center gap-0.5">
+                  <p className="text-xs text-success flex items-center gap-0.5">
                     ✓ Verified
                   </p>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3 text-[10px] text-text-muted shrink-0">
+            <div className="flex items-center gap-3 text-xs text-text-muted shrink-0">
               <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{m.views}</span>
               <span className="flex items-center gap-1"><Users className="h-3 w-3" />{m.intros}</span>
             </div>
@@ -242,7 +242,7 @@ export default function MarketplacePage() {
               <SlidersHorizontal className="h-4 w-4" />
               Filters
               {activeFiltersCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-brand-gold text-black text-[10px] font-bold flex items-center justify-center">
+                <span className="w-5 h-5 rounded-full bg-brand-gold text-black text-xs font-bold flex items-center justify-center">
                   {activeFiltersCount}
                 </span>
               )}
@@ -416,3 +416,4 @@ export default function MarketplacePage() {
     </div>
   )
 }
+

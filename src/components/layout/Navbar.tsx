@@ -7,10 +7,10 @@ import { getInitials } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
 const publicNavLinks = [
-  { label: 'Area Circles', href: '/#circles' },
+  { label: 'Area Circles', href: '/dashboard/circles' },
   { label: 'How it Works', href: '/#how' },
-  { label: 'Marketplace', href: '/marketplace' },
-  { label: 'Pricing', href: '/pricing' },
+  { label: 'Categories', href: '/#categories' },
+  { label: 'List your property', href: '/list-property' },
 ]
 
 export function Navbar() {
@@ -48,9 +48,7 @@ export function Navbar() {
             <span className="font-bold text-base tracking-widest text-text-primary">
               COBROKINGS
             </span>
-          </Link>
-
-          {/* Desktop nav */}
+          </Link>          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
             {publicNavLinks.map((link) => (
               <a
@@ -86,7 +84,7 @@ export function Navbar() {
                         getInitials(user.fullName)
                       )}
                     </div>
-                    <span className="text-sm text-text-primary hidden lg:block">{user.fullName.split(' ')[0]}</span>
+                    <span className="text-sm text-text-primary hidden lg:block">{user.fullName?.split(' ')[0] ?? 'You'}</span>
                     <ChevronDown className="h-3.5 w-3.5 text-text-muted" />
                   </button>
 
@@ -128,6 +126,9 @@ export function Navbar() {
               </>
             ) : (
               <>
+                <Button variant="ghost" size="sm" asChild className="text-text-muted">
+                  <Link to="/login">Demo login</Link>
+                </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/login">Sign in</Link>
                 </Button>
@@ -197,7 +198,10 @@ export function AuthNavbar() {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
             <span className="text-brand-gold text-xl">⬡</span>
-            <span className="font-bold text-base tracking-widest text-text-primary">COBROKINGS</span>
+            <div>
+              <span className="font-bold text-base tracking-widest text-text-primary">COBROKINGS</span>
+              <span className="hidden sm:block text-xs text-text-muted -mt-0.5">Verified Property Marketplace</span>
+            </div>
           </Link>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/">← Back to Home</Link>
@@ -240,3 +244,4 @@ export function SidebarLink({ to, icon, label, badge }: SidebarLinkProps) {
     </NavLink>
   )
 }
+

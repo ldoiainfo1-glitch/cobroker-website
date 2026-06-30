@@ -46,19 +46,19 @@ function TopBrokerCard({ member, rank }: { member: CircleMember; rank: number })
           <p className="text-xs font-semibold text-text-primary truncate">{member.name}</p>
           {member.verified && <CheckCircle2 className="h-3 w-3 text-success shrink-0" />}
         </div>
-        <p className="text-[10px] text-text-muted truncate">{member.company}</p>
+        <p className="text-xs text-text-muted truncate">{member.company}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <span className={cn('px-1.5 py-0.5 rounded text-[9px] font-medium', TIER_STYLE[member.tier])}>
+          <span className={cn('px-1.5 py-0.5 rounded text-xs font-medium', TIER_STYLE[member.tier])}>
             {TIER_LABEL[member.tier]}
           </span>
-          <span className="flex items-center gap-0.5 text-[10px] text-brand-gold">
+          <span className="flex items-center gap-0.5 text-xs text-brand-gold">
             <Star className="h-2.5 w-2.5 fill-brand-gold" /> {member.rating}
           </span>
         </div>
       </div>
       <div className="text-right shrink-0">
         <p className="text-sm font-bold text-text-primary">{member.dealsCount}</p>
-        <p className="text-[10px] text-text-muted">deals</p>
+        <p className="text-xs text-text-muted">deals</p>
       </div>
     </div>
   )
@@ -87,18 +87,18 @@ function LeaderRow({ entry, isMe }: { entry: LeaderboardEntry; isMe?: boolean })
           <p className="text-xs font-semibold text-text-primary truncate">{entry.member.name}</p>
           {entry.member.verified && <CheckCircle2 className="h-3 w-3 text-success shrink-0" />}
         </div>
-        <p className="text-[10px] text-text-muted truncate">{entry.member.company}</p>
+        <p className="text-xs text-text-muted truncate">{entry.member.company}</p>
       </div>
       <div className="flex items-center gap-3 shrink-0 text-center">
         <div>
           <p className="text-xs font-bold text-text-primary">{entry.score}</p>
-          <p className="text-[9px] text-text-muted">score</p>
+          <p className="text-xs text-text-muted">score</p>
         </div>
         <div>
-          <p className="text-[10px] font-medium text-text-secondary">{entry.deals} deals</p>
+          <p className="text-xs font-medium text-text-secondary">{entry.deals} deals</p>
         </div>
         {delta !== 0 && (
-          <span className={cn('text-[10px] font-medium', delta > 0 ? 'text-success' : 'text-error')}>
+          <span className={cn('text-xs font-medium', delta > 0 ? 'text-success' : 'text-error')}>
             {delta > 0 ? `▲${delta}` : `▼${Math.abs(delta)}`}
           </span>
         )}
@@ -127,15 +127,15 @@ function PostCard({ post }: { post: typeof MOCK_CIRCLE_POSTS[0] }) {
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-semibold text-text-primary">{post.author.name}</span>
             {post.author.verified && <CheckCircle2 className="h-3 w-3 text-success" />}
-            <span className={cn('px-1.5 py-0.5 rounded text-[9px] font-medium', TIER_STYLE[post.author.tier])}>
+            <span className={cn('px-1.5 py-0.5 rounded text-xs font-medium', TIER_STYLE[post.author.tier])}>
               {TIER_LABEL[post.author.tier]}
             </span>
           </div>
-          <p className="text-[10px] text-text-muted">{post.author.company}</p>
+          <p className="text-xs text-text-muted">{post.author.company}</p>
         </div>
         <div className="text-right shrink-0">
-          <span className={cn('text-[10px] font-semibold', cfg.color)}>{cfg.label}</span>
-          <p className="text-[10px] text-text-muted">{timeAgo(post.postedAt)}</p>
+          <span className={cn('text-xs font-semibold', cfg.color)}>{cfg.label}</span>
+          <p className="text-xs text-text-muted">{timeAgo(post.postedAt)}</p>
         </div>
       </div>
 
@@ -144,7 +144,7 @@ function PostCard({ post }: { post: typeof MOCK_CIRCLE_POSTS[0] }) {
 
       {/* Meta + actions */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 text-[10px] text-text-muted">
+        <div className="flex items-center gap-4 text-xs text-text-muted">
           <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views} views</span>
           {post.intros > 0 && (
             <span className="flex items-center gap-1 text-brand-gold font-medium">
@@ -153,7 +153,7 @@ function PostCard({ post }: { post: typeof MOCK_CIRCLE_POSTS[0] }) {
           )}
         </div>
         {post.type === 'mandate' && (
-          <Button variant="outline" size="sm" className="h-7 text-[11px] px-3">
+          <Button variant="outline" size="sm" className="h-7 text-xs px-3">
             Request Intro
           </Button>
         )}
@@ -188,7 +188,7 @@ export default function CircleDetailPage() {
   ]
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-text-muted">
         <Link to="/dashboard/circles" className="flex items-center gap-1 hover:text-text-secondary transition-colors">
@@ -209,14 +209,14 @@ export default function CircleDetailPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-xl font-bold text-text-primary">{circle.name}</h1>
-                {circle.isFeatured && <Badge variant="gold" dot className="text-[10px]">Featured</Badge>}
+                {circle.isFeatured && <Badge variant="gold" dot className="text-xs">Featured</Badge>}
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm text-text-muted">
                 <Badge variant={
                   circle.scope === 'area' ? 'default' :
                   circle.scope === 'city' ? 'info' :
                   circle.scope === 'state' ? 'warning' : 'gold'
-                } className="text-[10px] capitalize">{circle.scope}</Badge>
+                } className="text-xs capitalize">{circle.scope}</Badge>
                 {circle.city && (
                   <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {circle.city}</span>
                 )}
@@ -327,7 +327,7 @@ export default function CircleDetailPage() {
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm font-semibold text-text-primary">{member.name}</span>
                   {member.verified && <CheckCircle2 className="h-3.5 w-3.5 text-success" />}
-                  <span className={cn('px-1.5 py-0.5 rounded text-[10px] font-medium', TIER_STYLE[member.tier])}>
+                  <span className={cn('px-1.5 py-0.5 rounded text-xs font-medium', TIER_STYLE[member.tier])}>
                     {TIER_LABEL[member.tier]}
                   </span>
                 </div>
@@ -336,13 +336,13 @@ export default function CircleDetailPage() {
               <div className="hidden sm:flex items-center gap-4 text-center shrink-0">
                 <div>
                   <p className="text-sm font-bold text-brand-gold">{member.dealsCount}</p>
-                  <p className="text-[10px] text-text-muted">Deals</p>
+                  <p className="text-xs text-text-muted">Deals</p>
                 </div>
                 <div>
                   <p className="text-sm font-bold text-text-primary flex items-center gap-0.5">
                     <Star className="h-3 w-3 fill-brand-gold text-brand-gold" /> {member.rating}
                   </p>
-                  <p className="text-[10px] text-text-muted">{member.reviewCount} reviews</p>
+                  <p className="text-xs text-text-muted">{member.reviewCount} reviews</p>
                 </div>
               </div>
               <Button variant="secondary" size="sm">Connect</Button>
@@ -375,7 +375,7 @@ export default function CircleDetailPage() {
           </div>
 
           {/* Column headers */}
-          <div className="flex items-center gap-3 px-3 py-1.5 text-[10px] text-text-muted uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-3 px-3 py-1.5 text-xs text-text-muted uppercase tracking-wider mb-1">
             <div className="w-7 text-center">Rank</div>
             <div className="w-8" />
             <div className="flex-1">Broker</div>
@@ -470,7 +470,7 @@ export default function CircleDetailPage() {
                         className="h-full bg-brand-gold/40 rounded-md flex items-center pl-2"
                         style={{ width: `${(b.count / 67) * 100}%` }}
                       >
-                        <span className="text-[10px] font-medium text-text-primary">{b.count}</span>
+                        <span className="text-xs font-medium text-text-primary">{b.count}</span>
                       </div>
                     </div>
                   </div>
@@ -503,11 +503,11 @@ export default function CircleDetailPage() {
                         }}
                       />
                     </div>
-                    <span className="text-[10px] text-text-muted w-8 text-right">{h.intensity}</span>
+                    <span className="text-xs text-text-muted w-8 text-right">{h.intensity}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-text-muted mt-3">
+              <p className="text-xs text-text-muted mt-3">
                 OpenStreetMap integration — Phase 7 (Circle Insights advanced)
               </p>
             </CardContent>
@@ -517,3 +517,4 @@ export default function CircleDetailPage() {
     </div>
   )
 }
+

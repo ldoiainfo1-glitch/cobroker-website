@@ -45,3 +45,4 @@ function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement
 }
 
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
+

@@ -76,18 +76,17 @@ export default function LoginPage() {
               backgroundImage: `url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80')`,
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-0/90 via-surface-0/70 to-brand-gold/10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-surface-0/95 via-surface-0/80 to-surface-0/40" />
           <div className="relative z-10 flex flex-col justify-center px-12 xl:px-16 py-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-medium mb-8 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse" />
-              India's Largest Co-Broking Network
-            </div>
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-gold mb-4">
+              Verified Property Marketplace
+            </p>
             <h2 className="text-4xl xl:text-5xl font-bold text-text-primary leading-tight mb-5">
               Co-broke faster.<br />
               <span className="gradient-text">Close more deals.</span>
             </h2>
-            <p className="text-text-secondary text-lg max-w-md mb-10">
-              Join 12,400+ verified brokers already on the network. Post requirements, reach every broker in your city, and close more mandates.
+            <p className="text-text-secondary text-base max-w-md mb-10">
+              Find verified homes or list yours. Every property and broker on COBROKINGS is KYC-checked and RERA-verified.
             </p>
             <div className="flex items-center gap-8">
               {stats.map((stat) => (
@@ -196,3 +195,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

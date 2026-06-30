@@ -89,10 +89,10 @@ function MandateRow({ m, onDelete }: { m: MyMandate; onDelete: (id: string) => v
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <Badge variant={m.type} className="text-[10px] capitalize">
+            <Badge variant={m.type} className="text-xs capitalize">
               {MANDATE_TYPES[m.type]}
             </Badge>
-            <Badge variant={STATUS_VARIANT[m.status]} dot className="text-[10px] capitalize">
+            <Badge variant={STATUS_VARIANT[m.status]} dot className="text-xs capitalize">
               {STATUS_ICON[m.status]}
               {m.status}
             </Badge>
@@ -110,15 +110,15 @@ function MandateRow({ m, onDelete }: { m: MyMandate; onDelete: (id: string) => v
         <div className="hidden sm:flex items-center gap-6 text-center shrink-0">
           <div>
             <p className="text-base font-bold text-text-primary">{m.views}</p>
-            <p className="text-[10px] text-text-muted">Views</p>
+            <p className="text-xs text-text-muted">Views</p>
           </div>
           <div>
             <p className="text-base font-bold text-text-primary">{m.intros}</p>
-            <p className="text-[10px] text-text-muted">Intros</p>
+            <p className="text-xs text-text-muted">Intros</p>
           </div>
           <div>
             <p className="text-xs font-medium text-text-secondary">{timeAgo(m.postedAt)}</p>
-            <p className="text-[10px] text-text-muted">Posted</p>
+            <p className="text-xs text-text-muted">Posted</p>
           </div>
         </div>
 
@@ -194,7 +194,7 @@ export default function MandatesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -277,3 +277,4 @@ export default function MandatesPage() {
     </div>
   )
 }
+

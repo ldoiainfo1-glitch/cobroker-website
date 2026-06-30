@@ -46,7 +46,7 @@ function CompletenessRing({ score }: { score: number }) {
       </svg>
       <div className="text-center z-10">
         <div className="text-xl font-bold text-text-primary">{score}%</div>
-        <div className="text-[9px] text-text-muted leading-tight">complete</div>
+        <div className="text-xs text-text-muted leading-tight">complete</div>
       </div>
     </div>
   )
@@ -110,7 +110,7 @@ export default function ProfilePage() {
   ] as const
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                   <Camera className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <div className={cn('text-[10px] font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
+              <div className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
                 {tierConfig[profile.tier].label}
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function ProfilePage() {
                     return cfg ? (
                       <div
                         key={b}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-2 border border-border text-[10px] font-medium"
+                        className="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-2 border border-border text-xs font-medium"
                       >
                         <span className={cfg.color}>{cfg.icon}</span>
                         <span className="text-text-secondary">{cfg.label}</span>
@@ -230,7 +230,7 @@ export default function ProfilePage() {
                   <div key={s.label} className="text-center">
                     <div className="flex justify-center mb-1">{s.icon}</div>
                     <div className="text-xl font-bold text-text-primary">{s.value}</div>
-                    <div className="text-[11px] text-text-muted">{s.label}</div>
+                    <div className="text-xs text-text-muted">{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -416,7 +416,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-text-secondary mb-3 leading-relaxed">{r.body}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {r.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20">
+                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20">
                       {tagLabel[tag]}
                     </span>
                   ))}
@@ -446,7 +446,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <div className="text-xs font-medium text-text-primary">{e.endorserName}</div>
-                      <div className="text-[10px] text-text-muted">{e.endorserCompany}</div>
+                      <div className="text-xs text-text-muted">{e.endorserCompany}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 text-sm font-bold text-brand-gold">
@@ -456,7 +456,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="text-sm font-semibold text-text-primary mb-2">{e.skill}</div>
                 {e.endorsedByMe
-                  ? <Badge variant="outline" className="text-[10px] border-brand-gold/30 text-brand-gold">You endorsed this</Badge>
+                  ? <Badge variant="outline" className="text-xs border-brand-gold/30 text-brand-gold">You endorsed this</Badge>
                   : null}
               </CardContent>
             </Card>
@@ -512,3 +512,5 @@ export default function ProfilePage() {
     </div>
   )
 }
+
+

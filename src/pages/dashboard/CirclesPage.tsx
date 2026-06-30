@@ -55,7 +55,7 @@ export default function CirclesPage() {
   const suggested = circles.filter((c) => !c.isJoined).slice(0, 6)
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -83,7 +83,7 @@ export default function CirclesPage() {
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse" />
                 {c.name}
-                <span className="text-[10px] text-brand-gold/70">{c.membersCount}</span>
+                <span className="text-xs text-brand-gold/70">{c.membersCount}</span>
               </Link>
             ))}
           </div>
@@ -163,11 +163,11 @@ export default function CirclesPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <Badge variant={SCOPE_BADGE[circle.scope]} className="text-[10px] capitalize">
+                      <Badge variant={SCOPE_BADGE[circle.scope]} className="text-xs capitalize">
                         {circle.scope}
                       </Badge>
                       {circle.isFeatured && (
-                        <Badge variant="gold" dot className="text-[10px]">Featured</Badge>
+                        <Badge variant="gold" dot className="text-xs">Featured</Badge>
                       )}
                     </div>
                     <h3 className="text-sm font-semibold text-text-primary">{circle.name}</h3>
@@ -188,7 +188,7 @@ export default function CirclesPage() {
                 {/* Asset classes */}
                 <div className="flex flex-wrap gap-1 mb-3">
                   {circle.assetClasses.map((a) => (
-                    <span key={a} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-2 text-[10px] text-text-muted">
+                    <span key={a} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-2 text-xs text-text-muted">
                       <Briefcase className="h-2.5 w-2.5" /> {a}
                     </span>
                   ))}
@@ -198,17 +198,17 @@ export default function CirclesPage() {
                 <div className="flex items-center gap-4 py-3 border-y border-border mb-3">
                   <div className="text-center flex-1">
                     <p className="text-base font-bold text-text-primary">{circle.membersCount.toLocaleString('en-IN')}</p>
-                    <p className="text-[10px] text-text-muted">Brokers</p>
+                    <p className="text-xs text-text-muted">Brokers</p>
                   </div>
                   <div className="w-px h-8 bg-border" />
                   <div className="text-center flex-1">
                     <p className="text-base font-bold text-text-primary">{circle.postsCount.toLocaleString('en-IN')}</p>
-                    <p className="text-[10px] text-text-muted">Posts</p>
+                    <p className="text-xs text-text-muted">Posts</p>
                   </div>
                   <div className="w-px h-8 bg-border" />
                   <div className="text-center flex-1">
                     <p className="text-base font-bold text-brand-gold">{circle.dealsCount.toLocaleString('en-IN')}</p>
-                    <p className="text-[10px] text-text-muted">Deals closed</p>
+                    <p className="text-xs text-text-muted">Deals closed</p>
                   </div>
                 </div>
 
@@ -256,3 +256,4 @@ export default function CirclesPage() {
     </div>
   )
 }
+

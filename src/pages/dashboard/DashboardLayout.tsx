@@ -24,8 +24,6 @@ const navSections = [
     title: 'Co-Broking',
     links: [
       { to: '/dashboard/circles', icon: <Radio className="h-4 w-4" />, label: 'Circles', badge: 3 },
-      { to: '/dashboard/introductions', icon: <Users className="h-4 w-4" />, label: 'Introductions', badge: 3 },
-      { to: '/dashboard/deals', icon: <GitBranch className="h-4 w-4" />, label: 'Deal Pipeline' },
     ],
   },
   {
@@ -40,7 +38,6 @@ const navSections = [
     links: [
       { to: '/dashboard/profile', icon: <UserCircle className="h-4 w-4" />, label: 'My Profile' },
       { to: '/dashboard/kyc', icon: <Shield className="h-4 w-4" />, label: 'KYC & Verification' },
-      { to: '/dashboard/connections', icon: <Users className="h-4 w-4" />, label: 'Connections' },
     ],
   },
   {
@@ -63,7 +60,7 @@ export default function DashboardLayout() {
       <aside
         className={cn(
           'flex flex-col bg-surface-1 border-r border-border transition-all duration-300 ease-in-out relative shrink-0',
-          collapsed ? 'w-16' : 'w-60',
+          collapsed ? 'w-[72px]' : 'w-[268px]',
         )}
       >
         {/* Logo */}
@@ -94,7 +91,7 @@ export default function DashboardLayout() {
           {navSections.map((section) => (
             <div key={section.title}>
               {!collapsed && (
-                <p className="px-3 mb-1 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                <p className="px-3 mb-1 text-xs font-semibold text-text-muted uppercase tracking-wider">
                   {section.title}
                 </p>
               )}
@@ -125,12 +122,12 @@ export default function DashboardLayout() {
         <div className={cn('border-t border-border p-3', collapsed && 'flex justify-center')}>
           {!collapsed ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-xs font-semibold text-brand-gold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-sm font-semibold text-brand-gold shrink-0">
                 {user ? getInitials(user.fullName) : '?'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-text-primary truncate">{user?.fullName || 'User'}</p>
-                <p className="text-[10px] text-text-muted truncate">{user?.email}</p>
+                <p className="text-sm font-medium text-text-primary truncate">{user?.fullName || 'User'}</p>
+                <p className="text-xs text-text-muted truncate">{user?.email}</p>
               </div>
               <button
                 onClick={logout}
@@ -179,17 +176,18 @@ export default function DashboardLayout() {
               <Bell className="h-5 w-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-gold rounded-full" />
             </button>
-            <div className="w-8 h-8 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-xs font-semibold text-brand-gold cursor-pointer">
+            <div className="w-9 h-9 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-sm font-semibold text-brand-gold cursor-pointer">
               {user ? getInitials(user.fullName) : '?'}
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <div className="flex-1 overflow-y-auto bg-surface-0">
+        <div className="flex-1 overflow-hidden bg-surface-0 flex flex-col">
           <Outlet />
         </div>
       </main>
     </div>
   )
 }
+
