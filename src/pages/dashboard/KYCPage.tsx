@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import {
   Shield, CheckCircle2, Clock, XCircle, Upload,
   AlertCircle, FileText, RefreshCw, ChevronDown,
+  X, File, ImageIcon,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -10,7 +11,146 @@ import { cn } from '@/lib/utils'
 import { MOCK_KYC_DOCS } from '@/data/profiles'
 import type { KYCDocument, KYCDocStatus } from '@/types'
 
-// ─── Status config ────────────────────────────────────────────────────────────
+// ─── Upload modal ─────────────────────────────────────────────────────────────
+interface UploadModalProps {
+  doc: KYCDocument
+  onClose: () => void
+  onUploaded: (docId: string, file: File) => void
+}
+
+function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
+  const [dragging, setDragging] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [progress, setProgress] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const [done, setDone] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) return alert('File too large. Max 5 MB.')
+    setSelectedFile(file)
+  }
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFile(file)
+  }, [])
+
+  const simulateUpload = () => {
+    setUploading(true)
+    let p = 0
+    const interval = setInterval(() => {
+      p += Math.random() * 25
+      if (p >= 100) {
+        p = 100
+        clearInterval(interval)
+        setDone(true)
+        setUploading(false)
+        setTimeout(() => { onUploaded(doc.id, selectedFile!); onClose() }, 800)
+      }
+      setProgress(Math.min(p, 100))
+    }, 300)
+  }
+
+  const isImage = selectedFile?.type.startsWith('image/')
+  const fileIcon = isImage ? <ImageIcon className="h-8 w-8 text-info" /> : <File className="h-8 w-8 text-brand-gold" />
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-surface-0 border border-border rounded-2xl w-full max-w-md shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div>
+            <p className="text-sm font-semibold text-text-primary">{doc.label}</p>
+            <p className="text-xs text-text-muted mt-0.5">{doc.description}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-5">
+          {!selectedFile ? (
+            /* Drop zone */
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={onDrop}
+              onClick={() => inputRef.current?.click()}
+              className={cn(
+                'border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all',
+                dragging
+                  ? 'border-brand-gold bg-brand-gold/5'
+                  : 'border-border hover:border-brand-gold/50 hover:bg-surface-1',
+              )}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+              />
+              <Upload className="h-8 w-8 text-text-muted mx-auto mb-3" />
+              <p className="text-sm font-medium text-text-primary mb-1">Drop your file here</p>
+              <p className="text-xs text-text-muted">or click to browse</p>
+              <p className="text-xs text-text-muted mt-3">PDF, JPG, PNG — max 5 MB</p>
+            </div>
+          ) : done ? (
+            /* Success */
+            <div className="text-center py-6">
+              <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
+              <p className="text-sm font-semibold text-text-primary">Uploaded successfully!</p>
+              <p className="text-xs text-text-muted mt-1">Sent for review. You'll be notified within 1–2 days.</p>
+            </div>
+          ) : (
+            /* File preview + upload */
+            <div>
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-1 border border-border mb-4">
+                {fileIcon}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-text-primary truncate">{selectedFile.name}</p>
+                  <p className="text-xs text-text-muted">{(selectedFile.size / 1024).toFixed(0)} KB · {selectedFile.type || 'document'}</p>
+                </div>
+                {!uploading && (
+                  <button onClick={() => setSelectedFile(null)} className="p-1 rounded text-text-muted hover:text-error transition-colors">
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {uploading && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-text-muted mb-1">
+                    <span>Uploading…</span>
+                    <span>{Math.round(progress)}%</span>
+                  </div>
+                  <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                    <div className="h-full bg-brand-gold rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => setSelectedFile(null)} disabled={uploading}>
+                  Choose different file
+                </Button>
+                <Button size="sm" className="flex-1" onClick={simulateUpload} disabled={uploading}>
+                  <Upload className="h-3.5 w-3.5" />
+                  {uploading ? 'Uploading…' : 'Submit document'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Status config ─────────────────────────────────────────────────────────────
 const statusConfig: Record<KYCDocStatus, { label: string; icon: React.ReactNode; color: string; bg: string; border: string }> = {
   not_uploaded: {
     label: 'Not uploaded',
@@ -105,7 +245,7 @@ function VerificationBanner({ docs }: { docs: KYCDocument[] }) {
 }
 
 // ─── Document row ─────────────────────────────────────────────────────────────
-function DocRow({ doc }: { doc: KYCDocument }) {
+function DocRow({ doc, onUploadClick }: { doc: KYCDocument; onUploadClick: (doc: KYCDocument) => void }) {
   const [expanded, setExpanded] = useState(doc.status === 'rejected')
   const cfg = statusConfig[doc.status]
 
@@ -164,13 +304,13 @@ function DocRow({ doc }: { doc: KYCDocument }) {
 
           <div className="flex items-center gap-2">
             {(doc.status === 'not_uploaded' || doc.status === 'rejected') && (
-              <Button size="sm" className="flex items-center gap-2">
+              <Button size="sm" className="flex items-center gap-2" onClick={() => onUploadClick(doc)}>
                 <Upload className="h-3.5 w-3.5" />
                 {doc.status === 'rejected' ? 'Re-upload document' : 'Upload document'}
               </Button>
             )}
             {doc.status === 'approved' && (
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => onUploadClick(doc)}>
                 <RefreshCw className="h-3.5 w-3.5" /> Replace document
               </Button>
             )}
@@ -211,13 +351,29 @@ function VerificationProgress({ docs }: { docs: KYCDocument[] }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function KYCPage() {
-  const [docs] = useState<KYCDocument[]>(MOCK_KYC_DOCS)
+  const [docs, setDocs] = useState<KYCDocument[]>(MOCK_KYC_DOCS)
+  const [uploadTarget, setUploadTarget] = useState<KYCDocument | null>(null)
 
   const requiredDocs = docs.filter((d) => d.required)
   const optionalDocs = docs.filter((d) => !d.required)
 
+  const handleUploaded = (docId: string, file: File) => {
+    setDocs((prev) => prev.map((d) =>
+      d.id === docId
+        ? { ...d, status: 'under_review', fileName: file.name, fileSize: `${(file.size / 1024).toFixed(0)} KB`, uploadedAt: new Date().toISOString() }
+        : d
+    ))
+  }
+
   return (
     <div className="flex-1 overflow-y-auto p-6">
+      {uploadTarget && (
+        <UploadModal
+          doc={uploadTarget}
+          onClose={() => setUploadTarget(null)}
+          onUploaded={(id, file) => { handleUploaded(id, file); setUploadTarget(null) }}
+        />
+      )}
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -258,7 +414,7 @@ export default function KYCPage() {
       <h2 className="text-sm font-semibold text-text-primary mb-3">Required documents</h2>
       <div className="flex flex-col gap-3 mb-6">
         {requiredDocs.map((doc) => (
-          <DocRow key={doc.id} doc={doc} />
+          <DocRow key={doc.id} doc={doc} onUploadClick={setUploadTarget} />
         ))}
       </div>
 
@@ -266,7 +422,7 @@ export default function KYCPage() {
       <h2 className="text-sm font-semibold text-text-primary mb-3">Optional documents</h2>
       <div className="flex flex-col gap-3 mb-6">
         {optionalDocs.map((doc) => (
-          <DocRow key={doc.id} doc={doc} />
+          <DocRow key={doc.id} doc={doc} onUploadClick={setUploadTarget} />
         ))}
       </div>
 

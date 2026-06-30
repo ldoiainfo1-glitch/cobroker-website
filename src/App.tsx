@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { ProtectedRoute, GuestRoute } from '@/components/layout/ProtectedRoute'
+import { ProtectedRoute, GuestRoute, AdminRoute } from '@/components/layout/ProtectedRoute'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 
 // Public pages
@@ -24,7 +24,16 @@ import BrokerProfilePage from '@/pages/dashboard/BrokerProfilePage'
 import KYCPage from '@/pages/dashboard/KYCPage'
 import ChatPage from '@/pages/dashboard/ChatPage'
 import NotificationsPage from '@/pages/dashboard/NotificationsPage'
+import CompanyProfilePage from '@/pages/dashboard/CompanyProfilePage'
+import SettingsPage from '@/pages/dashboard/SettingsPage'
 import ListPropertyPage from '@/pages/public/ListPropertyPage'
+import AdminLayout from '@/pages/admin/AdminLayout'
+import AdminDashboard from '@/pages/admin/AdminDashboard'
+import AdminUsersPage from '@/pages/admin/AdminUsersPage'
+import AdminCompaniesPage from '@/pages/admin/AdminCompaniesPage'
+import AdminMandatesPage from '@/pages/admin/AdminMandatesPage'
+import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage'
+import AdminPlatformSettingsPage from '@/pages/admin/AdminPlatformSettingsPage'
 
 // Placeholder for not-yet-built pages
 function ComingSoon({ title }: { title: string }) {
@@ -76,15 +85,27 @@ export default function App() {
           <Route path="chat" element={<ChatPage />} />
           <Route path="chat/:conversationId" element={<ChatPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="company" element={<ComingSoon title="Company Profile" />} />
+          <Route path="company" element={<CompanyProfilePage />} />
           <Route path="analytics" element={<ComingSoon title="Analytics" />} />
-          <Route path="settings" element={<ComingSoon title="Settings" />} />
+          <Route path="settings" element={<SettingsPage />} />
 
         </Route>
       </Route>
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
+      {/* Admin panel — requires super_admin role */}
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="companies" element={<AdminCompaniesPage />} />
+          <Route path="mandates" element={<AdminMandatesPage />} />
+          <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route path="settings" element={<AdminPlatformSettingsPage />} />
+        </Route>
+      </Route>
     </Routes>
   )
 }

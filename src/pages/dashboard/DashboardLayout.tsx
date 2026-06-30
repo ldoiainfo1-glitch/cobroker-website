@@ -118,6 +118,29 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
+        {/* Admin return banner — only visible to super_admin */}
+        {user?.role === 'super_admin' && (
+          <div className={cn('px-3 pb-2', collapsed && 'flex justify-center')}>
+            {!collapsed ? (
+              <Link
+                to="/admin"
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-error/10 border border-error/20 text-error text-xs font-semibold hover:bg-error/20 transition-colors"
+              >
+                <Shield className="h-3.5 w-3.5 shrink-0" />
+                Back to Admin Panel
+              </Link>
+            ) : (
+              <Link
+                to="/admin"
+                title="Back to Admin Panel"
+                className="p-2 rounded-xl bg-error/10 text-error hover:bg-error/20 transition-colors flex items-center justify-center"
+              >
+                <Shield className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        )}
+
         {/* User footer */}
         <div className={cn('border-t border-border p-3', collapsed && 'flex justify-center')}>
           {!collapsed ? (

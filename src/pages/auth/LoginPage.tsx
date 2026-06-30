@@ -44,7 +44,20 @@ export default function LoginPage() {
       // sessionStorage.setItem('access_token', res.accessToken)
 
       // Demo login — remove when backend is ready
-      if (data.email === 'demo@cobrokings.com' && data.password === 'demo123') {
+      if (data.email === 'admin@cobrokings.in' && data.password === 'Admin@1234') {
+        // Admin login
+        setUser({
+          id: 'admin-1',
+          email: data.email,
+          fullName: 'Admin',
+          role: 'super_admin',
+          isVerified: true,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+        })
+        navigate('/admin', { replace: true })
+      } else if (data.email === 'demo@cobrokings.com' && data.password === 'demo123') {
+        // Broker login
         setUser({
           id: '1',
           email: data.email,
