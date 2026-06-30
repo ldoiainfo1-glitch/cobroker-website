@@ -128,7 +128,7 @@ export default function HomePage() {
             alt="Verified broker network across India"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-0 via-surface-0/70 to-surface-0/10" />
+          <div className="absolute inset-0 bg-linear-to-r from-surface-0 via-surface-0/70 to-surface-0/10" />
         </div>
         {/* Full overlay for small screens */}
         <div className="absolute inset-0 lg:hidden">
@@ -146,7 +146,7 @@ export default function HomePage() {
               <span>12,400+ verified brokers</span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-text-primary leading-[1.0] mb-5">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-text-primary leading-none mb-5">
               India's Largest<br />
               <span className="gradient-text">Co-Broking Network</span>
             </h1>

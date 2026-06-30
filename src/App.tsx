@@ -38,7 +38,7 @@ import AdminPlatformSettingsPage from '@/pages/admin/AdminPlatformSettingsPage'
 // Placeholder for not-yet-built pages
 function ComingSoon({ title }: { title: string }) {
   return (
-    <div className="flex items-center justify-center h-full min-h-[400px]">
+    <div className="flex items-center justify-center h-full min-h-100">
       <div className="text-center">
         <div className="text-4xl mb-4">🚧</div>
         <h2 className="text-xl font-semibold text-text-primary mb-2">{title}</h2>

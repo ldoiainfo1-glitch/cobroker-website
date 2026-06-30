@@ -89,7 +89,7 @@ export default function LoginPage() {
               backgroundImage: `url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80')`,
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-0/95 via-surface-0/80 to-surface-0/40" />
+          <div className="absolute inset-0 bg-linear-to-br from-surface-0/95 via-surface-0/80 to-surface-0/40" />
           <div className="relative z-10 flex flex-col justify-center px-12 xl:px-16 py-12">
             <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-gold mb-4">
               Verified Property Marketplace

@@ -93,7 +93,7 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
           <div className="absolute top-3 left-3 flex items-center gap-1.5">
             <Badge variant={m.type === 'joint_venture' ? 'gold' : m.type} className="capitalize">
               {MANDATE_TYPES[m.type]}

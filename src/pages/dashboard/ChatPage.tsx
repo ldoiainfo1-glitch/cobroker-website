@@ -63,7 +63,7 @@ function Avatar({ initial, size = 'md', online }: { initial: string; size?: 'sm'
 function MandateCardMsg({ card, isMine }: { card: NonNullable<ChatMessage['mandateCard']>; isMine: boolean }) {
   const typeClass = mandateTypeColor[card.mandateType] ?? 'text-text-muted bg-surface-3 border-border'
   return (
-    <div className={cn('rounded-xl border p-3 min-w-[220px] max-w-[280px]', isMine ? 'bg-brand-gold/5 border-brand-gold/30' : 'bg-surface-2 border-border')}>
+    <div className={cn('rounded-xl border p-3 min-w-55 max-w-70', isMine ? 'bg-brand-gold/5 border-brand-gold/30' : 'bg-surface-2 border-border')}>
       <div className="flex items-center gap-2 mb-2">
         <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full border uppercase tracking-wide', typeClass)}>
           {card.mandateType}

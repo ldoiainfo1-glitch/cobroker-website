@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Building2, FileText,
   Settings, LogOut, ChevronRight, Shield,
-  BarChart3, AlertTriangle, Bell,
+  BarChart3, Bell,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
