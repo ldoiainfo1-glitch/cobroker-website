@@ -143,7 +143,16 @@ INSERT INTO mandates (
 ON CONFLICT (id) DO NOTHING;
 
 -- ─── 5. Mandate images (delete + re-insert for idempotency) ──────────────────
-DELETE FROM mandate_images WHERE mandate_id LIKE 'bbbbbbbb%';
+DELETE FROM mandate_images WHERE mandate_id IN (
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb01',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb02',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb03',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb04',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb05',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb06',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb07',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb08'
+);
 
 INSERT INTO mandate_images (mandate_id, url, is_primary, sort_order) VALUES
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb01', 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80', true,  0),
@@ -174,7 +183,12 @@ SELECT
   count(i.id)     AS images
 FROM mandates m
 LEFT JOIN mandate_images i ON i.mandate_id = m.id
-WHERE m.id LIKE 'bbbbbbbb%'
+WHERE m.id IN (
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb01','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb02',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb03','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb04',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb05','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb06',
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb07','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb08'
+)
 GROUP BY m.id, m.title, m.mandate_type, m.city, m.status
 ORDER BY m.created_at;
 
