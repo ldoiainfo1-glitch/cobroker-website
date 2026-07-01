@@ -123,12 +123,10 @@ function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
               </div>
 
               {uploading && (
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-text-muted mb-1">
-                    <span>Uploading…</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                  <div className="flex gap-2">
+                <div className="mb-4 text-xs text-text-muted">Uploading document to S3…</div>
+              )}
+
+              <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1" onClick={() => setSelectedFile(null)} disabled={uploading}>
                   Choose different file
                 </Button>

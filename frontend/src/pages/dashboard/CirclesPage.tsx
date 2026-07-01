@@ -60,6 +60,7 @@ export default function CirclesPage() {
   if (isLoading) return <div className="flex justify-center py-20"><Spinner /></div>
 
   return (
+    <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Circles</h1>
@@ -229,11 +230,13 @@ export default function CirclesPage() {
                         </Link>
                       </Button>
                       <Button variant="secondary" size="sm" onClick={() => handleJoin(circle.id, true)}>
+                        Leave
                       </Button>
                     </>
                   ) : (
                     <>
                       <Button size="sm" className="flex-1" onClick={() => handleJoin(circle.id, false)}>
+                        Join Circle
                       </Button>
                       <Button variant="secondary" size="sm" asChild>
                         <Link to={`/dashboard/circles/${circle.id}`}>Preview</Link>

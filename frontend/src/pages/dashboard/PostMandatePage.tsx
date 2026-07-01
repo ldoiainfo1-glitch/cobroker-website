@@ -33,11 +33,11 @@ const step2Schema = z.object({
 })
 
 const step3Schema = z.object({
-  minBudget: z.number({ required_error: 'Enter minimum budget' }).min(1),
-  maxBudget: z.number({ required_error: 'Enter maximum budget' }).min(1),
+  minBudget: z.number({ error: 'Enter minimum budget' }).min(1),
+  maxBudget: z.number({ error: 'Enter maximum budget' }).min(1),
   minArea: z.number().optional(),
   maxArea: z.number().optional(),
-  areaUnit: z.string().default('sq.ft'),
+  areaUnit: z.string().optional(),
   commissionPercent: z.string().optional(),
 }).refine((d) => d.maxBudget >= d.minBudget, {
   message: 'Max budget must be ≥ Min budget',
@@ -133,13 +133,14 @@ export default function PostMandatePage() {
   const back = () => setStep((s) => Math.max(s - 1, 1))
 
   const submit = async (publishNow = true) => {
+    if (!user?.id || !user.companyId) return
     setIsSubmitting(true)
     try {
       await createMandate({
         mandateType: data.mandateType!,
         title: data.title!,
         description: data.description,
-        propertyType: data.propertyCategory,
+        propertyCategory: data.propertyCategory!,
         city: data.city!,
         state: data.state!,
         locations: data.locations?.split(',').map((l) => l.trim()).filter(Boolean) ?? [],
@@ -148,10 +149,10 @@ export default function PostMandatePage() {
         minArea: data.minArea,
         maxArea: data.maxArea,
         areaUnit: data.areaUnit ?? 'sq.ft',
-        commissionPercent: data.commissionPercent ? Number(data.commissionPercent) : undefined,
+        commissionPercent: data.commissionPercent,
         bedrooms: data.bedrooms,
         postedBy: user!.id,
-        companyId: user!.companyId ?? undefined,
+        companyId: user.companyId,
         publishNow,
       })
       navigate('/dashboard/mandates')
@@ -566,7 +567,7 @@ export default function PostMandatePage() {
               Continue <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button size="lg" onClick={submit} loading={isSubmitting}>
+            <Button size="lg" onClick={() => submit(true)} loading={isSubmitting}>
               {isSubmitting ? 'Publishing…' : 'Publish Mandate'}
             </Button>
           )}

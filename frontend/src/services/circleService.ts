@@ -33,7 +33,7 @@ export async function fetchCircles(userId?: string): Promise<Circle[]> {
   ])
 
   if (circlesRes.error) throw circlesRes.error
-  const joinedIds = new Set(((joinedRes as any).data ?? []).map((r: any) => r.circle_id as string))
+  const joinedIds = new Set<string>(((joinedRes as any).data ?? []).map((r: any) => r.circle_id as string))
   return (circlesRes.data ?? []).map((row) => mapRow(row, joinedIds))
 }
 

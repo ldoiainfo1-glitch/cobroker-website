@@ -91,6 +91,7 @@ export default function NotificationsPage() {
         <div className="flex flex-col gap-2">
           {filtered.map((n) => {
             const cfg = typeConfig[n.type] ?? typeConfig.system
+            const actionUrl = typeof n.data?.actionUrl === 'string' ? n.data.actionUrl : undefined
             return (
               <Card
                 key={n.id}
@@ -119,9 +120,9 @@ export default function NotificationsPage() {
                         </div>
                       </div>
                       <p className="text-sm text-text-muted leading-relaxed">{n.body}</p>
-                      {n.actionUrl && (
+                      {actionUrl && (
                         <Link
-                          to={n.actionUrl}
+                          to={actionUrl}
                           className="inline-flex items-center gap-1 mt-2 text-xs text-brand-gold hover:text-brand-gold-light font-medium"
                           onClick={(e) => e.stopPropagation()}
                         >

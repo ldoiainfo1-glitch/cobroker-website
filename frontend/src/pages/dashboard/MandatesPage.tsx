@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { MANDATE_TYPES } from '@/constants'
-import type { Mandate, MandateStatus, MandateType } from '@/types'
+import type { Mandate, MandateStatus } from '@/types'
 import { useMyMandates, useDeleteMandate } from '@/hooks/useMandates'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -32,7 +32,7 @@ function MandateRow({ m, onDelete }: { m: Mandate; onDelete: (id: string) => voi
   const budgetLabel =
     m.mandateType === 'lease'
       ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
-      : `${formatCurrency(m.minBudget)} – ${formatCurrency(m.maxBudget)}`
+      : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`
 
   return (
     <Card hover className="p-4">
@@ -140,6 +140,7 @@ export default function MandatesPage() {
     active: mandates.filter((m) => m.status === 'active').length,
     draft: mandates.filter((m) => m.status === 'draft').length,
     closed: mandates.filter((m) => m.status === 'closed').length,
+    expired: mandates.filter((m) => m.status === 'expired').length,
   }
 
   return (
