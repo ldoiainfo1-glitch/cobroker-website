@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, INDIAN_STATES } from '@/constants'
+import { supabase } from '@/lib/supabase'
 
 // --- Schemas ---
 const step1Schema = z.object({
@@ -50,6 +51,7 @@ export default function RegisterPage() {
   const [step1Data, setStep1Data] = useState<Step1Form | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [registerError, setRegisterError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   // Step 1
@@ -71,10 +73,67 @@ export default function RegisterPage() {
     setCurrentStep(2)
   }
 
-  const onStep2 = async (_data: Step2Form) => {
-    // TODO: API call to register
-    // await api.post('/auth/register', { ...step1Data, ..._data })
-    setCurrentStep(3)
+  const onStep2 = async (data: Step2Form) => {
+    if (!step1Data) return
+    setRegisterError(null)
+
+    try {
+      // 1. Create Supabase auth user
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: step1Data.email,
+        password: step1Data.password,
+        options: {
+          data: {
+            full_name: step1Data.fullName,
+            phone: step1Data.phone,
+          },
+        },
+      })
+
+      if (signUpError) throw new Error(signUpError.message)
+      if (!authData.user) throw new Error('Sign up failed. Please try again.')
+
+      // 2. Create the company record
+      const baseSlug = data.companyName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+      const uniqueSlug = `${baseSlug}-${Date.now()}`
+
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .insert({
+          name: data.companyName,
+          slug: uniqueSlug,
+          city: data.companyCity,
+          state: data.companyState,
+          address: data.companyAddress || null,
+          website: data.website || null,
+          verification_status: 'pending',
+        })
+        .select()
+        .single()
+
+      if (companyError) throw new Error(companyError.message)
+
+      // 3. Update the auto-created profile with full details
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: step1Data.fullName,
+          phone: step1Data.phone,
+          company_id: company.id,
+          role: 'company_admin',
+        })
+        .eq('id', authData.user.id)
+
+      if (profileError) throw new Error(profileError.message)
+
+      setCurrentStep(3)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Try again.'
+      setRegisterError(message)
+    }
   }
 
   return (
@@ -323,6 +382,9 @@ export default function RegisterPage() {
                       Continue <ArrowRight className="h-4 w-4" />
                     </Button>
                   </div>
+                  {registerError && (
+                    <p className="text-sm text-error text-center">{registerError}</p>
+                  )}
                 </form>
               </>
             )}

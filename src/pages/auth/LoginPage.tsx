@@ -8,6 +8,7 @@ import { AuthNavbar } from '@/components/layout/Navbar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/authStore'
+import { supabase, fetchProfile } from '@/lib/supabase'
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -38,39 +39,24 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      // TODO: replace with real API call
-      // const { data: res } = await api.post('/auth/login', data)
-      // setUser(res.user)
-      // sessionStorage.setItem('access_token', res.accessToken)
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
 
-      // Demo login — remove when backend is ready
-      if (data.email === 'admin@cobrokings.in' && data.password === 'Admin@1234') {
-        // Admin login
-        setUser({
-          id: 'admin-1',
-          email: data.email,
-          fullName: 'Admin',
-          role: 'super_admin',
-          isVerified: true,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-        })
-        navigate('/admin', { replace: true })
-      } else if (data.email === 'demo@cobrokings.com' && data.password === 'demo123') {
-        // Broker login
-        setUser({
-          id: '1',
-          email: data.email,
-          fullName: 'Raj Kumar',
-          role: 'broker',
-          isVerified: true,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-        })
-        navigate(from, { replace: true })
-      } else {
-        setError('root', { message: 'Invalid email or password' })
+      if (error) {
+        setError('root', { message: error.message })
+        return
       }
+
+      const profile = await fetchProfile(authData.user.id)
+      if (!profile) {
+        setError('root', { message: 'Account not found. Please register first.' })
+        return
+      }
+
+      setUser(profile)
+      navigate(profile.role === 'super_admin' ? '/admin' : from, { replace: true })
     } catch {
       setError('root', { message: 'Something went wrong. Try again.' })
     }
