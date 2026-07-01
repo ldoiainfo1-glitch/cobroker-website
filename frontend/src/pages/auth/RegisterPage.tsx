@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, INDIAN_STATES } from '@/constants'
 import { supabase } from '@/lib/supabase'
 
+const PENDING_ENQUIRY_KEY = 'cobrokings-pending-enquiry'
+
 // --- Schemas ---
 const step1Schema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -52,6 +54,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [registerError, setRegisterError] = useState<string | null>(null)
+  const [pendingEnquiryTitle, setPendingEnquiryTitle] = useState<string | null>(null)
   const navigate = useNavigate()
 
   // Step 1
@@ -128,6 +131,26 @@ export default function RegisterPage() {
         .eq('id', authData.user.id)
 
       if (profileError) throw new Error(profileError.message)
+
+      // 4. If user came from a mandate page, submit their enquiry now
+      const raw = localStorage.getItem(PENDING_ENQUIRY_KEY)
+      if (raw) {
+        try {
+          const { mandateId, mandateTitle } = JSON.parse(raw)
+          await supabase.from('mandate_enquiries').insert({
+            mandate_id: mandateId ?? null,
+            full_name: step1Data.fullName,
+            email: step1Data.email.toLowerCase(),
+            phone: step1Data.phone,
+            message: `Registered after expressing interest in: ${mandateTitle}`,
+          })
+          setPendingEnquiryTitle(mandateTitle)
+        } catch (_) {
+          // Non-critical — enquiry submission failure shouldn't block registration
+        } finally {
+          localStorage.removeItem(PENDING_ENQUIRY_KEY)
+        }
+      }
 
       setCurrentStep(3)
     } catch (err: unknown) {
@@ -396,9 +419,22 @@ export default function RegisterPage() {
                 </div>
                 <h1 className="text-2xl font-bold text-text-primary mb-2">Check your email</h1>
                 <p className="text-text-secondary mb-2">
-                  We've sent a verification link to
+                  We’ve sent a verification link to
                 </p>
                 <p className="text-brand-gold font-medium mb-6">{step1Data?.email}</p>
+
+                {pendingEnquiryTitle && (
+                  <div className="flex items-start gap-3 bg-success/10 border border-success/20 rounded-xl px-4 py-3 mb-6 text-left">
+                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Enquiry sent to admin</p>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Your interest in “{pendingEnquiryTitle}” has been recorded. The admin will reach out with details.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-text-muted text-sm mb-8">
                   Click the link in the email to verify your account. Your company will be reviewed and approved within 24–48 hours.
                 </p>

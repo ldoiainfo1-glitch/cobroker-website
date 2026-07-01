@@ -71,7 +71,7 @@ export default function MandateDetailPage() {
 
   const [currentImg, setCurrentImg] = useState(0)
 
-  // Enquiry modal
+  // Enquiry modal — only used when the user is already logged in
   const [showEnquiryModal, setShowEnquiryModal] = useState(false)
   const [enquiryName, setEnquiryName] = useState('')
   const [enquiryEmail, setEnquiryEmail] = useState('')
@@ -86,6 +86,16 @@ export default function MandateDetailPage() {
   const prevImg = () => setCurrentImg((p) => (p === 0 ? m.images.length - 1 : p - 1))
   const nextImg = () => setCurrentImg((p) => (p === m.images.length - 1 ? 0 : p + 1))
 
+  // Non-authenticated: store intent in localStorage and redirect to register
+  const handlePublicEnquiry = () => {
+    const mandateUuid = id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null
+    localStorage.setItem('cobrokings-pending-enquiry', JSON.stringify({
+      mandateId: mandateUuid,
+      mandateTitle: m.title,
+    }))
+    navigate('/register')
+  }
+
   const sendEnquiry = async () => {
     setEnquiryError('')
     if (!enquiryName.trim()) { setEnquiryError('Please enter your name.'); return }
@@ -93,7 +103,6 @@ export default function MandateDetailPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryEmail)) { setEnquiryError('Enter a valid email address.'); return }
 
     setEnquiryLoading(true)
-    // Only pass mandate_id if it looks like a valid UUID
     const mandateUuid = id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null
 
     const { error } = await supabase.from('mandate_enquiries').insert({
@@ -267,7 +276,7 @@ export default function MandateDetailPage() {
                     Send Enquiry
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full mb-3" onClick={() => setShowEnquiryModal(true)}>
+                  <Button size="lg" className="w-full mb-3" onClick={handlePublicEnquiry}>
                     <Send className="h-4 w-4" />
                     Send Enquiry
                   </Button>
