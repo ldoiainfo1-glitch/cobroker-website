@@ -80,16 +80,10 @@ Client is pre-approved and ready to close within 30–45 days of finding the rig
 export default function MandateDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
 
   const [currentImg, setCurrentImg] = useState(0)
 
-  // Enquiry modal — only used when the user is already logged in
-  const [showEnquiryModal, setShowEnquiryModal] = useState(false)
-  const [enquiryName, setEnquiryName] = useState('')
-  const [enquiryEmail, setEnquiryEmail] = useState('')
-  const [enquiryPhone, setEnquiryPhone] = useState('')
-  const [enquiryNote, setEnquiryNote] = useState('')
   const [enquirySent, setEnquirySent] = useState(false)
   const [enquiryLoading, setEnquiryLoading] = useState(false)
   const [enquiryError, setEnquiryError] = useState('')
@@ -112,20 +106,16 @@ export default function MandateDetailPage() {
   }
 
   const sendEnquiry = async () => {
+    if (!user) return
     setEnquiryError('')
-    if (!enquiryName.trim()) { setEnquiryError('Please enter your name.'); return }
-    if (!/^[6-9]\d{9}$/.test(enquiryPhone)) { setEnquiryError('Enter a valid 10-digit mobile number.'); return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryEmail)) { setEnquiryError('Enter a valid email address.'); return }
-
     setEnquiryLoading(true)
     const mandateUuid = id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null
 
     const { error } = await supabase.from('mandate_enquiries').insert({
       mandate_id: mandateUuid,
-      full_name: enquiryName.trim(),
-      email: enquiryEmail.trim().toLowerCase(),
-      phone: enquiryPhone.trim(),
-      message: enquiryNote.trim() || null,
+      full_name: user.fullName,
+      email: user.email,
+      phone: user.phone ?? '',
     })
     setEnquiryLoading(false)
 
@@ -295,10 +285,20 @@ export default function MandateDetailPage() {
                 </div>
 
                 {isAuthenticated ? (
-                  <Button size="lg" className="w-full mb-3" onClick={() => setShowEnquiryModal(true)}>
-                    <Send className="h-4 w-4" />
-                    Send Enquiry
-                  </Button>
+                  enquirySent ? (
+                    <div className="flex items-center gap-2 justify-center w-full mb-3 py-2.5 px-4 rounded-xl bg-success/10 border border-success/20">
+                      <CheckCircle2 className="h-5 w-5 text-success" />
+                      <span className="text-sm font-medium text-success">Enquiry sent!</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Button size="lg" className="w-full mb-3" onClick={sendEnquiry} disabled={enquiryLoading}>
+                        <Send className="h-4 w-4" />
+                        {enquiryLoading ? 'Sending…' : 'Send Enquiry'}
+                      </Button>
+                      {enquiryError && <p className="text-xs text-error text-center -mt-2 mb-2">{enquiryError}</p>}
+                    </>
+                  )
                 ) : (
                   <Button size="lg" className="w-full mb-3" onClick={handlePublicEnquiry}>
                     <Send className="h-4 w-4" />
@@ -367,96 +367,7 @@ export default function MandateDetailPage() {
         </div>
       </div>
 
-      {/* Public Enquiry Modal */}
-      {showEnquiryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (!enquiryLoading) { setShowEnquiryModal(false); setEnquirySent(false) } }} />
-          <div className="relative bg-surface-1 rounded-2xl border border-border p-6 w-full max-w-md shadow-2xl">
-            {enquirySent ? (
-              <div className="text-center py-4">
-                <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-text-primary mb-1">Enquiry sent!</h3>
-                <p className="text-sm text-text-muted mb-2">
-                  The team from {m.company.name} will be in touch within 24–48 hours.
-                </p>
-                <p className="text-xs text-text-muted mb-6">
-                  Want to track your enquiries and co-broke with verified brokers?
-                </p>
-                <div className="flex gap-3">
-                  <Button variant="secondary" size="md" className="flex-1" onClick={() => { setShowEnquiryModal(false); setEnquirySent(false) }}>Close</Button>
-                  <Button size="md" className="flex-1" onClick={() => navigate('/register')}>Register free</Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold text-text-primary mb-1">Send Enquiry</h3>
-                <p className="text-sm text-text-muted mb-5">
-                  Express your interest in <span className="font-medium text-text-primary">{m.title}</span>. The broker will contact you directly.
-                </p>
 
-                <div className="flex flex-col gap-3 mb-4">
-                  <div>
-                    <label className="text-xs font-medium text-text-secondary mb-1 block">Full name *</label>
-                    <input
-                      type="text"
-                      value={enquiryName}
-                      onChange={(e) => setEnquiryName(e.target.value)}
-                      placeholder="Rajesh Kumar"
-                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-text-secondary mb-1 block">Mobile number *</label>
-                    <input
-                      type="tel"
-                      value={enquiryPhone}
-                      onChange={(e) => setEnquiryPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      placeholder="9876543210"
-                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-text-secondary mb-1 block">Email *</label>
-                    <input
-                      type="email"
-                      value={enquiryEmail}
-                      onChange={(e) => setEnquiryEmail(e.target.value)}
-                      placeholder="you@email.com"
-                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-text-secondary mb-1 block">Note (optional)</label>
-                    <textarea
-                      value={enquiryNote}
-                      onChange={(e) => setEnquiryNote(e.target.value)}
-                      placeholder="Any specific requirements or questions..."
-                      rows={3}
-                      maxLength={300}
-                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-brand-gold/50"
-                    />
-                  </div>
-                </div>
-
-                {enquiryError && (
-                  <p className="text-xs text-error mb-3">{enquiryError}</p>
-                )}
-
-                <div className="flex gap-3">
-                  <Button variant="secondary" size="lg" className="flex-1" onClick={() => setShowEnquiryModal(false)} disabled={enquiryLoading}>Cancel</Button>
-                  <Button size="lg" className="flex-1" onClick={sendEnquiry} disabled={enquiryLoading}>
-                    {enquiryLoading ? 'Sending…' : 'Send Enquiry'}
-                  </Button>
-                </div>
-
-                <p className="text-xs text-text-muted text-center mt-3">
-                  By submitting you agree your details are shared with the listing broker.
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
