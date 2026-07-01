@@ -418,7 +418,7 @@ export default function ChatPage() {
                 <Building2 className="h-3.5 w-3.5" />
                 Share Mandate
                 {activeMandates.length > 0 && (
-                  <span className="ml-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-gold text-black text-[10px] font-bold flex items-center justify-center">
+                  <span className="ml-1 min-w-4.5 h-4.5 px-1 rounded-full bg-brand-gold text-black text-[10px] font-bold flex items-center justify-center">
                     {activeMandates.length}
                   </span>
                 )}
@@ -426,7 +426,7 @@ export default function ChatPage() {
 
               {/* Mandate picker panel */}
               {showMandatePicker && (
-                <div className="absolute bottom-full left-0 mb-3 w-[560px] bg-surface-0 border border-border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
+                <div className="absolute bottom-full left-0 mb-3 w-140 bg-surface-0 border border-border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
                   {/* Header */}
                   <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-surface-1">
                     <div>
@@ -457,7 +457,7 @@ export default function ChatPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="max-h-[400px] overflow-y-auto p-4 flex flex-col gap-3">
+                      <div className="max-h-100 overflow-y-auto p-4 flex flex-col gap-3">
                         {activeMandates.map((m: Mandate) => {
                           const isSelected = selectedMandateIds.has(m.id)
                           const budgetLabel = m.mandateType === 'lease'

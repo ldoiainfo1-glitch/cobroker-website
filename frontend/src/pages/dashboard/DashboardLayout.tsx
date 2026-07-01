@@ -1,17 +1,152 @@
-import { useState } from 'react'
-import { Outlet, Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Outlet, Link, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Building2, Search,
   MessageSquare, Bell, BarChart3, Settings,
   ChevronLeft, ChevronRight, Plus, LogOut, Radio,
-  UserCircle, Shield, GitBranch,
+  UserCircle, Shield, GitBranch, CheckCheck,
+  AlertCircle, UserPlus, CreditCard, Users,
 } from 'lucide-react'
 import { SidebarLink } from '@/components/layout/Navbar'
 import { useAuthStore } from '@/stores/authStore'
-import { getInitials, cn } from '@/lib/utils'
+import { getInitials, cn, timeAgo } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useNotifications, useMarkRead, useMarkAllRead } from '@/hooks/useNotifications'
+import type { NotificationType } from '@/types'
 
 type NavLink = { to: string; icon: React.ReactNode; label: string; badge?: number }
+
+// ─── Notification icon/color per type ────────────────────────────────────────
+const notifTypeConfig: Record<NotificationType, { icon: React.ReactNode; bg: string; color: string }> = {
+  new_mandate:        { icon: <Building2 className="h-3.5 w-3.5" />,    bg: 'bg-brand-gold/10', color: 'text-brand-gold' },
+  new_introduction:   { icon: <Users className="h-3.5 w-3.5" />,         bg: 'bg-info/10',       color: 'text-info' },
+  intro_accepted:     { icon: <UserPlus className="h-3.5 w-3.5" />,      bg: 'bg-success/10',    color: 'text-success' },
+  intro_rejected:     { icon: <AlertCircle className="h-3.5 w-3.5" />,   bg: 'bg-error/10',      color: 'text-error' },
+  new_message:        { icon: <MessageSquare className="h-3.5 w-3.5" />, bg: 'bg-info/10',       color: 'text-info' },
+  deal_stage_update:  { icon: <GitBranch className="h-3.5 w-3.5" />,     bg: 'bg-warning/10',    color: 'text-warning' },
+  verification_update:{ icon: <Shield className="h-3.5 w-3.5" />,        bg: 'bg-success/10',    color: 'text-success' },
+  payment_success:    { icon: <CreditCard className="h-3.5 w-3.5" />,    bg: 'bg-success/10',    color: 'text-success' },
+  mandate_expiring:   { icon: <AlertCircle className="h-3.5 w-3.5" />,   bg: 'bg-warning/10',    color: 'text-warning' },
+  new_follower:       { icon: <UserPlus className="h-3.5 w-3.5" />,      bg: 'bg-brand-gold/10', color: 'text-brand-gold' },
+  system:             { icon: <Bell className="h-3.5 w-3.5" />,          bg: 'bg-surface-3',     color: 'text-text-muted' },
+}
+
+// ─── Bell dropdown ────────────────────────────────────────────────────────────
+function BellDropdown() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const { data: notifications = [] } = useNotifications()
+  const { mutate: markRead } = useMarkRead()
+  const { mutate: markAllRead } = useMarkAllRead()
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length
+  const preview = notifications.slice(0, 6)
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    if (open) document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="relative p-2 text-text-secondary hover:text-text-primary hover:bg-surface-2 rounded-lg transition-colors"
+        aria-label="Notifications"
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute top-1 right-1 min-w-4.5 h-4.5 px-0.5 flex items-center justify-center rounded-full bg-brand-gold text-black text-[10px] font-bold leading-none">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-96 bg-surface-1 border border-border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <span className="text-sm font-bold text-text-primary flex items-center gap-2">
+              Notifications
+              {unreadCount > 0 && (
+                <span className="min-w-5 h-5 px-1.5 bg-brand-gold text-black text-xs font-bold rounded-full flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </span>
+            {unreadCount > 0 && (
+              <button
+                onClick={() => markAllRead()}
+                className="flex items-center gap-1 text-xs text-brand-gold hover:text-brand-gold-light font-medium transition-colors"
+              >
+                <CheckCheck className="h-3.5 w-3.5" /> Mark all read
+              </button>
+            )}
+          </div>
+
+          {/* List */}
+          <div className="max-h-105 overflow-y-auto">
+            {preview.length === 0 ? (
+              <div className="py-12 text-center">
+                <Bell className="h-8 w-8 mx-auto text-text-muted opacity-40 mb-2" />
+                <p className="text-sm text-text-muted">You're all caught up!</p>
+              </div>
+            ) : (
+              preview.map((n) => {
+                const cfg = notifTypeConfig[n.type] ?? notifTypeConfig.system
+                const actionUrl = typeof n.data?.actionUrl === 'string' ? n.data.actionUrl : undefined
+                return (
+                  <button
+                    key={n.id}
+                    onClick={() => {
+                      if (!n.isRead) markRead(n.id)
+                      setOpen(false)
+                      if (actionUrl) navigate(actionUrl)
+                      else navigate('/dashboard/notifications')
+                    }}
+                    className={cn(
+                      'w-full flex items-start gap-3 px-4 py-3 text-left border-b border-border/50 hover:bg-surface-2 transition-colors',
+                      !n.isRead && 'bg-brand-gold/5',
+                    )}
+                  >
+                    <div className={cn('w-8 h-8 rounded-full shrink-0 flex items-center justify-center mt-0.5', cfg.bg, cfg.color)}>
+                      {cfg.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className={cn('text-sm font-medium leading-snug', !n.isRead ? 'text-text-primary' : 'text-text-secondary')}>
+                          {n.title}
+                        </p>
+                        {!n.isRead && <span className="w-2 h-2 rounded-full bg-brand-gold shrink-0 mt-1.5" />}
+                      </div>
+                      {n.body && <p className="text-xs text-text-muted mt-0.5 line-clamp-2">{n.body}</p>}
+                      <p className="text-xs text-text-muted mt-1">{timeAgo(n.createdAt)}</p>
+                    </div>
+                  </button>
+                )
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-2.5 border-t border-border">
+            <button
+              onClick={() => { setOpen(false); navigate('/dashboard/notifications') }}
+              className="w-full flex items-center justify-center gap-1.5 text-sm text-brand-gold hover:text-brand-gold-light font-medium py-1 transition-colors"
+            >
+              View all notifications <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const navSections: { title: string; links: NavLink[] }[] = [
   {
@@ -198,10 +333,7 @@ export default function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="relative p-2 text-text-secondary hover:text-text-primary hover:bg-surface-2 rounded-lg transition-colors">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-gold rounded-full" />
-            </button>
+            <BellDropdown />
             <div className="w-9 h-9 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-sm font-semibold text-brand-gold cursor-pointer">
               {user ? getInitials(user.fullName) : '?'}
             </div>

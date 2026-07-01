@@ -9,6 +9,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <title>COBROKINGS — India's Co-Broking Network</title>
+    <!-- Apply saved theme before paint to avoid flash -->
+    <script>
+      (function () {
+        var t = localStorage.getItem('cobrokings-theme') || 'dark';
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var useDark = t === 'system' ? prefersDark : t === 'dark';
+        if (!useDark) document.documentElement.classList.add('light');
+        if (localStorage.getItem('cobrokings-compact') === 'true') document.documentElement.classList.add('compact');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

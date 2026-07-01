@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   User, Bell, Lock, Eye, Palette, Smartphone,
   CheckCircle2, ChevronRight, Save, AlertTriangle,
@@ -136,8 +136,36 @@ export default function SettingsPage() {
   })
 
   // Appearance state
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark')
-  const [compactMode, setCompactMode] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>(
+    () => (localStorage.getItem('cobrokings-theme') as 'dark' | 'light' | 'system') ?? 'dark',
+  )
+  const [compactMode, setCompactMode] = useState(
+    () => localStorage.getItem('cobrokings-compact') === 'true',
+  )
+
+  // Apply theme to <html> whenever it changes
+  useEffect(() => {
+    function apply(t: 'dark' | 'light' | 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const useDark = t === 'system' ? prefersDark : t === 'dark'
+      document.documentElement.classList.toggle('light', !useDark)
+      localStorage.setItem('cobrokings-theme', t)
+    }
+    apply(theme)
+
+    if (theme === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)')
+      const listener = () => apply('system')
+      mq.addEventListener('change', listener)
+      return () => mq.removeEventListener('change', listener)
+    }
+  }, [theme])
+
+  // Apply compact mode to <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle('compact', compactMode)
+    localStorage.setItem('cobrokings-compact', String(compactMode))
+  }, [compactMode])
 
   const handleSave = () => {
     setSaved(true)

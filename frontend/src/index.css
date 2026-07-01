@@ -60,6 +60,29 @@ html, body, #root {
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #D4A017; }
 
+/* ── Light theme overrides ───────────────────────────────────────────────── */
+html.light {
+  color-scheme: light;
+  color: #111111;
+  background-color: #FFFFFF;
+  --color-surface-0: #FFFFFF;
+  --color-surface-1: #F7F7F7;
+  --color-surface-2: #EDEDED;
+  --color-surface-3: #E2E2E2;
+  --color-border: #D4D4D4;
+  --color-border-muted: #E8E8E8;
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-text-muted: #909090;
+}
+
+html.light ::-webkit-scrollbar-track { background: #f0f0f0; }
+html.light ::-webkit-scrollbar-thumb { background: #ccc; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #D4A017; }
+
+/* ── Compact mode ────────────────────────────────────────────────────────── */
+html.compact { font-size: 15px; }
+
 /* Gold gradient text utility */
 .gradient-text {
   background: linear-gradient(135deg, #D4A017 0%, #E8B84B 50%, #D4A017 100%);
