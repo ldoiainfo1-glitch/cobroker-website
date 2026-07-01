@@ -9,31 +9,33 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Navbar } from '@/components/layout/Navbar'
+import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { MANDATE_TYPES } from '@/constants'
-import type { MandateType } from '@/types'
+import type { Mandate } from '@/types'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
+import { useMandate } from '@/hooks/useMandates'
 
-// Mock single mandate — replace with API call
-const MOCK_MANDATE = {
-  id: '1',
-  type: 'buy' as MandateType,
+// Demo mandate shown when no real mandate is found (e.g. /marketplace/preview)
+const DEMO_MANDATE: Mandate = {
+  id: 'demo',
   title: '3BHK / 4BHK in Bandra or Khar West',
-  description: `Looking for a premium 3BHK or 4BHK apartment in Bandra West or Khar West for a HNI client. 
-  
-  Key requirements:
-  - Minimum 1,800 sq.ft carpet area
-  - High floor preferred (above 10th floor)
-  - Sea view or garden view preferred
-  - Well-maintained society
-  - Parking: minimum 2 covered spots
-  - Ready to move or within 6 months possession
-  - No SRA or chawl properties
-  
-  Client is pre-approved and ready to close within 30–45 days of finding the right property.`,
+  description: `Looking for a premium 3BHK or 4BHK apartment in Bandra West or Khar West for a HNI client.
+
+Key requirements:
+- Minimum 1,800 sq.ft carpet area
+- High floor preferred (above 10th floor)
+- Sea view or garden view preferred
+- Well-maintained society
+- Parking: minimum 2 covered spots
+- Ready to move or within 6 months possession
+- No SRA or chawl properties
+
+Client is pre-approved and ready to close within 30–45 days of finding the right property.`,
+  mandateType: 'buy',
+  propertyType: 'residential',
   category: 'Residential',
-  propertyType: 'Apartment / Flat',
   city: 'Mumbai',
   state: 'Maharashtra',
   locations: ['Bandra West', 'Khar West', 'Santacruz West'],
@@ -43,24 +45,35 @@ const MOCK_MANDATE = {
   maxArea: 3500,
   areaUnit: 'sq.ft',
   tags: ['Premium', 'HNI Client', 'Ready to Move', 'Sea View'],
-  views: 420,
-  intros: 8,
+  viewsCount: 420,
+  introCount: 8,
   images: [
-    'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
-    'https://images.unsplash.com/photo-1502005097973-6a7082348e28?w=1200&q=80',
-    'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
+    { id: '1', url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80', isPrimary: true, sortOrder: 0 },
+    { id: '2', url: 'https://images.unsplash.com/photo-1502005097973-6a7082348e28?w=1200&q=80', isPrimary: false, sortOrder: 1 },
+    { id: '3', url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80', isPrimary: false, sortOrder: 2 },
   ],
-  postedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+  createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+  updatedAt: new Date().toISOString(),
   expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 25).toISOString(),
   status: 'active',
-  broker: {
-    name: 'Raj Kumar',
-    company: 'Lodha Capital Partners',
+  postedBy: {
+    id: 'demo',
+    email: '',
+    fullName: 'Raj Kumar',
+    role: 'company_admin',
+    isVerified: true,
+    isActive: true,
+    createdAt: '',
+  },
+  company: {
+    id: 'demo',
+    name: 'Lodha Capital Partners',
+    slug: 'lodha-capital',
+    verificationStatus: 'verified',
     city: 'Mumbai',
-    verified: true,
-    mandates: 34,
-    deals: 12,
-    joinedAt: '2023-06-01',
+    state: 'Maharashtra',
+    isActive: true,
+    createdAt: '',
   },
 }
 
@@ -81,7 +94,9 @@ export default function MandateDetailPage() {
   const [enquiryLoading, setEnquiryLoading] = useState(false)
   const [enquiryError, setEnquiryError] = useState('')
 
-  const m = MOCK_MANDATE // TODO: fetch by id
+  const isUuid = !!id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  const { data: mandateData, isLoading: mandateLoading } = useMandate(isUuid ? id : '')
+  const m: Mandate = mandateData ?? DEMO_MANDATE
 
   const prevImg = () => setCurrentImg((p) => (p === 0 ? m.images.length - 1 : p - 1))
   const nextImg = () => setCurrentImg((p) => (p === m.images.length - 1 ? 0 : p + 1))
@@ -122,6 +137,15 @@ export default function MandateDetailPage() {
     setEnquirySent(true)
   }
 
+  if (mandateLoading) return (
+    <div className="min-h-screen bg-surface-0">
+      <Navbar />
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <Spinner size="lg" />
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-surface-0">
       <Navbar />
@@ -143,7 +167,7 @@ export default function MandateDetailPage() {
             {/* Image gallery */}
             <div className="relative rounded-2xl overflow-hidden bg-surface-2 aspect-video">
               <img
-                src={m.images[currentImg]}
+                src={m.images[currentImg]?.url ?? ''}
                 alt={m.title}
                 className="w-full h-full object-cover"
               />
@@ -171,8 +195,8 @@ export default function MandateDetailPage() {
             {/* Title + badges */}
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge variant={m.type} className="capitalize">
-                  {MANDATE_TYPES[m.type]}
+                <Badge variant={m.mandateType} className="capitalize">
+                  {MANDATE_TYPES[m.mandateType]}
                 </Badge>
                 <Badge variant="default">{m.category}</Badge>
                 <Badge variant={m.status === 'active' ? 'success' : 'default'} dot>
@@ -187,11 +211,11 @@ export default function MandateDetailPage() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4" />
-                  Posted {timeAgo(m.postedAt)}
+                  Posted {timeAgo(m.createdAt)}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Eye className="h-4 w-4" />
-                  {m.views} views
+                  {m.viewsCount} views
                 </span>
               </div>
             </div>
@@ -302,12 +326,12 @@ export default function MandateDetailPage() {
                 <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-4">Posted by</h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center font-bold text-brand-gold text-lg">
-                    {m.broker.name[0]}
+                    {(m.postedBy.fullName || 'B')[0]}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-text-primary">{m.broker.name}</p>
-                    <p className="text-xs text-text-muted">{m.broker.company}</p>
-                    {m.broker.verified && (
+                    <p className="text-sm font-semibold text-text-primary">{m.postedBy.fullName}</p>
+                    <p className="text-xs text-text-muted">{m.company.name}</p>
+                    {m.company.verificationStatus === 'verified' && (
                       <p className="text-xs text-success flex items-center gap-1 mt-0.5">
                         <CheckCircle2 className="h-3 w-3" /> RERA Verified
                       </p>
@@ -316,12 +340,12 @@ export default function MandateDetailPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
                   <div className="text-center">
-                    <p className="text-base font-bold text-text-primary">{m.broker.mandates}</p>
-                    <p className="text-xs text-text-muted">Mandates</p>
+                    <p className="text-base font-bold text-text-primary">{m.viewsCount}</p>
+                    <p className="text-xs text-text-muted">Views</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base font-bold text-text-primary">{m.broker.deals}</p>
-                    <p className="text-xs text-text-muted">Deals Closed</p>
+                    <p className="text-base font-bold text-text-primary">{m.introCount}</p>
+                    <p className="text-xs text-text-muted">Enquiries</p>
                   </div>
                 </div>
               </CardContent>
@@ -353,7 +377,7 @@ export default function MandateDetailPage() {
                 <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-text-primary mb-1">Enquiry sent!</h3>
                 <p className="text-sm text-text-muted mb-2">
-                  {m.broker.name} will be in touch within 24–48 hours.
+                  The team from {m.company.name} will be in touch within 24–48 hours.
                 </p>
                 <p className="text-xs text-text-muted mb-6">
                   Want to track your enquiries and co-broke with verified brokers?

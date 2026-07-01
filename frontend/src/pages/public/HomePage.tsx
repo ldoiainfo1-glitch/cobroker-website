@@ -326,7 +326,7 @@ export default function HomePage() {
             </div>
             <div className="divide-y divide-border">
               {filtered.map((m, i) => (
-                <div key={i} className="flex items-center gap-4 px-5 py-4 hover:bg-surface-1 transition-colors cursor-pointer group">
+                <Link key={i} to="/marketplace/preview" className="flex items-center gap-4 px-5 py-4 hover:bg-surface-1 transition-colors cursor-pointer group">
                   <div className="w-10 h-10 rounded-full bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-sm font-bold text-brand-gold shrink-0">
                     {m.initial}
                   </div>
@@ -353,7 +353,7 @@ export default function HomePage() {
                       </span>
                     )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
             <div className="px-5 py-3 border-t border-border text-center">
