@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import ws from 'ws'
 import { logger } from '@/utils/logger'
 
 const url = process.env.SUPABASE_URL!
@@ -11,12 +10,10 @@ if (!url || !anonKey) {
   process.exit(1)
 }
 
-const clientOptions = { realtime: { transport: ws } }
-
 /** Standard client — respects RLS */
-export const supabase = createClient(url, anonKey, clientOptions)
+export const supabase = createClient(url, anonKey)
 
 /** Admin client — bypasses RLS; server-side only */
 export const supabaseAdmin = serviceKey
-  ? createClient(url, serviceKey, { ...clientOptions, auth: { persistSession: false } })
+  ? createClient(url, serviceKey, { auth: { persistSession: false } })
   : supabase

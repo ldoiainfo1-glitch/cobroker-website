@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts"
   },
@@ -37,6 +37,7 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.14.9",
     "@types/nodemailer": "^6.4.15",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3"
   },
