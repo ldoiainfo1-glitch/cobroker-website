@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, Search,
   MessageSquare, Bell, BarChart3, Settings,
   ChevronLeft, ChevronRight, Plus, LogOut, Radio,
-  UserCircle, Shield,
+  UserCircle, Shield, GitBranch,
 } from 'lucide-react'
 import { SidebarLink } from '@/components/layout/Navbar'
 import { useAuthStore } from '@/stores/authStore'
@@ -40,6 +40,7 @@ const navSections: { title: string; links: NavLink[] }[] = [
     links: [
       { to: '/dashboard/profile', icon: <UserCircle className="h-4 w-4" />, label: 'My Profile' },
       { to: '/dashboard/kyc', icon: <Shield className="h-4 w-4" />, label: 'KYC & Verification' },
+      { to: '/dashboard/network', icon: <GitBranch className="h-4 w-4" />, label: 'My Network' },
     ],
   },
   {

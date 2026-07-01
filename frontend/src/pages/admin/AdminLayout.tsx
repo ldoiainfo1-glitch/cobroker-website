@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Building2, FileText,
   Settings, LogOut, ChevronRight, Shield,
-  BarChart3, Bell, Inbox,
+  BarChart3, Bell, Inbox, GitBranch,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -15,6 +15,7 @@ const NAV = [
   { to: '/admin/mandates',  label: 'Mandates',   icon: <FileText className="h-4 w-4" />, badge: 3 },
   { to: '/admin/analytics', label: 'Analytics',  icon: <BarChart3 className="h-4 w-4" /> },
   { to: '/admin/leads',     label: 'Leads',       icon: <Inbox className="h-4 w-4" /> },
+  { to: '/admin/network',   label: 'Ref. Network', icon: <GitBranch className="h-4 w-4" /> },
   { to: '/admin/settings',  label: 'Platform Settings', icon: <Settings className="h-4 w-4" /> },
 ]
 

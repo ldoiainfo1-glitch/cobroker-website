@@ -26,6 +26,12 @@ const step1Schema = z.object({
     .regex(/[A-Z]/, 'Must include an uppercase letter')
     .regex(/[0-9]/, 'Must include a number'),
   confirmPassword: z.string(),
+  introducerName: z.string().optional(),
+  introducerPhone: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number')
+    .optional()
+    .or(z.literal('')),
 }).refine((d) => d.password === d.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
@@ -132,7 +138,27 @@ export default function RegisterPage() {
 
       if (profileError) throw new Error(profileError.message)
 
-      // 4. If user came from a mandate page, submit their enquiry now
+      // 4. Link to introducer if a phone number was provided
+      if (step1Data.introducerPhone?.trim()) {
+        try {
+          const { data: introducerProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('phone', step1Data.introducerPhone.trim())
+            .maybeSingle()
+
+          if (introducerProfile) {
+            await supabase
+              .from('profiles')
+              .update({ introducer_id: introducerProfile.id })
+              .eq('id', authData.user.id)
+          }
+        } catch (_) {
+          // Non-critical — introducer linking failure should not block registration
+        }
+      }
+
+      // 5. If user came from a mandate page, submit their enquiry now
       const raw = localStorage.getItem(PENDING_ENQUIRY_KEY)
       if (raw) {
         try {
@@ -321,6 +347,31 @@ export default function RegisterPage() {
                     error={err1.confirmPassword?.message}
                     {...reg1('confirmPassword')}
                   />
+
+                  {/* Introducer / Referral (optional) */}
+                  <div className="border-t border-border pt-4 flex flex-col gap-3">
+                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                      Introducer <span className="font-normal normal-case text-text-muted/70">(optional)</span>
+                    </p>
+                    <Input
+                      label="Introducer name"
+                      placeholder="e.g. Rajesh Kumar"
+                      leftIcon={<User className="h-4 w-4" />}
+                      hint="Name of the person who referred you"
+                      error={err1.introducerName?.message}
+                      {...reg1('introducerName')}
+                    />
+                    <Input
+                      label="Introducer phone number"
+                      type="tel"
+                      placeholder="e.g. 9876543210"
+                      leftIcon={<Phone className="h-4 w-4" />}
+                      hint="Their registered mobile number on COBROKINGS"
+                      error={err1.introducerPhone?.message}
+                      {...reg1('introducerPhone')}
+                    />
+                  </div>
+
                   <p className="text-xs text-text-muted">
                     By registering, you agree to our{' '}
                     <Link to="/terms" className="text-brand-gold hover:underline">Terms</Link> and{' '}
