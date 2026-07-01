@@ -34,6 +34,7 @@ import AdminCompaniesPage from '@/pages/admin/AdminCompaniesPage'
 import AdminMandatesPage from '@/pages/admin/AdminMandatesPage'
 import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage'
 import AdminPlatformSettingsPage from '@/pages/admin/AdminPlatformSettingsPage'
+import AdminLeadsPage from '@/pages/admin/AdminLeadsPage'
 
 // Placeholder for not-yet-built pages
 function ComingSoon({ title }: { title: string }) {
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="companies" element={<AdminCompaniesPage />} />
           <Route path="mandates" element={<AdminMandatesPage />} />
           <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route path="leads" element={<AdminLeadsPage />} />
           <Route path="settings" element={<AdminPlatformSettingsPage />} />
         </Route>
       </Route>

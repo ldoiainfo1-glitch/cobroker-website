@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import {
   MapPin, Eye, Users, Clock, ArrowLeft, Share2,
   Bookmark, CheckCircle2, Phone, Building2, Shield,
-  ChevronLeft, ChevronRight, MessageSquare,
+  ChevronLeft, ChevronRight, MessageSquare, Send,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +12,8 @@ import { Navbar } from '@/components/layout/Navbar'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { MANDATE_TYPES } from '@/constants'
 import type { MandateType } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
+import { supabase } from '@/lib/supabase'
 
 // Mock single mandate — replace with API call
 const MOCK_MANDATE = {
@@ -64,10 +66,25 @@ const MOCK_MANDATE = {
 
 export default function MandateDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
+
   const [currentImg, setCurrentImg] = useState(0)
+
+  // Broker intro modal (authenticated)
   const [showIntroModal, setShowIntroModal] = useState(false)
   const [introMessage, setIntroMessage] = useState('')
   const [introSent, setIntroSent] = useState(false)
+
+  // Public enquiry modal (unauthenticated)
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false)
+  const [enquiryName, setEnquiryName] = useState('')
+  const [enquiryEmail, setEnquiryEmail] = useState('')
+  const [enquiryPhone, setEnquiryPhone] = useState('')
+  const [enquiryNote, setEnquiryNote] = useState('')
+  const [enquirySent, setEnquirySent] = useState(false)
+  const [enquiryLoading, setEnquiryLoading] = useState(false)
+  const [enquiryError, setEnquiryError] = useState('')
 
   const m = MOCK_MANDATE // TODO: fetch by id
 
@@ -79,6 +96,33 @@ export default function MandateDetailPage() {
     // TODO: API call
     setIntroSent(true)
     setTimeout(() => setShowIntroModal(false), 1500)
+  }
+
+  const sendEnquiry = async () => {
+    setEnquiryError('')
+    if (!enquiryName.trim()) { setEnquiryError('Please enter your name.'); return }
+    if (!/^[6-9]\d{9}$/.test(enquiryPhone)) { setEnquiryError('Enter a valid 10-digit mobile number.'); return }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryEmail)) { setEnquiryError('Enter a valid email address.'); return }
+
+    setEnquiryLoading(true)
+    // Only pass mandate_id if it looks like a valid UUID
+    const mandateUuid = id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null
+
+    const { error } = await supabase.from('mandate_enquiries').insert({
+      mandate_id: mandateUuid,
+      full_name: enquiryName.trim(),
+      email: enquiryEmail.trim().toLowerCase(),
+      phone: enquiryPhone.trim(),
+      message: enquiryNote.trim() || null,
+    })
+    setEnquiryLoading(false)
+
+    if (error) {
+      setEnquiryError('Something went wrong. Please try again.')
+      console.error('[sendEnquiry]', error)
+      return
+    }
+    setEnquirySent(true)
   }
 
   return (
@@ -233,10 +277,17 @@ export default function MandateDetailPage() {
                   <Badge variant="success" dot>Active</Badge>
                 </div>
 
-                <Button size="lg" className="w-full mb-3" onClick={() => setShowIntroModal(true)}>
-                  <MessageSquare className="h-4 w-4" />
-                  Request Introduction
-                </Button>
+                {isAuthenticated ? (
+                  <Button size="lg" className="w-full mb-3" onClick={() => setShowIntroModal(true)}>
+                    <MessageSquare className="h-4 w-4" />
+                    Request Introduction
+                  </Button>
+                ) : (
+                  <Button size="lg" className="w-full mb-3" onClick={() => setShowEnquiryModal(true)}>
+                    <Send className="h-4 w-4" />
+                    Send Enquiry
+                  </Button>
+                )}
                 <div className="flex gap-2">
                   <Button variant="secondary" size="md" className="flex-1">
                     <Bookmark className="h-4 w-4" /> Save
@@ -247,7 +298,9 @@ export default function MandateDetailPage() {
                 </div>
 
                 <p className="text-xs text-text-muted text-center mt-3">
-                  Only verified brokers can request introductions
+                  {isAuthenticated
+                    ? 'Only verified brokers can request introductions'
+                    : 'Your details are shared only with the listing broker'}
                 </p>
               </CardContent>
             </Card>
@@ -298,6 +351,97 @@ export default function MandateDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Public Enquiry Modal */}
+      {showEnquiryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (!enquiryLoading) { setShowEnquiryModal(false); setEnquirySent(false) } }} />
+          <div className="relative bg-surface-1 rounded-2xl border border-border p-6 w-full max-w-md shadow-2xl">
+            {enquirySent ? (
+              <div className="text-center py-4">
+                <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-text-primary mb-1">Enquiry sent!</h3>
+                <p className="text-sm text-text-muted mb-2">
+                  {m.broker.name} will be in touch within 24–48 hours.
+                </p>
+                <p className="text-xs text-text-muted mb-6">
+                  Want to track your enquiries and co-broke with verified brokers?
+                </p>
+                <div className="flex gap-3">
+                  <Button variant="secondary" size="md" className="flex-1" onClick={() => { setShowEnquiryModal(false); setEnquirySent(false) }}>Close</Button>
+                  <Button size="md" className="flex-1" onClick={() => navigate('/register')}>Register free</Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold text-text-primary mb-1">Send Enquiry</h3>
+                <p className="text-sm text-text-muted mb-5">
+                  Express your interest in <span className="font-medium text-text-primary">{m.title}</span>. The broker will contact you directly.
+                </p>
+
+                <div className="flex flex-col gap-3 mb-4">
+                  <div>
+                    <label className="text-xs font-medium text-text-secondary mb-1 block">Full name *</label>
+                    <input
+                      type="text"
+                      value={enquiryName}
+                      onChange={(e) => setEnquiryName(e.target.value)}
+                      placeholder="Rajesh Kumar"
+                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-text-secondary mb-1 block">Mobile number *</label>
+                    <input
+                      type="tel"
+                      value={enquiryPhone}
+                      onChange={(e) => setEnquiryPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="9876543210"
+                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-text-secondary mb-1 block">Email *</label>
+                    <input
+                      type="email"
+                      value={enquiryEmail}
+                      onChange={(e) => setEnquiryEmail(e.target.value)}
+                      placeholder="you@email.com"
+                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-text-secondary mb-1 block">Note (optional)</label>
+                    <textarea
+                      value={enquiryNote}
+                      onChange={(e) => setEnquiryNote(e.target.value)}
+                      placeholder="Any specific requirements or questions..."
+                      rows={3}
+                      maxLength={300}
+                      className="w-full rounded-xl bg-surface-2 border border-border px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-brand-gold/50"
+                    />
+                  </div>
+                </div>
+
+                {enquiryError && (
+                  <p className="text-xs text-error mb-3">{enquiryError}</p>
+                )}
+
+                <div className="flex gap-3">
+                  <Button variant="secondary" size="lg" className="flex-1" onClick={() => setShowEnquiryModal(false)} disabled={enquiryLoading}>Cancel</Button>
+                  <Button size="lg" className="flex-1" onClick={sendEnquiry} disabled={enquiryLoading}>
+                    {enquiryLoading ? 'Sending…' : 'Send Enquiry'}
+                  </Button>
+                </div>
+
+                <p className="text-xs text-text-muted text-center mt-3">
+                  By submitting you agree your details are shared with the listing broker.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Introduction Request Modal */}
       {showIntroModal && (
