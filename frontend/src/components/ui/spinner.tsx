@@ -25,7 +25,7 @@ export function FullPageSpinner() {
   return (
     <div className="fixed inset-0 bg-surface-0 flex items-center justify-center z-50">
       <div className="flex flex-col items-center gap-4">
-        <div className="text-2xl font-bold text-brand-gold tracking-widest">⬡ COBROKINGS</div>
+        <div className="text-2xl font-bold text-brand-gold tracking-widest">⬡ Co-Brokings</div>
         <Spinner size="lg" />
       </div>
     </div>

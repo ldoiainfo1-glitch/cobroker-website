@@ -206,7 +206,7 @@ export default function DashboardLayout() {
           {!collapsed ? (
             <Link to="/" className="flex items-center gap-2">
               <span className="text-brand-gold text-lg">⬡</span>
-              <span className="font-bold text-sm tracking-widest text-text-primary">COBROKINGS</span>
+              <span className="font-bold text-sm tracking-widest text-text-primary">Co-Brokings</span>
             </Link>
           ) : (
             <Link to="/" className="text-brand-gold text-xl">⬡</Link>

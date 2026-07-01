@@ -168,7 +168,7 @@ export default function RegisterPage() {
             </p>
             <h2 className="text-3xl xl:text-4xl font-bold text-text-primary leading-tight mb-4">
               Grow your business<br />
-              <span className="gradient-text">on COBROKINGS</span>
+              <span className="gradient-text">on Co-Brokings</span>
             </h2>
             <p className="text-text-secondary text-sm">
               Get verified, post mandates, and co-broke with trusted real estate companies across India.
@@ -336,7 +336,7 @@ export default function RegisterPage() {
                       type="tel"
                       placeholder="e.g. 9876543210"
                       leftIcon={<Phone className="h-4 w-4" />}
-                      hint="Their registered mobile number on COBROKINGS"
+                      hint="Their registered mobile number on Co-Brokings"
                       error={err1.introducerPhone?.message}
                       {...reg1('introducerPhone')}
                     />

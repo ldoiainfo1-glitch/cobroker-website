@@ -46,7 +46,7 @@ export function Navbar() {
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <span className="text-brand-gold text-xl">⬡</span>
             <span className="font-bold text-base tracking-widest text-text-primary">
-              COBROKINGS
+              Co-Brokings
             </span>
           </Link>          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
@@ -196,7 +196,7 @@ export function AuthNavbar() {
           <Link to="/" className="flex items-center gap-2">
             <span className="text-brand-gold text-xl">⬡</span>
             <div>
-              <span className="font-bold text-base tracking-widest text-text-primary">COBROKINGS</span>
+              <span className="font-bold text-base tracking-widest text-text-primary">Co-Brokings</span>
               <span className="hidden sm:block text-xs text-text-muted -mt-0.5">Verified Property Marketplace</span>
             </div>
           </Link>

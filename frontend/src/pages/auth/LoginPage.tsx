@@ -85,7 +85,7 @@ export default function LoginPage() {
               <span className="gradient-text">Close more deals.</span>
             </h2>
             <p className="text-text-secondary text-base max-w-md mb-10">
-              Find verified homes or list yours. Every property and broker on COBROKINGS is KYC-checked and RERA-verified.
+              Find verified homes or list yours. Every property and broker on Co-Brokings is KYC-checked and RERA-verified.
             </p>
             <div className="flex items-center gap-8">
               {stats.map((stat) => (

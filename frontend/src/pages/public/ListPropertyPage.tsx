@@ -182,7 +182,7 @@ export default function ListPropertyPage() {
             <div className="w-px h-4 bg-border" />
             <Link to="/" className="flex items-center gap-1.5">
               <span className="text-brand-gold">⬡</span>
-              <span className="font-bold text-sm tracking-widest text-text-primary">COBROKINGS</span>
+              <span className="font-bold text-sm tracking-widest text-text-primary">Co-Brokings</span>
             </Link>
           </div>
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 border border-success/30 text-success text-xs font-semibold">
@@ -402,7 +402,7 @@ export default function ListPropertyPage() {
           {/* ── Submit ── */}
           <div className="flex flex-col gap-3 pt-1">
             <p className="text-xs text-text-muted leading-relaxed">
-              By submitting you agree your contact details will be shared with KYC-verified brokers on COBROKINGS. You can request takedown anytime.{' '}
+              By submitting you agree your contact details will be shared with KYC-verified brokers on Co-Brokings. You can request takedown anytime.{' '}
               <Link to="/privacy" className="text-brand-gold hover:underline">Privacy Policy</Link>
             </p>
             <Button type="submit" size="lg" className="w-full sm:w-auto sm:self-start px-10">

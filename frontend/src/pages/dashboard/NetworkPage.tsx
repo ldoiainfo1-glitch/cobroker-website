@@ -179,7 +179,7 @@ export default function NetworkPage() {
             My Network
           </h1>
           <p className="text-text-secondary text-sm mt-1">
-            Members who registered on COBROKINGS using your referral
+            Members who registered on Co-Brokings using your referral
           </p>
         </div>
 

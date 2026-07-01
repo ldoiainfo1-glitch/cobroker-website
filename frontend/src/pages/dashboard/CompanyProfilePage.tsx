@@ -553,7 +553,7 @@ export default function CompanyProfilePage() {
             <div className="mt-5 flex items-start gap-2.5 p-4 rounded-xl bg-surface-2 border border-border">
               <Shield className="h-4 w-4 text-text-muted mt-0.5 shrink-0" />
               <p className="text-xs text-text-muted leading-relaxed">
-                Documents marked <span className="text-success font-medium">Verified</span> have been reviewed by the COBROKINGS compliance team. Only company admins can upload or delete documents.
+                Documents marked <span className="text-success font-medium">Verified</span> have been reviewed by the Co-Brokings compliance team. Only company admins can upload or delete documents.
               </p>
             </div>
           </div>

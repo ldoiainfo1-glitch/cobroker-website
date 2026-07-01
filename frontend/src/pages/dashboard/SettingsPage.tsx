@@ -316,7 +316,7 @@ export default function SettingsPage() {
             {section === 'privacy' && (
               <>
                 <SectionCard title="Profile visibility">
-                  <Toggle label="Public profile" description="Allow anyone on COBROKINGS to view your profile" checked={privacy.profilePublic} onChange={setP('profilePublic')} />
+                  <Toggle label="Public profile" description="Allow anyone on Co-Brokings to view your profile" checked={privacy.profilePublic} onChange={setP('profilePublic')} />
                   <Divider />
                   <Toggle label="Show phone number" description="Visible to verified brokers you connect with" checked={privacy.showPhone} onChange={setP('showPhone')} />
                   <Divider />

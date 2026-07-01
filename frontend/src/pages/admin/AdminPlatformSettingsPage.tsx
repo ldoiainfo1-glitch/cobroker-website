@@ -76,7 +76,7 @@ function SettingsCard({ title, sub, children }: { title: string; sub?: string; c
 // ── Section content components ────────────────────────────────────────────────
 function GeneralSettings() {
   const [vals, setVals] = useState({
-    platformName: 'COBROKINGS',
+    platformName: 'Co-Brokings',
     tagline: "India's Co-Broking Network",
     supportEmail: 'support@cobrokings.in',
     supportPhone: '+91 98765 43210',
@@ -315,17 +315,17 @@ function IntegrationSettings() {
 
 type EmailTemplate = { id: string; name: string; subject: string; enabled: boolean }
 const EMAIL_TEMPLATES: EmailTemplate[] = [
-  { id: 't1', name: 'Welcome Email',         subject: 'Welcome to COBROKINGS!',              enabled: true },
+  { id: 't1', name: 'Welcome Email',         subject: 'Welcome to Co-Brokings!',              enabled: true },
   { id: 't2', name: 'KYC Approved',          subject: 'Your KYC has been verified ✅',       enabled: true },
   { id: 't3', name: 'KYC Rejected',          subject: 'Action required: KYC resubmission',   enabled: true },
-  { id: 't4', name: 'New Message',           subject: 'You have a new message on COBROKINGS', enabled: true },
-  { id: 't5', name: 'Password Reset',        subject: 'Reset your COBROKINGS password',       enabled: true },
+  { id: 't4', name: 'New Message',           subject: 'You have a new message on Co-Brokings', enabled: true },
+  { id: 't5', name: 'Password Reset',        subject: 'Reset your Co-Brokings password',       enabled: true },
   { id: 't6', name: 'Mandate Co-brok Request', subject: 'A broker wants to co-brok with you',enabled: false },
 ]
 
 function EmailSettings() {
   const [templates, setTemplates] = useState(EMAIL_TEMPLATES)
-  const [senderName, setSenderName] = useState('COBROKINGS')
+  const [senderName, setSenderName] = useState('Co-Brokings')
   const [senderEmail, setSenderEmail] = useState('noreply@cobrokings.in')
   const [replyTo, setReplyTo] = useState('support@cobrokings.in')
 
@@ -352,11 +352,11 @@ function EmailSettings() {
         <div className="flex flex-col gap-3">
           <div className="p-3 rounded-xl bg-surface-2 border border-border">
             <p className="text-xs font-medium text-text-secondary mb-1">OTP Verification</p>
-            <p className="text-xs text-text-muted font-mono">Your COBROKINGS OTP is {'{{otp}}'}. Valid for 10 minutes.</p>
+            <p className="text-xs text-text-muted font-mono">Your Co-Brokings OTP is {'{{otp}}'}. Valid for 10 minutes.</p>
           </div>
           <div className="p-3 rounded-xl bg-surface-2 border border-border">
             <p className="text-xs font-medium text-text-secondary mb-1">KYC Approved</p>
-            <p className="text-xs text-text-muted font-mono">Hi {'{{name}}'}, your KYC on COBROKINGS is approved! Start co-broking today.</p>
+            <p className="text-xs text-text-muted font-mono">Hi {'{{name}}'}, your KYC on Co-Brokings is approved! Start co-broking today.</p>
           </div>
         </div>
       </SettingsCard>

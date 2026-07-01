@@ -55,7 +55,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <span className="text-brand-gold text-2xl">⬡</span>
-              <span className="font-bold text-lg tracking-widest text-text-primary">COBROKINGS</span>
+              <span className="font-bold text-lg tracking-widest text-text-primary">Co-Brokings</span>
             </Link>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs mb-6">
               India's largest co-broking network for verified real estate brokers. Post mandates, find partners, close deals — all in one place.
@@ -108,7 +108,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="py-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-muted">
-            © {new Date().getFullYear()} COBROKINGS. All rights reserved.
+            © {new Date().getFullYear()} Co-Brokings. All rights reserved.
           </p>
           <div className="flex items-center gap-1 text-xs text-text-muted">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />

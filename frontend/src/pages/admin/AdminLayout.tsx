@@ -45,7 +45,7 @@ export default function AdminLayout() {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-xs font-bold text-text-primary tracking-wide">COBROKINGS</p>
+              <p className="text-xs font-bold text-text-primary tracking-wide">Co-Brokings</p>
               <p className="text-[10px] text-error font-semibold uppercase tracking-widest">Admin Panel</p>
             </div>
           )}

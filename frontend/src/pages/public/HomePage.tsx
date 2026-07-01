@@ -226,7 +226,7 @@ export default function HomePage() {
 
             {/* Popular cities */}
             <div>
-              <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wider">Popular cities on COBROKINGS</p>
+              <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wider">Popular cities on Co-Brokings</p>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 {['Mumbai', 'Bengaluru', 'Delhi NCR', 'Pune', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad', 'Goa', 'Jaipur'].map((city, i, arr) => (
                   <span key={city} className="flex items-center gap-2">
