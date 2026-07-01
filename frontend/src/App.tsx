@@ -60,7 +60,6 @@ export default function App() {
       </Route>
 
       {/* Marketplace — standalone (has its own Navbar) */}
-      <Route path="/marketplace" element={<MarketplacePage />} />
       <Route path="/marketplace/:id" element={<MandateDetailPage />} />
 
       {/* List property — public, no auth required */}
@@ -92,7 +91,7 @@ export default function App() {
           <Route path="analytics" element={<ComingSoon title="Analytics" />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="network" element={<NetworkPage />} />
-
+          <Route path="marketplace" element={<MarketplacePage />} />
         </Route>
       </Route>
 

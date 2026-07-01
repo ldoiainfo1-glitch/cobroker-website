@@ -7,7 +7,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { Navbar } from '@/components/layout/Navbar'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, MANDATE_TYPES } from '@/constants'
@@ -188,10 +187,8 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-surface-0">
-      <Navbar />
-
       {/* Page header */}
-      <div className="pt-16 bg-surface-1 border-b border-border">
+      <div className="bg-surface-1 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>

@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-  Search, Send, Paperclip, MoreVertical, Phone,
+  Search, Send, Paperclip,
   CheckCheck, Check, Building2, MapPin, Users,
-  GitBranch, ChevronRight, MessageSquare, Smile,
+  GitBranch, ChevronRight, MessageSquare, Smile, X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn, timeAgo } from '@/lib/utils'
+import { cn, timeAgo, formatCurrency } from '@/lib/utils'
 import { MOCK_CONVERSATIONS, MOCK_MESSAGES } from '@/data/messages'
-import type { Conversation, ChatMessage, ConvParticipant } from '@/types'
+import type { Conversation, ChatMessage, ConvParticipant, Mandate } from '@/types'
+import { useMyMandates } from '@/hooks/useMandates'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatTime(iso: string) {
@@ -208,6 +209,11 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  const [showMandatePicker, setShowMandatePicker] = useState(false)
+  const [selectedMandateIds, setSelectedMandateIds] = useState<Set<string>>(new Set())
+  const { data: myMandates } = useMyMandates()
+  const activeMandates = (myMandates ?? []).filter((m: Mandate) => m.status === 'active')
+
   const selectedConv = MOCK_CONVERSATIONS.find((c) => c.id === selectedId)
   const selectedMessages = messages[selectedId] ?? []
 
@@ -351,14 +357,7 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors">
-                  <Phone className="h-4 w-4" />
-                </button>
-                <button className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors">
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-              </div>
+              <div className="flex items-center gap-1" />
             </div>
 
             {/* Messages */}
@@ -405,11 +404,164 @@ export default function ChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Mandate share pill */}
-            <div className="px-5 pb-2 flex gap-2">
-              <button className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-2 border border-border text-xs text-text-muted hover:text-brand-gold hover:border-brand-gold/30 transition-all">
-                <Building2 className="h-3 w-3" /> Share Mandate
+            {/* Mandate share pill + picker */}
+            <div className="px-5 pb-2 flex gap-2 relative">
+              <button
+                onClick={() => { setShowMandatePicker((v) => !v); setSelectedMandateIds(new Set()) }}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all',
+                  activeMandates.length > 0
+                    ? 'bg-brand-gold/10 border-brand-gold/40 text-brand-gold hover:bg-brand-gold/20'
+                    : 'bg-surface-2 border-border text-text-muted hover:text-brand-gold hover:border-brand-gold/30',
+                )}
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                Share Mandate
+                {activeMandates.length > 0 && (
+                  <span className="ml-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-gold text-black text-[10px] font-bold flex items-center justify-center">
+                    {activeMandates.length}
+                  </span>
+                )}
               </button>
+
+              {/* Mandate picker panel */}
+              {showMandatePicker && (
+                <div className="absolute bottom-full left-0 mb-3 w-[560px] bg-surface-0 border border-border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-surface-1">
+                    <div>
+                      <p className="text-base font-bold text-text-primary">Share Mandate</p>
+                      <p className="text-sm text-text-muted mt-0.5">Select one or more mandates to share</p>
+                    </div>
+                    <button
+                      onClick={() => setShowMandatePicker(false)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  {/* Mandate list */}
+                  {activeMandates.length === 0 ? (
+                    <div className="px-5 py-8 text-center">
+                      <Building2 className="h-8 w-8 text-text-muted mx-auto mb-3" />
+                      <p className="text-sm font-medium text-text-secondary mb-1">No active mandates</p>
+                      <p className="text-xs text-text-muted mb-3">Post a mandate to share it in chat</p>
+                      <Link
+                        to="/dashboard/mandates/new"
+                        onClick={() => setShowMandatePicker(false)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-gold text-black text-xs font-semibold hover:bg-brand-gold-light transition-colors"
+                      >
+                        + Post Mandate
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="max-h-[400px] overflow-y-auto p-4 flex flex-col gap-3">
+                        {activeMandates.map((m: Mandate) => {
+                          const isSelected = selectedMandateIds.has(m.id)
+                          const budgetLabel = m.mandateType === 'lease'
+                            ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
+                            : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`
+                          return (
+                            <button
+                              key={m.id}
+                              onClick={() => setSelectedMandateIds((prev) => {
+                                const next = new Set(prev)
+                                next.has(m.id) ? next.delete(m.id) : next.add(m.id)
+                                return next
+                              })}
+                              className={cn(
+                                'w-full text-left p-4 rounded-xl border-2 transition-all',
+                                isSelected
+                                  ? 'border-brand-gold bg-brand-gold/8'
+                                  : 'border-border bg-surface-1 hover:border-brand-gold/40 hover:bg-surface-2',
+                              )}
+                            >
+                              <div className="flex items-start gap-3">
+                                {/* Checkbox */}
+                                <div className={cn(
+                                  'mt-1 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all',
+                                  isSelected ? 'bg-brand-gold border-brand-gold' : 'border-border',
+                                )}>
+                                  {isSelected && (
+                                    <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 12 12">
+                                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className={cn('text-xs font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wide', mandateTypeColor[m.mandateType] ?? 'text-text-muted bg-surface-3 border-border')}>
+                                      {m.mandateType}
+                                    </span>
+                                  </div>
+                                  <p className="text-base font-semibold text-text-primary leading-snug">{m.title}</p>
+                                  <div className="flex items-center gap-4 mt-2 text-sm text-text-muted">
+                                    <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{m.city}</span>
+                                    <span className="font-semibold text-brand-gold">{budgetLabel}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="px-5 py-4 border-t border-border bg-surface-1 flex items-center justify-between gap-3">
+                        <p className="text-sm text-text-muted">
+                          {selectedMandateIds.size > 0
+                            ? `${selectedMandateIds.size} mandate${selectedMandateIds.size > 1 ? 's' : ''} selected`
+                            : 'Tap cards to select'}
+                        </p>
+                        <button
+                          disabled={selectedMandateIds.size === 0}
+                          onClick={() => {
+                            const now = Date.now()
+                            const cards: ChatMessage[] = activeMandates
+                              .filter((m: Mandate) => selectedMandateIds.has(m.id))
+                              .map((m: Mandate, i: number) => ({
+                                id: `mandate-${now}-${i}`,
+                                conversationId: selectedId,
+                                senderId: 'me',
+                                senderName: 'Me',
+                                senderInitial: 'DB',
+                                type: 'mandate_share' as const,
+                                text: '',
+                                sentAt: new Date(now + i).toISOString(),
+                                isRead: false,
+                                isMine: true,
+                                mandateCard: {
+                                  mandateId: m.id,
+                                  title: m.title,
+                                  mandateType: m.mandateType,
+                                  city: m.city,
+                                  propertyType: m.propertyType,
+                                  budget: m.mandateType === 'lease'
+                                    ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
+                                    : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`,
+                                },
+                              }))
+                            setMessages((prev) => ({ ...prev, [selectedId]: [...(prev[selectedId] ?? []), ...cards] }))
+                            setShowMandatePicker(false)
+                            setSelectedMandateIds(new Set())
+                          }}
+                          className={cn(
+                            'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all',
+                            selectedMandateIds.size > 0
+                              ? 'bg-brand-gold text-black hover:bg-brand-gold-light'
+                              : 'bg-surface-3 text-text-muted cursor-not-allowed',
+                          )}
+                        >
+                          <Send className="h-4 w-4" />
+                          Send{selectedMandateIds.size > 0 ? ` (${selectedMandateIds.size})` : ''}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Input */}

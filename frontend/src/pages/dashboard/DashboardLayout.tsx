@@ -19,7 +19,7 @@ const navSections: { title: string; links: NavLink[] }[] = [
     links: [
       { to: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard' },
       { to: '/dashboard/mandates', icon: <Building2 className="h-4 w-4" />, label: 'My Mandates' },
-      { to: '/marketplace', icon: <Search className="h-4 w-4" />, label: 'Marketplace' },
+      { to: '/dashboard/marketplace', icon: <Search className="h-4 w-4" />, label: 'Marketplace' },
     ],
   },
   {
@@ -209,7 +209,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Page content */}
-        <div className="flex-1 overflow-hidden bg-surface-0 flex flex-col">
+        <div className="flex-1 overflow-y-auto bg-surface-0 flex flex-col">
           <Outlet />
         </div>
       </main>
