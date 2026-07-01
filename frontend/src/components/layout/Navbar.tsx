@@ -126,9 +126,6 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild className="text-text-muted">
-                  <Link to="/login">Demo login</Link>
-                </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/login">Sign in</Link>
                 </Button>
