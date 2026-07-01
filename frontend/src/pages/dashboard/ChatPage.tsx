@@ -136,9 +136,9 @@ function MessageBubble({ msg, showAvatar }: { msg: ChatMessage; showAvatar: bool
 // ─── Conversation list item ───────────────────────────────────────────────────
 function ConvItem({ conv, isActive, onClick }: { conv: Conversation; isActive: boolean; onClick: () => void }) {
   const participant = conv.participants[0]
-  const displayName = conv.type === 'group' ? conv.groupName! : participant.name
-  const displayInitial = conv.type === 'group' ? conv.groupInitial! : participant.avatarInitial
-  const isOnline = conv.type === 'direct' && participant.isOnline
+  const displayName = conv.type === 'group' ? (conv.groupName ?? 'Group') : (participant?.fullName ?? participant?.name ?? 'Unknown')
+  const displayInitial = conv.type === 'group' ? (conv.groupInitial ?? 'G') : (participant?.avatarInitial ?? '?')
+  const isOnline = conv.type === 'direct' && (participant?.isOnline ?? false)
 
   return (
     <button
@@ -294,7 +294,7 @@ export default function ChatPage() {
   const selectedConv = allConversations.find(c => c.id === selectedId)
 
   const filteredConvs = allConversations.filter(c => {
-    const name = c.type === 'group' ? c.groupName! : c.participants[0]?.name ?? ''
+    const name = c.type === 'group' ? (c.groupName ?? '') : (c.participants[0]?.fullName ?? c.participants[0]?.name ?? '')
     const matchesSearch = name.toLowerCase().includes(search.toLowerCase())
     const matchesTab = tab === 'all' || (tab === 'unread' && c.unreadCount > 0)
     return matchesSearch && matchesTab
@@ -380,14 +380,14 @@ export default function ChatPage() {
             <div className="h-16.25 px-5 flex items-center justify-between border-b border-border bg-surface-1 shrink-0">
               <div className="flex items-center gap-3">
                 <Avatar
-                  initial={selectedConv.type === 'group' ? selectedConv.groupInitial! : selectedConv.participants[0].avatarInitial}
+                  initial={selectedConv.type === 'group' ? (selectedConv.groupInitial ?? 'G') : (selectedConv.participants[0]?.avatarInitial ?? '?')}
                   size="md"
-                  online={selectedConv.type === 'direct' ? selectedConv.participants[0].isOnline : undefined}
+                  online={selectedConv.type === 'direct' ? (selectedConv.participants[0]?.isOnline ?? false) : undefined}
                 />
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-text-primary">
-                      {selectedConv.type === 'group' ? selectedConv.groupName : selectedConv.participants[0].name}
+                      {selectedConv.type === 'group' ? selectedConv.groupName : (selectedConv.participants[0]?.fullName ?? selectedConv.participants[0]?.name ?? 'Unknown')}
                     </span>
                     {participant?.isVerified && <span className="text-xs text-success">✓</span>}
                   </div>
@@ -416,7 +416,7 @@ export default function ChatPage() {
                   </div>
                   <p className="text-sm font-medium text-text-secondary mb-1">Start the conversation</p>
                   <p className="text-xs text-text-muted">
-                    Say hello to {selectedConv.type === 'direct' ? selectedConv.participants[0].name : 'the group'}.
+                    Say hello to {selectedConv.type === 'direct' ? (selectedConv.participants[0]?.fullName ?? selectedConv.participants[0]?.name ?? 'them') : 'the group'}.
                   </p>
                 </div>
               ) : (

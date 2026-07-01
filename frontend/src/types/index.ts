@@ -338,8 +338,11 @@ export type ChatMessageType = 'text' | 'mandate_share' | 'system' | 'deal_update
 export interface ConvParticipant {
   id: string
   name: string
+  fullName?: string        // alias used by real DB data (same as name)
+  userId?: string
   company: string
   avatarInitial: string
+  avatarUrl?: string | null
   isVerified: boolean
   isOnline: boolean
   lastSeen?: string
