@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useSearchParams } from 'react-router-dom'
 import {
   Search, Send, Paperclip,
   CheckCheck, Check, Building2, MapPin, Users,
@@ -7,9 +7,12 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn, timeAgo, formatCurrency } from '@/lib/utils'
-import { MOCK_CONVERSATIONS, MOCK_MESSAGES } from '@/data/messages'
-import type { Conversation, ChatMessage, ConvParticipant, Mandate } from '@/types'
+import type { Conversation, ChatMessage, ChatMessageType, ConvParticipant, Mandate } from '@/types'
 import { useMyMandates } from '@/hooks/useMandates'
+import { useAuthStore } from '@/stores/authStore'
+import { useConversations, useMessages, useSendMessage, useMarkConversationRead } from '@/hooks/useChat'
+import { getOrCreateDirectConversation } from '@/services/chatService'
+import { Spinner } from '@/components/ui/spinner'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatTime(iso: string) {
@@ -101,12 +104,9 @@ function MessageBubble({ msg, showAvatar }: { msg: ChatMessage; showAvatar: bool
 
   return (
     <div className={cn('flex items-end gap-2 mb-1', msg.isMine ? 'flex-row-reverse' : 'flex-row')}>
-      {/* Avatar placeholder (keeps alignment) */}
       <div className="w-8 shrink-0">
         {showAvatar && !msg.isMine && <Avatar initial={msg.senderInitial} size="sm" />}
       </div>
-
-      {/* Bubble */}
       <div className={cn('flex flex-col gap-0.5 max-w-[65%]', msg.isMine ? 'items-end' : 'items-start')}>
         {msg.type === 'mandate_share' && msg.mandateCard ? (
           <MandateCardMsg card={msg.mandateCard} isMine={msg.isMine} />
@@ -120,7 +120,6 @@ function MessageBubble({ msg, showAvatar }: { msg: ChatMessage; showAvatar: bool
             {msg.text}
           </div>
         )}
-        {/* Time + read */}
         <div className={cn('flex items-center gap-1 text-xs text-text-muted px-1', msg.isMine && 'flex-row-reverse')}>
           <span>{formatTime(msg.sentAt)}</span>
           {msg.isMine && (
@@ -157,7 +156,6 @@ function ConvItem({ conv, isActive, onClick }: { conv: Conversation; isActive: b
           </span>
         )}
       </div>
-
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-0.5">
           <span className={cn('text-sm font-semibold truncate', conv.unreadCount > 0 ? 'text-text-primary' : 'text-text-secondary')}>
@@ -200,75 +198,124 @@ function EmptyThread() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ChatPage() {
-  const { conversationId } = useParams<{ conversationId?: string }>()
-  const [selectedId, setSelectedId] = useState<string>(conversationId ?? MOCK_CONVERSATIONS[0].id)
+  const { conversationId: convIdParam } = useParams<{ conversationId?: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { user } = useAuthStore()
+
+  const [selectedId, setSelectedId] = useState<string | null>(convIdParam ?? null)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'all' | 'unread'>('all')
   const [text, setText] = useState('')
-  const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({ ...MOCK_MESSAGES })
-  const [isTyping, setIsTyping] = useState(false)
+  const [isCreatingConv, setIsCreatingConv] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Mandate picker (client-side only, sends to DB via sendMsgMutation)
   const [showMandatePicker, setShowMandatePicker] = useState(false)
   const [selectedMandateIds, setSelectedMandateIds] = useState<Set<string>>(new Set())
   const { data: myMandates } = useMyMandates()
   const activeMandates = (myMandates ?? []).filter((m: Mandate) => m.status === 'active')
 
-  const selectedConv = MOCK_CONVERSATIONS.find((c) => c.id === selectedId)
-  const selectedMessages = messages[selectedId] ?? []
+  // ── Real data from Supabase ────────────────────────────────────────────────
+  const { data: convSummaries = [], isLoading: convsLoading } = useConversations()
+  const { data: msgRows = [], isLoading: msgsLoading } = useMessages(selectedId)
+  const { mutate: sendMsgMutation } = useSendMessage()
+  useMarkConversationRead(selectedId)
 
-  // Scroll to bottom when conversation or messages change
+  // Map DB summaries → Conversation type for UI components
+  const allConversations: Conversation[] = convSummaries.map(c => ({
+    id: c.id,
+    type: c.type === 'direct' ? 'direct' : 'group',
+    groupName: c.type !== 'direct' ? (c.name ?? 'Group') : undefined,
+    groupInitial: c.type !== 'direct' ? ((c.name ?? 'G')[0].toUpperCase()) : undefined,
+    participants: c.participants.map(p => ({
+      id: p.userId,
+      name: p.fullName,
+      company: p.company,
+      avatarInitial: p.avatarInitial,
+      isVerified: p.isVerified,
+      isOnline: p.isOnline,
+    } satisfies ConvParticipant)),
+    lastMessage: c.lastMessage,
+    lastMessageAt: c.lastMessageAt,
+    lastMessageType: 'text' as ChatMessageType,
+    unreadCount: c.unreadCount,
+  }))
+
+  // Map DB message rows → ChatMessage type for UI components
+  const selectedMessages: ChatMessage[] = msgRows.map(m => ({
+    id: m.id,
+    conversationId: m.conversationId,
+    senderId: m.senderId,
+    senderName: m.senderName,
+    senderInitial: m.senderInitial,
+    type: (m.type || 'text') as ChatMessageType,
+    text: m.text,
+    mandateCard: m.type === 'mandate_share' && m.metadata ? {
+      id: m.metadata.id ?? '',
+      title: m.metadata.title ?? '',
+      mandateType: m.metadata.mandateType ?? '',
+      budget: m.metadata.budget ?? '',
+      city: m.metadata.city ?? '',
+      propertyType: m.metadata.propertyType ?? '',
+    } : undefined,
+    sentAt: m.sentAt,
+    isRead: true,
+    isMine: m.isMine,
+  }))
+
+  // Auto-select first conversation
+  useEffect(() => {
+    if (!selectedId && allConversations.length > 0) {
+      setSelectedId(allConversations[0].id)
+    }
+  }, [allConversations.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle ?with=userId → get or create direct conversation in DB
+  useEffect(() => {
+    const withUserId = searchParams.get('with')
+    if (!withUserId || !user?.id) return
+
+    setIsCreatingConv(true)
+    getOrCreateDirectConversation(withUserId)
+      .then((convId) => {
+        setSelectedId(convId)
+        setSearchParams({}, { replace: true })
+      })
+      .catch(console.error)
+      .finally(() => setIsCreatingConv(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
+  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [selectedId, messages])
+  }, [selectedId, msgRows.length])
 
-  // Simulate typing indicator when switching to c1
-  useEffect(() => {
-    if (selectedId === 'c1') {
-      const t = setTimeout(() => setIsTyping(true), 2000)
-      const t2 = setTimeout(() => setIsTyping(false), 5000)
-      return () => { clearTimeout(t); clearTimeout(t2) }
-    } else {
-      setIsTyping(false)
-    }
-  }, [selectedId])
+  const selectedConv = allConversations.find(c => c.id === selectedId)
 
-  const filteredConvs = MOCK_CONVERSATIONS.filter((c) => {
-    const name = c.type === 'group' ? c.groupName! : c.participants[0].name
+  const filteredConvs = allConversations.filter(c => {
+    const name = c.type === 'group' ? c.groupName! : c.participants[0]?.name ?? ''
     const matchesSearch = name.toLowerCase().includes(search.toLowerCase())
     const matchesTab = tab === 'all' || (tab === 'unread' && c.unreadCount > 0)
     return matchesSearch && matchesTab
   })
 
-  const unreadCount = MOCK_CONVERSATIONS.filter((c) => c.unreadCount > 0).length
+  const unreadCount = allConversations.filter(c => c.unreadCount > 0).length
 
   function handleSend() {
     const trimmed = text.trim()
     if (!trimmed || !selectedId) return
-    const newMsg: ChatMessage = {
-      id: `new-${Date.now()}`,
-      conversationId: selectedId,
-      senderId: 'me',
-      senderName: 'Me',
-      senderInitial: 'DB',
-      type: 'text',
-      text: trimmed,
-      sentAt: new Date().toISOString(),
-      isRead: false,
-      isMine: true,
-    }
-    setMessages((prev) => ({ ...prev, [selectedId]: [...(prev[selectedId] ?? []), newMsg] }))
+    sendMsgMutation({ conversationId: selectedId, content: trimmed })
     setText('')
   }
 
-  // Participant info for thread header
-  const participant: ConvParticipant | undefined = selectedConv?.type === 'direct' ? selectedConv.participants[0] : undefined
+  const participant: ConvParticipant | undefined =
+    selectedConv?.type === 'direct' ? selectedConv.participants[0] : undefined
 
   return (
     <div className="flex h-full overflow-hidden">
       {/* ── Left Panel: Conversation List ──────────────────────────────────── */}
       <div className="w-[320px] shrink-0 flex flex-col border-r border-border bg-surface-1">
-        {/* Header */}
         <div className="px-4 pt-5 pb-3 border-b border-border">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-text-primary">Messages</h2>
@@ -276,8 +323,6 @@ export default function ChatPage() {
               <MessageSquare className="h-3.5 w-3.5" /> New
             </Button>
           </div>
-
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
             <input
@@ -287,8 +332,6 @@ export default function ChatPage() {
               className="w-full pl-9 pr-3 py-2 bg-surface-2 border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
             />
           </div>
-
-          {/* Tabs */}
           <div className="flex gap-2 mt-3">
             {([['all', 'All'], ['unread', `Unread (${unreadCount})`]] as const).map(([id, label]) => (
               <button
@@ -305,12 +348,17 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* List */}
         <div className="flex-1 overflow-y-auto">
-          {filteredConvs.length === 0 ? (
-            <div className="text-center py-12 text-text-muted text-sm">No conversations found</div>
+          {convsLoading || isCreatingConv ? (
+            <div className="flex justify-center py-12"><Spinner /></div>
+          ) : filteredConvs.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <MessageSquare className="h-8 w-8 mx-auto text-text-muted opacity-40 mb-3" />
+              <p className="text-sm text-text-muted">No conversations yet.</p>
+              <p className="text-xs text-text-muted mt-1">Message a broker from their profile or network page.</p>
+            </div>
           ) : (
-            filteredConvs.map((conv) => (
+            filteredConvs.map(conv => (
               <ConvItem
                 key={conv.id}
                 conv={conv}
@@ -341,9 +389,7 @@ export default function ChatPage() {
                     <span className="text-sm font-semibold text-text-primary">
                       {selectedConv.type === 'group' ? selectedConv.groupName : selectedConv.participants[0].name}
                     </span>
-                    {participant?.isVerified && (
-                      <span className="text-xs text-success">✓</span>
-                    )}
+                    {participant?.isVerified && <span className="text-xs text-success">✓</span>}
                   </div>
                   <p className="text-xs text-text-muted">
                     {selectedConv.type === 'group'
@@ -352,62 +398,53 @@ export default function ChatPage() {
                         ? 'Online now'
                         : participant?.lastSeen
                           ? `Last seen ${timeAgo(participant.lastSeen)}`
-                          : participant?.company}
+                          : participant?.company || 'Direct message'}
                   </p>
                 </div>
               </div>
-
               <div className="flex items-center gap-1" />
             </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-0.5">
-              {selectedMessages.map((msg, idx) => {
-                const prev = selectedMessages[idx - 1]
-                const showDateSep = !prev || !isSameDay(prev.sentAt, msg.sentAt)
-                const showAvatar = !prev || prev.senderId !== msg.senderId || msg.type === 'system'
-
-                return (
-                  <div key={msg.id}>
-                    {showDateSep && (
-                      <div className="flex justify-center my-4">
-                        <span className="text-xs text-text-muted bg-surface-2 border border-border px-3 py-1 rounded-full">
-                          {formatDateSep(msg.sentAt)}
-                        </span>
-                      </div>
-                    )}
-                    <MessageBubble msg={msg} showAvatar={showAvatar} />
+              {msgsLoading ? (
+                <div className="flex justify-center py-12"><Spinner /></div>
+              ) : selectedMessages.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center py-16">
+                  <div className="w-12 h-12 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mb-3">
+                    <MessageSquare className="h-5 w-5 text-text-muted" />
                   </div>
-                )
-              })}
-
-              {/* Typing indicator */}
-              {isTyping && (
-                <div className="flex items-end gap-2 mb-1">
-                  <div className="w-8 shrink-0">
-                    <Avatar initial={selectedConv.participants[0].avatarInitial} size="sm" />
-                  </div>
-                  <div className="px-4 py-3 bg-surface-2 border border-border rounded-2xl rounded-bl-sm">
-                    <div className="flex gap-1 items-center h-3">
-                      {[0, 1, 2].map((i) => (
-                        <span
-                          key={i}
-                          className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce"
-                          style={{ animationDelay: `${i * 0.15}s` }}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <p className="text-sm font-medium text-text-secondary mb-1">Start the conversation</p>
+                  <p className="text-xs text-text-muted">
+                    Say hello to {selectedConv.type === 'direct' ? selectedConv.participants[0].name : 'the group'}.
+                  </p>
                 </div>
+              ) : (
+                selectedMessages.map((msg, idx) => {
+                  const prev = selectedMessages[idx - 1]
+                  const showDateSep = !prev || !isSameDay(prev.sentAt, msg.sentAt)
+                  const showAvatar = !prev || prev.senderId !== msg.senderId || msg.type === 'system'
+                  return (
+                    <div key={msg.id}>
+                      {showDateSep && (
+                        <div className="flex justify-center my-4">
+                          <span className="text-xs text-text-muted bg-surface-2 border border-border px-3 py-1 rounded-full">
+                            {formatDateSep(msg.sentAt)}
+                          </span>
+                        </div>
+                      )}
+                      <MessageBubble msg={msg} showAvatar={showAvatar} />
+                    </div>
+                  )
+                })
               )}
-
               <div ref={messagesEndRef} />
             </div>
 
             {/* Mandate share pill + picker */}
             <div className="px-5 pb-2 flex gap-2 relative">
               <button
-                onClick={() => { setShowMandatePicker((v) => !v); setSelectedMandateIds(new Set()) }}
+                onClick={() => { setShowMandatePicker(v => !v); setSelectedMandateIds(new Set()) }}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all',
                   activeMandates.length > 0
@@ -424,10 +461,8 @@ export default function ChatPage() {
                 )}
               </button>
 
-              {/* Mandate picker panel */}
               {showMandatePicker && (
                 <div className="absolute bottom-full left-0 mb-3 w-140 bg-surface-0 border border-border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
-                  {/* Header */}
                   <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-surface-1">
                     <div>
                       <p className="text-base font-bold text-text-primary">Share Mandate</p>
@@ -441,7 +476,6 @@ export default function ChatPage() {
                     </button>
                   </div>
 
-                  {/* Mandate list */}
                   {activeMandates.length === 0 ? (
                     <div className="px-5 py-8 text-center">
                       <Building2 className="h-8 w-8 text-text-muted mx-auto mb-3" />
@@ -466,20 +500,17 @@ export default function ChatPage() {
                           return (
                             <button
                               key={m.id}
-                              onClick={() => setSelectedMandateIds((prev) => {
+                              onClick={() => setSelectedMandateIds(prev => {
                                 const next = new Set(prev)
                                 next.has(m.id) ? next.delete(m.id) : next.add(m.id)
                                 return next
                               })}
                               className={cn(
                                 'w-full text-left p-4 rounded-xl border-2 transition-all',
-                                isSelected
-                                  ? 'border-brand-gold bg-brand-gold/8'
-                                  : 'border-border bg-surface-1 hover:border-brand-gold/40 hover:bg-surface-2',
+                                isSelected ? 'border-brand-gold bg-brand-gold/8' : 'border-border bg-surface-1 hover:border-brand-gold/40 hover:bg-surface-2',
                               )}
                             >
                               <div className="flex items-start gap-3">
-                                {/* Checkbox */}
                                 <div className={cn(
                                   'mt-1 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all',
                                   isSelected ? 'bg-brand-gold border-brand-gold' : 'border-border',
@@ -507,8 +538,6 @@ export default function ChatPage() {
                           )
                         })}
                       </div>
-
-                      {/* Footer */}
                       <div className="px-5 py-4 border-t border-border bg-surface-1 flex items-center justify-between gap-3">
                         <p className="text-sm text-text-muted">
                           {selectedMandateIds.size > 0
@@ -516,34 +545,28 @@ export default function ChatPage() {
                             : 'Tap cards to select'}
                         </p>
                         <button
-                          disabled={selectedMandateIds.size === 0}
+                          disabled={selectedMandateIds.size === 0 || !selectedId}
                           onClick={() => {
-                            const now = Date.now()
-                            const cards: ChatMessage[] = activeMandates
+                            activeMandates
                               .filter((m: Mandate) => selectedMandateIds.has(m.id))
-                              .map((m: Mandate, i: number) => ({
-                                id: `mandate-${now}-${i}`,
-                                conversationId: selectedId,
-                                senderId: 'me',
-                                senderName: 'Me',
-                                senderInitial: 'DB',
-                                type: 'mandate_share' as const,
-                                text: '',
-                                sentAt: new Date(now + i).toISOString(),
-                                isRead: false,
-                                isMine: true,
-                                mandateCard: {
-                                  id: m.id,
-                                  title: m.title,
-                                  mandateType: m.mandateType,
-                                  city: m.city,
-                                  propertyType: m.propertyType,
-                                  budget: m.mandateType === 'lease'
-                                    ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
-                                    : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`,
-                                },
-                              }))
-                            setMessages((prev) => ({ ...prev, [selectedId]: [...(prev[selectedId] ?? []), ...cards] }))
+                              .forEach((m: Mandate) => {
+                                const budgetLabel = m.mandateType === 'lease'
+                                  ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
+                                  : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`
+                                sendMsgMutation({
+                                  conversationId: selectedId!,
+                                  content: m.title,
+                                  type: 'mandate_share',
+                                  metadata: {
+                                    id: m.id,
+                                    title: m.title,
+                                    mandateType: m.mandateType,
+                                    city: m.city,
+                                    propertyType: m.propertyType,
+                                    budget: budgetLabel,
+                                  },
+                                })
+                              })
                             setShowMandatePicker(false)
                             setSelectedMandateIds(new Set())
                           }}

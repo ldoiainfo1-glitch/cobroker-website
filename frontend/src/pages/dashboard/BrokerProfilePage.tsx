@@ -230,7 +230,7 @@ export default function BrokerProfilePage() {
                 {/* Action buttons — hidden when viewing own profile */}
                 {profile.userId !== currentUser?.id && (
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/chat')}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/chat?with=${profile.userId}&name=${encodeURIComponent(profile.fullName)}&initial=${profile.avatarInitial}&company=${encodeURIComponent(profile.company)}`)}>
                       <MessageSquare className="h-3.5 w-3.5" /> Message
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => setShowReviewModal(true)}>

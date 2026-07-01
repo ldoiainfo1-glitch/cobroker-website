@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   GitBranch, ChevronRight, ChevronDown,
-  Phone, Mail, Building2, Calendar, Users,
+  Phone, Mail, Building2, Calendar, Users, MessageSquare,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
@@ -36,6 +36,7 @@ async function fetchReferrals(userId: string): Promise<NetworkProfile[]> {
 // ─── Tree node component ──────────────────────────────────────────────────────
 
 function TreeNode({ node, depth = 0 }: { node: NetworkProfile; depth?: number }) {
+  const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
   const [children, setChildren] = useState<NetworkProfile[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -110,20 +111,29 @@ function TreeNode({ node, depth = 0 }: { node: NetworkProfile; depth?: number })
           </div>
         </div>
 
-        {/* Expand / collapse button */}
-        <button
-          onClick={handleToggle}
-          title={expanded ? 'Collapse referrals' : 'View this member\'s referrals'}
-          className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors shrink-0 mt-0.5"
-        >
-          {loading ? (
-            <Spinner size="sm" />
-          ) : expanded ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
-        </button>
+        {/* Actions */}
+        <div className="flex items-center gap-1 shrink-0 mt-0.5">
+          <button
+            onClick={() => navigate(`/dashboard/chat?with=${node.id}&name=${encodeURIComponent(node.full_name)}&initial=${getInitials(node.full_name)}&company=${encodeURIComponent(node.company?.name ?? '')}`)}
+            title={`Message ${node.full_name}`}
+            className="p-1.5 rounded-lg text-text-muted hover:text-brand-gold hover:bg-brand-gold/10 transition-colors"
+          >
+            <MessageSquare className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handleToggle}
+            title={expanded ? 'Collapse referrals' : 'View this member\'s referrals'}
+            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+          >
+            {loading ? (
+              <Spinner size="sm" />
+            ) : expanded ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Children */}
