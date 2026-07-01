@@ -16,8 +16,8 @@ dist-ssr
 .env
 .env.local
 .env.production
-backend/.env
-
+backend/.envbackend/.env.local
+backend/.env.production
 # SSH keys — never commit
 *.pem
 *.key
