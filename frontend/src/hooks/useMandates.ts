@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
 import {
   fetchMandates, fetchMyMandates, fetchMandate,
-  createMandate, updateMandateStatus, deleteMandate, fetchDashboardStats,
+  createMandate, updateMandate, updateMandateStatus, deleteMandate, fetchDashboardStats,
   type CreateMandatePayload,
 } from '@/services/mandateService'
 import type { MarketplaceFilters, MandateStatus } from '@/types'
@@ -46,6 +46,18 @@ export function useCreateMandate() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: CreateMandatePayload) => createMandate(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mandates'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+    },
+  })
+}
+
+export function useUpdateMandate() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateMandatePayload> }) =>
+      updateMandate(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mandates'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })

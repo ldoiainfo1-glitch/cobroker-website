@@ -146,7 +146,7 @@ function PostCard({ post }: { post: typeof MOCK_CIRCLE_POSTS[0] }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-xs text-text-muted">
           <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views} views</span>
-          {post.intros > 0 && (
+          {false && (
             <span className="flex items-center gap-1 text-brand-gold font-medium">
               <MessageSquare className="h-3 w-3" /> {post.intros} intros
             </span>

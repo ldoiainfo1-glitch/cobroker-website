@@ -470,13 +470,7 @@ CREATE POLICY "Participants can view conversations"
 
 CREATE POLICY "Participants can view conversation members"
   ON conversation_participants FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM conversation_participants cp
-      WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND cp.user_id = auth.uid()
-    )
-  );
+  USING (user_id = auth.uid());
 
 CREATE POLICY "Users can join conversations"
   ON conversation_participants FOR INSERT TO authenticated

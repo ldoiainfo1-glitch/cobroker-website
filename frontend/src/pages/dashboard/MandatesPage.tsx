@@ -63,10 +63,6 @@ function MandateRow({ m, onDelete }: { m: Mandate; onDelete: (id: string) => voi
             <p className="text-xs text-text-muted">Views</p>
           </div>
           <div>
-            <p className="text-base font-bold text-text-primary">{m.introCount}</p>
-            <p className="text-xs text-text-muted">Intros</p>
-          </div>
-          <div>
             <p className="text-xs font-medium text-text-secondary">{timeAgo(m.createdAt)}</p>
             <p className="text-xs text-text-muted">Posted</p>
           </div>

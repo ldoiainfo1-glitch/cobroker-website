@@ -243,7 +243,6 @@ export default function DashboardHome() {
               </p>
               <div className="flex items-center gap-4 text-xs text-text-muted">
                 <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> 420 views</span>
-                <span className="flex items-center gap-1"><Users className="h-3 w-3" /> 8 intros</span>
               </div>
             </CardContent>
           </Card>

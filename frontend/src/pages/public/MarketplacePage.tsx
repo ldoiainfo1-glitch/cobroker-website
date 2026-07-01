@@ -225,7 +225,7 @@ export default function MarketplacePage() {
             >
               <option value="newest">Newest first</option>
               <option value="views">Most viewed</option>
-              <option value="intros">Most intros</option>
+
               <option value="budget_asc">Budget: Low to High</option>
               <option value="budget_desc">Budget: High to Low</option>
             </select>

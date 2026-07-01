@@ -1,12 +1,12 @@
-import { useState, useRef, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
   CheckCircle2, ChevronRight, ChevronLeft, Building2,
   IndianRupee, MapPin, Upload, Eye, Home, Briefcase,
-  Warehouse, Leaf, HardHat, X,
+  Warehouse, Leaf, HardHat, X, Shield, AlertTriangle,
 } from 'lucide-react'
 import { uploadMandateImage } from '@/lib/s3'
 import { Button } from '@/components/ui/button'
@@ -16,8 +16,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, INDIAN_STATES, AREA_UNITS } from '@/constants'
 import type { MandateType } from '@/types'
-import { useCreateMandate } from '@/hooks/useMandates'
+import { useCreateMandate, useUpdateMandate, useMandate } from '@/hooks/useMandates'
 import { useAuthStore } from '@/stores/authStore'
+import { Spinner } from '@/components/ui/spinner'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 const step1Schema = z.object({
@@ -91,12 +92,20 @@ function formatCrore(n: number) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function PostMandatePage() {
+  const { id: editId } = useParams<{ id?: string }>()
+  const isEdit = !!editId
+
   const [step, setStep] = useState(1)
   const [data, setData] = useState<Partial<Step1 & Step2 & Step3 & Step4>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [prefilled, setPrefilled] = useState(false)
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { mutateAsync: createMandate } = useCreateMandate()
+  const { mutateAsync: updateMandate } = useUpdateMandate()
+
+  // Load existing mandate for edit mode
+  const { data: existingMandate, isLoading: loadingMandate } = useMandate(editId ?? '')
 
   // ─── Image upload state ──────────────────────────────────────────────
   const imgInputRef = useRef<HTMLInputElement>(null)
@@ -126,6 +135,37 @@ export default function PostMandatePage() {
   const form2 = useForm<Step2>({ resolver: zodResolver(step2Schema), defaultValues: data })
   const form3 = useForm<Step3>({ resolver: zodResolver(step3Schema), defaultValues: data as any })
   const form4 = useForm<Step4>({ resolver: zodResolver(step4Schema), defaultValues: data })
+
+  // Prefill forms when editing an existing mandate
+  useEffect(() => {
+    if (!isEdit || !existingMandate || prefilled) return
+    const m = existingMandate
+    const prefillData: Partial<Step1 & Step2 & Step3 & Step4> = {
+      mandateType: m.mandateType as any,
+      propertyCategory: m.propertyType ?? '',
+      title: m.title,
+      description: m.description ?? '',
+      bedrooms: m.postedBy ? String(m.postedBy) : undefined,
+      minBudget: m.minBudget ?? 0,
+      maxBudget: m.maxBudget ?? 0,
+      minArea: m.minArea,
+      maxArea: m.maxArea,
+      areaUnit: m.areaUnit ?? 'sq.ft',
+      city: m.city,
+      state: m.state,
+      locations: (m.locations ?? []).join(', '),
+    }
+    setData(prefillData)
+    form1.reset({ mandateType: prefillData.mandateType, propertyCategory: prefillData.propertyCategory, title: prefillData.title })
+    form2.reset({ description: prefillData.description })
+    form3.reset({ minBudget: prefillData.minBudget, maxBudget: prefillData.maxBudget, minArea: prefillData.minArea, maxArea: prefillData.maxArea, areaUnit: prefillData.areaUnit })
+    form4.reset({ city: prefillData.city, state: prefillData.state, locations: prefillData.locations as string })
+    // Prefill existing images as previews (URLs, no File objects)
+    if (m.images?.length) {
+      setImagePreviews(m.images.map((img) => img.url))
+    }
+    setPrefilled(true)
+  }, [existingMandate, isEdit, prefilled, form1, form2, form3, form4])
 
   const next = async () => {
     let valid = false
@@ -159,21 +199,25 @@ export default function PostMandatePage() {
     if (!user?.id || !user.companyId) return
     setIsSubmitting(true)
     try {
-      // Upload images to S3 first
+      // Upload only new File objects (not existing URL previews)
       const imageUrls: string[] = []
       for (const file of imageFiles) {
-        const { publicUrl } = await uploadMandateImage(file)
-        imageUrls.push(publicUrl)
+        if (file instanceof File) {
+          const { publicUrl } = await uploadMandateImage(file)
+          imageUrls.push(publicUrl)
+        }
       }
+      // Keep existing images if no new uploads
+      const finalImageUrls = imageUrls.length > 0 ? imageUrls : (existingMandate?.images?.map(i => i.url) ?? [])
 
-      await createMandate({
+      const payload = {
         mandateType: data.mandateType!,
         title: data.title!,
         description: data.description,
         propertyCategory: data.propertyCategory!,
         city: data.city!,
         state: data.state!,
-        locations: data.locations?.split(',').map((l) => l.trim()).filter(Boolean) ?? [],
+        locations: (data.locations as string)?.split(',').map((l) => l.trim()).filter(Boolean) ?? [],
         minBudget: data.minBudget!,
         maxBudget: data.maxBudget!,
         minArea: data.minArea,
@@ -184,20 +228,76 @@ export default function PostMandatePage() {
         postedBy: user!.id,
         companyId: user.companyId,
         publishNow,
-        imageUrls,
-      })
+        imageUrls: finalImageUrls,
+      }
+
+      if (isEdit && editId) {
+        await updateMandate({ id: editId, payload })
+      } else {
+        await createMandate(payload)
+      }
       navigate('/dashboard/mandates')
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // ─── KYC Gate ────────────────────────────────────────────────────────
+  if (!user?.isVerified) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 rounded-2xl bg-warning/10 border border-warning/20 flex items-center justify-center mx-auto mb-5">
+            <Shield className="h-8 w-8 text-warning" />
+          </div>
+          <h2 className="text-xl font-bold text-text-primary mb-2">KYC Verification Required</h2>
+          <p className="text-sm text-text-muted mb-6 leading-relaxed">
+            You need to complete KYC verification before posting mandates.
+            Once approved by our admin team, your mandates will go live on the platform.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Button asChild size="lg" className="w-full">
+              <Link to="/dashboard/kyc">
+                <Shield className="h-4 w-4" /> Complete KYC Verification
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" className="w-full" asChild>
+              <Link to="/dashboard/mandates">← Back to My Mandates</Link>
+            </Button>
+          </div>
+          <div className="mt-6 flex items-start gap-2.5 p-3 rounded-xl bg-surface-2 border border-border text-left">
+            <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+            <p className="text-xs text-text-muted">
+              KYC approval typically takes <strong className="text-text-secondary">24–48 hours</strong>.
+              You'll receive a notification once verified.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Loading state for edit mode ─────────────────────────────────────
+  if (isEdit && loadingMandate) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Spinner />
+      </div>
+    )
+  }
+
   return (
     <div className="flex-1 overflow-y-auto flex flex-col gap-6 max-w-3xl mx-auto p-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Post a Mandate</h1>
-        <p className="text-sm text-text-muted mt-0.5">Broadcast your requirement to verified brokers across India.</p>
+        <h1 className="text-2xl font-bold text-text-primary">
+          {isEdit ? 'Edit Mandate' : 'Post a Mandate'}
+        </h1>
+        <p className="text-sm text-text-muted mt-0.5">
+          {isEdit
+            ? 'Update your mandate details below. Changes go live immediately.'
+            : 'Broadcast your requirement to verified brokers across India.'}
+        </p>
       </div>
 
       {/* Step indicator */}
@@ -641,9 +741,18 @@ export default function PostMandatePage() {
               Continue <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button size="lg" onClick={() => submit(true)} loading={isSubmitting}>
-              {isSubmitting ? 'Publishing…' : 'Publish Mandate'}
-            </Button>
+            <>
+              {!isEdit && (
+                <Button variant="outline" size="lg" onClick={() => submit(false)} loading={isSubmitting}>
+                  Save as Draft
+                </Button>
+              )}
+              <Button size="lg" onClick={() => submit(true)} loading={isSubmitting}>
+                {isSubmitting
+                  ? (isEdit ? 'Updating…' : 'Publishing…')
+                  : (isEdit ? 'Update Mandate' : 'Publish Mandate')}
+              </Button>
+            </>
           )}
         </div>
       </div>

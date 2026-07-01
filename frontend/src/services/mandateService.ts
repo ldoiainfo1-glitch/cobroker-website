@@ -193,6 +193,45 @@ export async function updateMandateStatus(id: string, status: MandateStatus): Pr
   if (error) throw error
 }
 
+export async function updateMandate(id: string, payload: Partial<CreateMandatePayload>): Promise<Mandate> {
+  const { data, error } = await supabase
+    .from('mandates')
+    .update({
+      title: payload.title,
+      mandate_type: payload.mandateType,
+      property_type: payload.propertyCategory?.toLowerCase(),
+      description: payload.description ?? null,
+      bedrooms: payload.bedrooms ? parseInt(payload.bedrooms) : null,
+      min_budget: payload.minBudget,
+      max_budget: payload.maxBudget,
+      min_area: payload.minArea ?? null,
+      max_area: payload.maxArea ?? null,
+      area_unit: AREA_UNIT_DB[payload.areaUnit ?? ''] ?? 'sqft',
+      commission_pct: payload.commissionPercent ? parseFloat(payload.commissionPercent) : null,
+      city: payload.city,
+      state: payload.state,
+      locations: payload.locations ?? [],
+      status: payload.publishNow ? 'active' : 'draft',
+    })
+    .eq('id', id)
+    .select(SELECT)
+    .single()
+
+  if (error) throw error
+
+  // Replace images if new ones were provided
+  if (payload.imageUrls && payload.imageUrls.length > 0) {
+    await supabase.from('mandate_images').delete().eq('mandate_id', id)
+    await supabase.from('mandate_images').insert(
+      payload.imageUrls.map((url, i) => ({
+        mandate_id: id, url, is_primary: i === 0, sort_order: i,
+      }))
+    )
+  }
+
+  return mapRow(data)
+}
+
 export async function deleteMandate(id: string): Promise<void> {
   const { error } = await supabase.from('mandates').delete().eq('id', id)
   if (error) throw error
