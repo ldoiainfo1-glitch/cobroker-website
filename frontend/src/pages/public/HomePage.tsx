@@ -142,7 +142,7 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-1 border border-border text-xs font-medium text-text-secondary mb-6">
               <Star className="h-3 w-3 fill-brand-gold text-brand-gold" />
               <span className="text-brand-gold font-semibold">4.9</span>
-              <span className="text-text-muted">Â·</span>
+              <span className="text-text-muted">·</span>
               <span>12,400+ verified brokers</span>
             </div>
 
@@ -236,7 +236,7 @@ export default function HomePage() {
                     >
                       {city}
                     </button>
-                    {i < arr.length - 1 && <span className="text-text-muted/40">Â·</span>}
+                    {i < arr.length - 1 && <span className="text-text-muted/40">·</span>}
                   </span>
                 ))}
               </div>
