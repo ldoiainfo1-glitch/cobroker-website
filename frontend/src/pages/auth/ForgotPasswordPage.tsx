@@ -7,6 +7,7 @@ import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { AuthNavbar } from '@/components/layout/Navbar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { supabase } from '@/lib/supabase'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -17,6 +18,7 @@ type FormData = z.infer<typeof schema>
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [sentEmail, setSentEmail] = useState('')
+  const [submitError, setSubmitError] = useState('')
 
   const {
     register,
@@ -25,8 +27,14 @@ export default function ForgotPasswordPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
   const onSubmit = async (data: FormData) => {
-    // TODO: await api.post('/auth/forgot-password', data)
-    await new Promise((r) => setTimeout(r, 800)) // simulate delay
+    setSubmitError('')
+    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) {
+      setSubmitError(error.message)
+      return
+    }
     setSentEmail(data.email)
     setSent(true)
   }
@@ -57,6 +65,9 @@ export default function ForgotPasswordPage() {
                 <Button type="submit" size="lg" loading={isSubmitting}>
                   Send reset link <ArrowRight className="h-4 w-4" />
                 </Button>
+                {submitError && (
+                  <p className="text-sm text-error text-center mt-2">{submitError}</p>
+                )}
               </form>
               <p className="text-center text-sm text-text-muted mt-6">
                 Remember your password?{' '}
