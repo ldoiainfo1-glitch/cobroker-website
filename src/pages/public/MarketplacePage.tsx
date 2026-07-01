@@ -11,10 +11,12 @@ import { Navbar } from '@/components/layout/Navbar'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, MANDATE_TYPES } from '@/constants'
-import type { MandateType } from '@/types'
+import type { Mandate, MandateType } from '@/types'
+import { useMarketplaceMandates } from '@/hooks/useMandates'
+import { Spinner } from '@/components/ui/spinner'
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK_MANDATES = [
+// ─── kept for TS — real data comes from hook
+const _UNUSED = [
   {
     id: '1', type: 'buy' as MandateType, title: '3BHK / 4BHK in Bandra or Khar West',
     company: 'Lodha Capital Partners', verified: true, city: 'Mumbai', locations: ['Bandra West', 'Khar West'],
@@ -75,9 +77,9 @@ const budgetRanges = [
 ]
 
 // ─── Mandate Card ─────────────────────────────────────────────────────────────
-function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
+function MandateCard({ m }: { m: Mandate }) {
   const budgetLabel =
-    m.type === 'lease'
+    m.mandateType === 'lease'
       ? `₹${m.minBudget?.toLocaleString('en-IN')}/sq.ft`
       : `${formatCurrency(m.minBudget ?? 0)} – ${formatCurrency(m.maxBudget ?? 0)}`
 
@@ -86,23 +88,23 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
       <Card hover className="overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="relative h-44 overflow-hidden bg-surface-2">
-          {m.image && (
+          {m.images?.[0]?.url && (
             <img
-              src={m.image}
+              src={m.images[0].url}
               alt={m.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
           <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
           <div className="absolute top-3 left-3 flex items-center gap-1.5">
-            <Badge variant={m.type === 'joint_venture' ? 'gold' : m.type} className="capitalize">
-              {MANDATE_TYPES[m.type]}
+            <Badge variant={m.mandateType === 'joint_venture' ? 'gold' : m.mandateType} className="capitalize">
+              {MANDATE_TYPES[m.mandateType]}
             </Badge>
-            <Badge variant="default" className="text-xs">{m.category}</Badge>
+            {m.propertyType && <Badge variant="default" className="text-xs capitalize">{m.propertyType}</Badge>}
           </div>
           <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-white flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {timeAgo(m.postedAt)}
+            {timeAgo(m.createdAt)}
           </div>
         </div>
 
@@ -127,7 +129,7 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
             <div className="text-right">
               <p className="text-xs text-text-muted mb-0.5">Area</p>
               <p className="text-sm font-medium text-text-secondary">
-                {m.area?.toLocaleString('en-IN')} {m.areaUnit}
+                {m.minArea?.toLocaleString('en-IN')} {m.areaUnit}
               </p>
             </div>
           </div>
@@ -136,20 +138,18 @@ function MandateCard({ m }: { m: typeof MOCK_MANDATES[0] }) {
           <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center text-xs font-bold text-brand-gold">
-                {m.company[0]}
+                {(m.company?.name ?? '?')[0]}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium text-text-primary truncate max-w-28">{m.company}</p>
-                {m.verified && (
-                  <p className="text-xs text-success flex items-center gap-0.5">
-                    ✓ Verified
-                  </p>
+                <p className="text-xs font-medium text-text-primary truncate max-w-28">{m.company?.name}</p>
+                {m.company?.verificationStatus === 'verified' && (
+                  <p className="text-xs text-success flex items-center gap-0.5">✓ Verified</p>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs text-text-muted shrink-0">
-              <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{m.views}</span>
-              <span className="flex items-center gap-1"><Users className="h-3 w-3" />{m.intros}</span>
+              <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{m.viewsCount}</span>
+              <span className="flex items-center gap-1"><Users className="h-3 w-3" />{m.introCount}</span>
             </div>
           </div>
         </div>
@@ -168,14 +168,16 @@ export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('newest')
 
+  const { data: allMandates = [], isLoading } = useMarketplaceMandates()
+
   const toggleType = (t: MandateType) => {
     setSelectedTypes((prev) =>
       prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
     )
   }
 
-  const filtered = MOCK_MANDATES.filter((m) => {
-    if (selectedTypes.length && !selectedTypes.includes(m.type)) return false
+  const filtered = allMandates.filter((m) => {
+    if (selectedTypes.length && !selectedTypes.includes(m.mandateType)) return false
     if (selectedCity && m.city !== selectedCity) return false
     if (searchQuery && !m.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
@@ -386,7 +388,9 @@ export default function MarketplacePage() {
               )}
             </div>
 
-            {view === 'grid' ? (
+            {isLoading ? (
+              <div className="flex justify-center py-20"><Spinner /></div>
+            ) : view === 'grid' ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filtered.map((m) => (
                   <MandateCard key={m.id} m={m} />

@@ -11,59 +11,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { MANDATE_TYPES } from '@/constants'
-import type { MandateType } from '@/types'
-
-type MandateStatus = 'active' | 'draft' | 'closed' | 'expired'
-
-interface MyMandate {
-  id: string
-  type: MandateType
-  title: string
-  city: string
-  locations: string[]
-  minBudget: number
-  maxBudget: number
-  status: MandateStatus
-  views: number
-  intros: number
-  postedAt: string
-  expiresAt: string
-}
-
-const MOCK_MY_MANDATES: MyMandate[] = [
-  {
-    id: '1', type: 'buy', title: '3BHK / 4BHK in Bandra or Khar West',
-    city: 'Mumbai', locations: ['Bandra West', 'Khar West'],
-    minBudget: 20000000, maxBudget: 35000000, status: 'active',
-    views: 420, intros: 8,
-    postedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 25).toISOString(),
-  },
-  {
-    id: '2', type: 'sell', title: 'Retail Space in Phoenix Palladium Mumbai',
-    city: 'Mumbai', locations: ['Lower Parel'],
-    minBudget: 50000000, maxBudget: 80000000, status: 'active',
-    views: 180, intros: 3,
-    postedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 20).toISOString(),
-  },
-  {
-    id: '3', type: 'lease', title: 'Office Space in Andheri East',
-    city: 'Mumbai', locations: ['Andheri East', 'Kurla'],
-    minBudget: 7500, maxBudget: 9500, status: 'draft',
-    views: 0, intros: 0,
-    postedAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    expiresAt: '',
-  },
-  {
-    id: '4', type: 'buy', title: '2BHK in Thane West — Budget 80–90L',
-    city: 'Thane', locations: ['Thane West', 'Ghodbunder'],
-    minBudget: 8000000, maxBudget: 9000000, status: 'closed',
-    views: 890, intros: 22,
-    postedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 35).toISOString(),
-    expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-  },
-]
+import type { Mandate, MandateStatus, MandateType } from '@/types'
+import { useMyMandates, useDeleteMandate } from '@/hooks/useMandates'
+import { Spinner } from '@/components/ui/spinner'
 
 const STATUS_ICON: Record<MandateStatus, React.ReactNode> = {
   active: <CheckCircle2 className="h-3.5 w-3.5" />,
@@ -76,11 +26,11 @@ const STATUS_VARIANT: Record<MandateStatus, 'success' | 'warning' | 'default' | 
   active: 'success', draft: 'warning', closed: 'default', expired: 'error',
 }
 
-function MandateRow({ m, onDelete }: { m: MyMandate; onDelete: (id: string) => void }) {
+function MandateRow({ m, onDelete }: { m: Mandate; onDelete: (id: string) => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const budgetLabel =
-    m.type === 'lease'
+    m.mandateType === 'lease'
       ? `₹${m.minBudget?.toLocaleString('en-IN')}/sqft`
       : `${formatCurrency(m.minBudget)} – ${formatCurrency(m.maxBudget)}`
 
@@ -89,8 +39,8 @@ function MandateRow({ m, onDelete }: { m: MyMandate; onDelete: (id: string) => v
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <Badge variant={m.type} className="text-xs capitalize">
-              {MANDATE_TYPES[m.type]}
+            <Badge variant={m.mandateType} className="text-xs capitalize">
+              {MANDATE_TYPES[m.mandateType]}
             </Badge>
             <Badge variant={STATUS_VARIANT[m.status]} dot className="text-xs capitalize">
               {STATUS_ICON[m.status]}
@@ -109,15 +59,15 @@ function MandateRow({ m, onDelete }: { m: MyMandate; onDelete: (id: string) => v
         {/* Stats */}
         <div className="hidden sm:flex items-center gap-6 text-center shrink-0">
           <div>
-            <p className="text-base font-bold text-text-primary">{m.views}</p>
+            <p className="text-base font-bold text-text-primary">{m.viewsCount}</p>
             <p className="text-xs text-text-muted">Views</p>
           </div>
           <div>
-            <p className="text-base font-bold text-text-primary">{m.intros}</p>
+            <p className="text-base font-bold text-text-primary">{m.introCount}</p>
             <p className="text-xs text-text-muted">Intros</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-text-secondary">{timeAgo(m.postedAt)}</p>
+            <p className="text-xs font-medium text-text-secondary">{timeAgo(m.createdAt)}</p>
             <p className="text-xs text-text-muted">Posted</p>
           </div>
         </div>
@@ -176,15 +126,14 @@ const STATUS_TABS: Array<{ label: string; value: MandateStatus | 'all' }> = [
 
 export default function MandatesPage() {
   const [activeStatus, setActiveStatus] = useState<MandateStatus | 'all'>('all')
-  const [mandates, setMandates] = useState(MOCK_MY_MANDATES)
+  const { data: mandates = [], isLoading } = useMyMandates()
+  const { mutate: deleteMandate } = useDeleteMandate()
 
   const filtered = activeStatus === 'all'
     ? mandates
     : mandates.filter((m) => m.status === activeStatus)
 
-  const handleDelete = (id: string) => {
-    setMandates((prev) => prev.filter((m) => m.id !== id))
-  }
+  const handleDelete = (id: string) => deleteMandate(id)
 
   const counts = {
     all: mandates.length,
@@ -215,8 +164,8 @@ export default function MandatesPage() {
         {[
           { label: 'Total Mandates', value: mandates.length, color: 'text-text-primary' },
           { label: 'Active', value: counts.active, color: 'text-success' },
-          { label: 'Introductions', value: mandates.reduce((a, m) => a + m.intros, 0), color: 'text-info' },
-          { label: 'Total Views', value: mandates.reduce((a, m) => a + m.views, 0), color: 'text-brand-gold' },
+          { label: 'Introductions', value: mandates.reduce((a, m) => a + (m.introCount ?? 0), 0), color: 'text-info' },
+          { label: 'Total Views', value: mandates.reduce((a, m) => a + (m.viewsCount ?? 0), 0), color: 'text-brand-gold' },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="p-4">
@@ -249,7 +198,9 @@ export default function MandatesPage() {
           ))}
         </div>
 
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Spinner /></div>
+        ) : filtered.length === 0 ? (
           <div className="py-16 flex flex-col items-center justify-center text-center">
             <Building2 className="h-12 w-12 text-text-muted mb-3" />
             <h3 className="text-lg font-semibold text-text-primary mb-1">

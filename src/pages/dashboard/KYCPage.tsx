@@ -8,22 +8,24 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { MOCK_KYC_DOCS } from '@/data/profiles'
+import { useKycDocs, useSubmitKycDoc } from '@/hooks/useKyc'
+import { uploadKycDocument } from '@/lib/s3'
 import type { KYCDocument, KYCDocStatus } from '@/types'
+import { Spinner } from '@/components/ui/spinner'
 
 // ─── Upload modal ─────────────────────────────────────────────────────────────
 interface UploadModalProps {
   doc: KYCDocument
   onClose: () => void
-  onUploaded: (docId: string, file: File) => void
+  onUploaded: (docId: string, file: File, publicUrl: string) => void
 }
 
 function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
   const [dragging, setDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (file: File) => {
@@ -38,20 +40,19 @@ function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
     if (file) handleFile(file)
   }, [])
 
-  const simulateUpload = () => {
+  const simulateUpload = async () => {
+    if (!selectedFile) return
     setUploading(true)
-    let p = 0
-    const interval = setInterval(() => {
-      p += Math.random() * 25
-      if (p >= 100) {
-        p = 100
-        clearInterval(interval)
-        setDone(true)
-        setUploading(false)
-        setTimeout(() => { onUploaded(doc.id, selectedFile!); onClose() }, 800)
-      }
-      setProgress(Math.min(p, 100))
-    }, 300)
+    setError('')
+    try {
+      const { publicUrl } = await uploadKycDocument(selectedFile)
+      setDone(true)
+      setTimeout(() => { onUploaded(doc.id, selectedFile, publicUrl); onClose() }, 800)
+    } catch (e: any) {
+      setError(e?.message ?? 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
   }
 
   const isImage = selectedFile?.type.startsWith('image/')
@@ -127,13 +128,7 @@ function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
                     <span>Uploading…</span>
                     <span>{Math.round(progress)}%</span>
                   </div>
-                  <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-gold rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-                  </div>
-                </div>
-              )}
-
-              <div className="flex gap-2">
+                  <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1" onClick={() => setSelectedFile(null)} disabled={uploading}>
                   Choose different file
                 </Button>
@@ -142,6 +137,7 @@ function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
                   {uploading ? 'Uploading…' : 'Submit document'}
                 </Button>
               </div>
+              {error && <p className="text-xs text-error mt-2">{error}</p>}
             </div>
           )}
         </div>
@@ -351,19 +347,19 @@ function VerificationProgress({ docs }: { docs: KYCDocument[] }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function KYCPage() {
-  const [docs, setDocs] = useState<KYCDocument[]>(MOCK_KYC_DOCS)
   const [uploadTarget, setUploadTarget] = useState<KYCDocument | null>(null)
+  const { data: docs = [], isLoading } = useKycDocs()
+  const { mutateAsync: submitKycDoc } = useSubmitKycDoc()
 
   const requiredDocs = docs.filter((d) => d.required)
   const optionalDocs = docs.filter((d) => !d.required)
 
-  const handleUploaded = (docId: string, file: File) => {
-    setDocs((prev) => prev.map((d) =>
-      d.id === docId
-        ? { ...d, status: 'under_review', fileName: file.name, fileSize: `${(file.size / 1024).toFixed(0)} KB`, uploadedAt: new Date().toISOString() }
-        : d
-    ))
+  const handleUploaded = async (_docId: string, _file: File, publicUrl: string) => {
+    if (!uploadTarget) return
+    await submitKycDoc({ type: uploadTarget.type, docUrl: publicUrl })
   }
+
+  if (isLoading) return <div className="flex justify-center py-20"><Spinner /></div>
 
   return (
     <div className="flex-1 overflow-y-auto p-6">
@@ -371,7 +367,7 @@ export default function KYCPage() {
         <UploadModal
           doc={uploadTarget}
           onClose={() => setUploadTarget(null)}
-          onUploaded={(id, file) => { handleUploaded(id, file); setUploadTarget(null) }}
+          onUploaded={(id, file, url) => { handleUploaded(id, file, url); setUploadTarget(null) }}
         />
       )}
       {/* Header */}

@@ -15,6 +15,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { INDIAN_CITIES, INDIAN_STATES, AREA_UNITS } from '@/constants'
 import type { MandateType } from '@/types'
+import { useCreateMandate } from '@/hooks/useMandates'
+import { useAuthStore } from '@/stores/authStore'
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 const step1Schema = z.object({
@@ -93,6 +95,8 @@ export default function PostMandatePage() {
   const [data, setData] = useState<Partial<Step1 & Step2 & Step3 & Step4>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
+  const { user } = useAuthStore()
+  const { mutateAsync: createMandate } = useCreateMandate()
 
   // Step forms
   const form1 = useForm<Step1>({ resolver: zodResolver(step1Schema), defaultValues: data })
@@ -128,12 +132,32 @@ export default function PostMandatePage() {
 
   const back = () => setStep((s) => Math.max(s - 1, 1))
 
-  const submit = async () => {
+  const submit = async (publishNow = true) => {
     setIsSubmitting(true)
-    // TODO: API call
-    await new Promise((r) => setTimeout(r, 1000))
-    setIsSubmitting(false)
-    navigate('/dashboard/mandates')
+    try {
+      await createMandate({
+        mandateType: data.mandateType!,
+        title: data.title!,
+        description: data.description,
+        propertyType: data.propertyCategory,
+        city: data.city!,
+        state: data.state!,
+        locations: data.locations?.split(',').map((l) => l.trim()).filter(Boolean) ?? [],
+        minBudget: data.minBudget!,
+        maxBudget: data.maxBudget!,
+        minArea: data.minArea,
+        maxArea: data.maxArea,
+        areaUnit: data.areaUnit ?? 'sq.ft',
+        commissionPercent: data.commissionPercent ? Number(data.commissionPercent) : undefined,
+        bedrooms: data.bedrooms,
+        postedBy: user!.id,
+        companyId: user!.companyId ?? undefined,
+        publishNow,
+      })
+      navigate('/dashboard/mandates')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

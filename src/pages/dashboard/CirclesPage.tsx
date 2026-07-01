@@ -8,8 +8,9 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { MOCK_CIRCLES } from '@/data/circles'
 import type { CircleScope } from '@/types'
+import { useCircles, useJoinCircle, useLeaveCircle } from '@/hooks/useCircles'
+import { Spinner } from '@/components/ui/spinner'
 
 const SCOPE_TABS: Array<{ value: CircleScope | 'all'; label: string; icon: React.ReactNode }> = [
   { value: 'all', label: 'All Circles', icon: <Globe className="h-3.5 w-3.5" /> },
@@ -36,12 +37,14 @@ export default function CirclesPage() {
   const [scopeFilter, setScopeFilter] = useState<CircleScope | 'all'>('all')
   const [assetFilter, setAssetFilter] = useState('All')
   const [search, setSearch] = useState('')
-  const [circles, setCircles] = useState(MOCK_CIRCLES)
 
-  const handleJoin = (id: string) => {
-    setCircles((prev) =>
-      prev.map((c) => c.id === id ? { ...c, isJoined: !c.isJoined, membersCount: c.isJoined ? c.membersCount - 1 : c.membersCount + 1 } : c)
-    )
+  const { data: circles = [], isLoading } = useCircles()
+  const { mutate: joinCircle } = useJoinCircle()
+  const { mutate: leaveCircle } = useLeaveCircle()
+
+  const handleJoin = (id: string, isJoined: boolean) => {
+    if (isJoined) leaveCircle(id)
+    else joinCircle(id)
   }
 
   const filtered = circles.filter((c) => {
@@ -54,9 +57,9 @@ export default function CirclesPage() {
   const joined = circles.filter((c) => c.isJoined)
   const suggested = circles.filter((c) => !c.isJoined).slice(0, 6)
 
+  if (isLoading) return <div className="flex justify-center py-20"><Spinner /></div>
+
   return (
-    <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Circles</h1>
@@ -225,14 +228,12 @@ export default function CirclesPage() {
                           Open Circle <ChevronRight className="h-3.5 w-3.5" />
                         </Link>
                       </Button>
-                      <Button variant="secondary" size="sm" onClick={() => handleJoin(circle.id)}>
-                        Leave
+                      <Button variant="secondary" size="sm" onClick={() => handleJoin(circle.id, true)}>
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button size="sm" className="flex-1" onClick={() => handleJoin(circle.id)}>
-                        Join Circle
+                      <Button size="sm" className="flex-1" onClick={() => handleJoin(circle.id, false)}>
                       </Button>
                       <Button variant="secondary" size="sm" asChild>
                         <Link to={`/dashboard/circles/${circle.id}`}>Preview</Link>

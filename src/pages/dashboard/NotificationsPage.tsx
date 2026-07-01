@@ -7,8 +7,9 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn, timeAgo } from '@/lib/utils'
-import { MOCK_NOTIFICATIONS } from '@/data/messages'
 import type { NotificationType } from '@/types'
+import { useNotifications, useMarkRead, useMarkAllRead } from '@/hooks/useNotifications'
+import { Spinner } from '@/components/ui/spinner'
 
 // ─── Notification icon/color per type ────────────────────────────────────────
 const typeConfig: Record<NotificationType, { icon: React.ReactNode; bg: string; color: string }> = {
@@ -26,15 +27,20 @@ const typeConfig: Record<NotificationType, { icon: React.ReactNode; bg: string; 
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS)
   const [tab, setTab] = useState<'all' | 'unread'>('all')
+
+  const { data: notifications = [], isLoading } = useNotifications()
+  const { mutate: markReadMutation } = useMarkRead()
+  const { mutate: markAllReadMutation } = useMarkAllRead()
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
-  const markAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
-  const markRead = (id: string) => setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n))
+  const markAllRead = () => markAllReadMutation()
+  const markRead = (id: string) => markReadMutation(id)
 
   const filtered = notifications.filter((n) => tab === 'all' || !n.isRead)
+
+  if (isLoading) return <div className="flex justify-center py-20"><Spinner /></div>
 
   return (
     <div className="flex-1 overflow-y-auto p-6">

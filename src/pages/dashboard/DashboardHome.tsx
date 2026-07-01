@@ -1,74 +1,16 @@
 import { Link } from 'react-router-dom'
 import {
   Building2, GitBranch, Users, TrendingUp, Plus, ArrowRight,
-  Eye, Star, Clock, CheckCircle2, Radio, MapPin,
+  Eye, Star, Clock, CheckCircle2, Radio, MapPin, Bell,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuthStore } from '@/stores/authStore'
 import { formatCurrency, timeAgo } from '@/lib/utils'
-import { MOCK_CIRCLES } from '@/data/circles'
-
-const stats = [
-  {
-    label: 'Active Mandates',
-    value: '12',
-    change: '+2 this week',
-    positive: true,
-    icon: <Building2 className="h-5 w-5" />,
-    color: 'text-brand-gold',
-    bg: 'bg-brand-gold/10',
-  },
-  {
-    label: 'Open Deals',
-    value: '5',
-    change: '3 in negotiation',
-    positive: true,
-    icon: <GitBranch className="h-5 w-5" />,
-    color: 'text-info',
-    bg: 'bg-info/10',
-  },
-  {
-    label: 'Introductions',
-    value: '18',
-    change: '3 pending response',
-    positive: null,
-    icon: <Users className="h-5 w-5" />,
-    color: 'text-success',
-    bg: 'bg-success/10',
-  },
-  {
-    label: 'Total Views',
-    value: '1,240',
-    change: '+18% this month',
-    positive: true,
-    icon: <Eye className="h-5 w-5" />,
-    color: 'text-warning',
-    bg: 'bg-warning/10',
-  },
-]
-
-const recentActivity = [
-  {
-    type: 'mandate_view',
-    text: 'Raj Properties viewed your Bandra Buy mandate',
-    time: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-    action: null,
-  },
-  {
-    type: 'mandate_view',
-    text: 'Your Powai Commercial mandate received 34 new views today',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    action: null,
-  },
-  {
-    type: 'intro_accepted',
-    text: 'Skyline Realty accepted your introduction request for the Andheri Lease mandate',
-    time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    action: { label: 'Open chat', href: '/dashboard/chat' },
-  },
-]
+import { useDashboardStats } from '@/hooks/useMandates'
+import { useCircles } from '@/hooks/useCircles'
+import { useNotifications } from '@/hooks/useNotifications'
 
 const quickActions = [
   { label: 'Post Mandate', icon: <Plus className="h-4 w-4" />, href: '/dashboard/mandates/new', variant: 'primary' as const },
@@ -85,6 +27,52 @@ const activityIcons: Record<string, React.ReactNode> = {
 
 export default function DashboardHome() {
   const { user } = useAuthStore()
+  const { data: statsData } = useDashboardStats()
+  const { data: circles = [] } = useCircles()
+  const { data: notifications = [] } = useNotifications()
+  const recentActivity = notifications.slice(0, 5)
+
+  const joined = circles.filter((c) => c.isJoined)
+  const suggested = circles.filter((c) => !c.isJoined && c.scope === 'area').slice(0, 6)
+
+  const stats = [
+    {
+      label: 'Active Mandates',
+      value: statsData?.active?.toString() ?? '--',
+      change: 'Your active listings',
+      positive: true,
+      icon: <Building2 className="h-5 w-5" />,
+      color: 'text-brand-gold',
+      bg: 'bg-brand-gold/10',
+    },
+    {
+      label: 'Open Deals',
+      value: '--',
+      change: 'Coming soon',
+      positive: null,
+      icon: <GitBranch className="h-5 w-5" />,
+      color: 'text-info',
+      bg: 'bg-info/10',
+    },
+    {
+      label: 'Introductions',
+      value: '--',
+      change: 'Coming soon',
+      positive: null,
+      icon: <Users className="h-5 w-5" />,
+      color: 'text-success',
+      bg: 'bg-success/10',
+    },
+    {
+      label: 'Total Views',
+      value: statsData?.totalViews?.toLocaleString('en-IN') ?? '--',
+      change: 'Across all mandates',
+      positive: true,
+      icon: <Eye className="h-5 w-5" />,
+      color: 'text-warning',
+      bg: 'bg-warning/10',
+    },
+  ]
 
   return (
     <div className="flex-1 overflow-y-auto p-6 max-w-6xl mx-auto">
@@ -131,8 +119,6 @@ export default function DashboardHome() {
 
       {/* Suggested Circles */}
       {(() => {
-        const joined = MOCK_CIRCLES.filter((c) => c.isJoined)
-        const suggested = MOCK_CIRCLES.filter((c) => !c.isJoined && c.scope === 'area').slice(0, 6)
         return (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
@@ -199,27 +185,19 @@ export default function DashboardHome() {
             </Button>
           </div>
           <div className="flex flex-col gap-2">
-            {recentActivity.map((item, i) => (
-              <Card key={i} className="p-4">
+            {recentActivity.length === 0 ? (
+              <p className="text-sm text-text-muted py-4 text-center">No recent activity</p>
+            ) : recentActivity.map((item) => (
+              <Card key={item.id} className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center shrink-0 mt-0.5">
-                    {activityIcons[item.type]}
+                    {activityIcons[item.type] ?? <Bell className="h-4 w-4 text-text-muted" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary leading-relaxed">{item.text}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-text-muted flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> {timeAgo(item.time)}
-                      </span>
-                      {item.action && (
-                        <Link
-                          to={item.action.href}
-                          className="text-xs text-brand-gold hover:text-brand-gold-light font-medium"
-                        >
-                          {item.action.label} →
-                        </Link>
-                      )}
-                    </div>
+                    <p className="text-sm text-text-primary leading-relaxed">{item.body ?? item.title}</p>
+                    <span className="text-xs text-text-muted flex items-center gap-1 mt-2">
+                      <Clock className="h-3 w-3" /> {timeAgo(item.createdAt)}
+                    </span>
                   </div>
                 </div>
               </Card>
