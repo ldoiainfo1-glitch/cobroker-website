@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 </SectionCard>
 
                 <SectionCard title="Messaging">
-                  <Toggle label="Allow messages from anyone" description="If off, only your connections can message you" checked={privacy.allowMessages} onChange={setP('allowMessages')} />
+                  <Toggle label="Allow messages from anyone" description="If off, only your circle members can message you" checked={privacy.allowMessages} onChange={setP('allowMessages')} />
                 </SectionCard>
 
                 <SectionCard title="Search & discovery">

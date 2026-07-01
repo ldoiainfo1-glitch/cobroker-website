@@ -30,7 +30,7 @@ The core problem it solves: Indian real estate brokers work in silos. They have 
 | Stakeholder | Pain Point |
 |-------------|-----------|
 | Broker | Can't find counterpart broker for a specific mandate quickly |
-| Company Admin | Can't manage team's mandates or deal pipeline centrally |
+| Company Admin | Can't manage team's mandates centrally |
 | Client | Deals take too long; no transparency |
 | Industry | No standardization in co-broking fees or documentation |
 
@@ -112,14 +112,6 @@ The core problem it solves: Indian real estate brokers work in silos. They have 
 - [ ] Mandate detail page
 - [ ] Mandate status management (Draft → Active → Closed)
 
-### Phase 4 — Co-Broking
-- [ ] Introduction request system
-- [ ] Accept / Reject / Withdraw introductions
-- [ ] Co-broking agreement creation
-- [ ] Commission split definition
-- [ ] Deal pipeline (9 stages: Lead → Completed)
-- [ ] Deal notes and timeline
-
 ### Phase 5 — Communication
 - [ ] Direct messaging (broker to broker)
 - [ ] Company-level group chat
@@ -179,10 +171,8 @@ The core problem it solves: Indian real estate brokers work in silos. They have 
 - As a broker, I want to see a mandate on a map so I understand the location requirement
 
 ### Co-Broking
-- As a broker, I want to request an introduction to a mandate poster so we can discuss co-broking
-- As a mandate poster, I want to accept or reject introduction requests so I control who I work with
+- As a broker, I want to co-broke mandates with other verified brokers via the platform chat
 - As a broker, I want to define commission split percentages so there's no dispute later
-- As a broker, I want to track my deal's progress through pipeline stages so I know what's next
 
 ### Company Management
 - As a company admin, I want to add my team members so they can post mandates under my company
@@ -266,27 +256,12 @@ The core problem it solves: Indian real estate brokers work in silos. They have 
 53. Saved Searches
 54. Advanced Search
 
-### Introductions (5 screens)
-55. Sent Introduction Requests
-56. Received Introduction Requests
-57. Introduction Detail
-58. Co-Broking Agreement Form
-59. Co-Broking Agreement Preview
-
-### Deal Pipeline (6 screens)
-60. My Deals (Kanban)
-61. Deal Detail
-62. Deal Timeline
-63. Deal Notes
-64. Deal Documents
-65. Deal Commission Summary
-
 ### Chat & Messaging (5 screens)
-66. Chat Home
-67. Direct Message Thread
-68. Company Group Chat
-69. Chat File Viewer
-70. Chat Search
+55. Chat Home
+56. Direct Message Thread
+57. Company Group Chat
+58. Chat File Viewer
+59. Chat Search
 
 ### Notifications (3 screens)
 71. All Notifications

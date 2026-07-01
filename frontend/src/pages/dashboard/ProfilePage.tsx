@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import {
-  MY_PROFILE, COMPLETENESS_ITEMS, MOCK_REVIEWS, MOCK_ENDORSEMENTS, MOCK_CONNECTIONS,
+  MY_PROFILE, COMPLETENESS_ITEMS, MOCK_REVIEWS, MOCK_ENDORSEMENTS,
 } from '@/data/profiles'
 import type { ReviewTag } from '@/types'
 
@@ -97,7 +97,7 @@ function Stars({ rating }: { rating: number }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'endorsements' | 'connections'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'endorsements'>('overview')
   const [editBio, setEditBio] = useState(false)
   const [bioValue, setBioValue] = useState(MY_PROFILE.bio)
   const profile = MY_PROFILE
@@ -106,7 +106,6 @@ export default function ProfilePage() {
     { id: 'overview', label: 'Overview' },
     { id: 'reviews', label: `Reviews (${MOCK_REVIEWS.length})` },
     { id: 'endorsements', label: `Endorsements (${MOCK_ENDORSEMENTS.length})` },
-    { id: 'connections', label: `Connections (${MOCK_CONNECTIONS.length})` },
   ] as const
 
   return (
@@ -220,11 +219,10 @@ export default function ProfilePage() {
               )}
 
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-4 pt-4 border-t border-border">
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
                 {[
                   { label: 'Deals', value: profile.totalDeals, icon: <GitBranch className="h-4 w-4 text-brand-gold" /> },
                   { label: 'Mandates', value: profile.totalMandates, icon: <Building2 className="h-4 w-4 text-info" /> },
-                  { label: 'Connections', value: profile.totalConnections, icon: <Users className="h-4 w-4 text-success" /> },
                   { label: 'Reviews', value: profile.totalReviews, icon: <Star className="h-4 w-4 text-warning" /> },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
@@ -246,7 +244,7 @@ export default function ProfilePage() {
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="text-sm font-semibold text-text-primary">Complete your profile to unlock more leads</h3>
-                <p className="text-xs text-text-muted mt-0.5">Brokers with 90%+ profiles get 3× more introductions</p>
+                <p className="text-xs text-text-muted mt-0.5">Brokers with 90%+ profiles get 3× more enquiries</p>
               </div>
               <span className="text-sm font-bold text-brand-gold">{profile.completenessScore}%</span>
             </div>
@@ -458,52 +456,6 @@ export default function ProfilePage() {
                 {e.endorsedByMe
                   ? <Badge variant="outline" className="text-xs border-brand-gold/30 text-brand-gold">You endorsed this</Badge>
                   : null}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Tab: Connections */}
-      {activeTab === 'connections' && (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-text-muted">{MOCK_CONNECTIONS.length} connections</span>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/dashboard/connections">
-                Manage connections <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-          {MOCK_CONNECTIONS.map((c) => (
-            <Card key={c.id}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-3 flex items-center justify-center text-sm font-semibold text-text-secondary shrink-0">
-                    {c.avatarInitial}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-text-primary">{c.fullName}</span>
-                      {c.isVerified && <CheckCircle2 className="h-3.5 w-3.5 text-success" />}
-                    </div>
-                    <div className="flex items-center gap-3 mt-0.5 text-xs text-text-muted">
-                      <span>{c.company}</span>
-                      <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{c.city}</span>
-                    </div>
-                  </div>
-                  <div className="text-right text-xs shrink-0">
-                    <div className="flex items-center gap-1 justify-end text-brand-gold font-medium">
-                      <Star className="h-3 w-3 fill-brand-gold" /> {c.avgRating}
-                    </div>
-                    {c.mutualDeals > 0 && (
-                      <div className="text-text-muted mt-0.5">{c.mutualDeals} mutual deals</div>
-                    )}
-                  </div>
-                  <Link to={`/dashboard/brokers/${c.brokerId}`} className="ml-2 text-xs text-brand-gold hover:text-brand-gold-light whitespace-nowrap">
-                    View →
-                  </Link>
-                </div>
               </CardContent>
             </Card>
           ))}

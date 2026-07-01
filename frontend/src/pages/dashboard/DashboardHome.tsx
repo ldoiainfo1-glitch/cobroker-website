@@ -19,10 +19,7 @@ const quickActions = [
 ]
 
 const activityIcons: Record<string, React.ReactNode> = {
-  intro_received: <Users className="h-4 w-4 text-info" />,
-  deal_update: <GitBranch className="h-4 w-4 text-warning" />,
   mandate_view: <Eye className="h-4 w-4 text-text-muted" />,
-  intro_accepted: <CheckCircle2 className="h-4 w-4 text-success" />,
 }
 
 export default function DashboardHome() {
@@ -44,24 +41,6 @@ export default function DashboardHome() {
       icon: <Building2 className="h-5 w-5" />,
       color: 'text-brand-gold',
       bg: 'bg-brand-gold/10',
-    },
-    {
-      label: 'Open Deals',
-      value: '--',
-      change: 'Coming soon',
-      positive: null,
-      icon: <GitBranch className="h-5 w-5" />,
-      color: 'text-info',
-      bg: 'bg-info/10',
-    },
-    {
-      label: 'Introductions',
-      value: '--',
-      change: 'Coming soon',
-      positive: null,
-      icon: <Users className="h-5 w-5" />,
-      color: 'text-success',
-      bg: 'bg-success/10',
     },
     {
       label: 'Total Views',

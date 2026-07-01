@@ -476,7 +476,7 @@ export default function PostMandatePage() {
             <div className="flex flex-col gap-5">
               <div>
                 <h2 className="text-lg font-semibold text-text-primary mb-1">Photos & Documents</h2>
-                <p className="text-sm text-text-muted">Optional but recommended. Mandates with photos get 3× more introductions.</p>
+                <p className="text-sm text-text-muted">Optional but recommended. Mandates with photos get 3× more enquiries.</p>
               </div>
 
               <div className="border-2 border-dashed border-border rounded-2xl p-10 flex flex-col items-center justify-center text-center hover:border-brand-gold/40 transition-colors cursor-pointer bg-surface-2">

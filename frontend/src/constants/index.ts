@@ -15,30 +15,6 @@ export const PROPERTY_TYPES = {
   agricultural: 'Agricultural',
 } as const
 
-export const DEAL_STAGES = [
-  'lead',
-  'introduction',
-  'meeting',
-  'site_visit',
-  'negotiation',
-  'token',
-  'agreement',
-  'registration',
-  'completed',
-] as const
-
-export const DEAL_STAGE_LABELS: Record<string, string> = {
-  lead: 'Lead',
-  introduction: 'Introduction',
-  meeting: 'Meeting',
-  site_visit: 'Site Visit',
-  negotiation: 'Negotiation',
-  token: 'Token',
-  agreement: 'Agreement',
-  registration: 'Registration',
-  completed: 'Completed',
-}
-
 // Indian cities for dropdowns
 export const INDIAN_CITIES = [
   'Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Ahmedabad',

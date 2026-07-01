@@ -107,56 +107,6 @@ export interface MandateImage {
   sortOrder: number
 }
 
-// Introductions
-export interface Introduction {
-  id: string
-  mandateId: string
-  mandate?: Mandate
-  requesterId: string
-  requester?: User
-  responderId: string
-  responder?: User
-  requesterCompany?: Company
-  responderCompany?: Company
-  status: IntroductionStatus
-  message?: string
-  rejectionReason?: string
-  respondedAt?: string
-  createdAt: string
-}
-
-export type IntroductionStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn' | 'completed'
-
-// Deals
-export interface Deal {
-  id: string
-  introductionId?: string
-  mandateId?: string
-  mandate?: Mandate
-  title: string
-  stage: DealStage
-  propertyAddress?: string
-  dealValue?: number
-  brokeragePercentage?: number
-  commissionSplitBroker1?: number
-  commissionSplitBroker2?: number
-  broker1?: User
-  broker2?: User
-  company1?: Company
-  company2?: Company
-  expectedCloseDate?: string
-  actualCloseDate?: string
-  notes?: string
-  isArchived: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export type DealStage =
-  | 'lead' | 'introduction' | 'meeting'
-  | 'site_visit' | 'negotiation' | 'token'
-  | 'agreement' | 'registration' | 'completed'
-
 // Notifications
 export interface Notification {
   id: string
@@ -171,10 +121,9 @@ export interface Notification {
 }
 
 export type NotificationType =
-  | 'new_mandate' | 'new_introduction' | 'intro_accepted'
-  | 'intro_rejected' | 'new_message' | 'deal_stage_update'
+  | 'new_mandate' | 'new_message'
   | 'verification_update' | 'payment_success' | 'mandate_expiring'
-  | 'new_follower' | 'system'
+  | 'system'
 
 // API response wrapper
 export interface ApiResponse<T> {
@@ -288,8 +237,6 @@ export interface BrokerProfile {
   totalDeals: number
   totalMandates: number
   totalReviews: number
-  avgRating: number
-  totalConnections: number
   tier: BrokerTier
   completenessScore: number       // 0–100
   badges: ProfileBadge[]

@@ -317,80 +317,14 @@ CREATE TABLE saved_searches (
 );
 ```
 
-### 3.3 Co-Broking Tables
-
-```sql
--- Introductions
-CREATE TABLE introductions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mandate_id UUID REFERENCES mandates(id),
-  requester_id UUID REFERENCES users(id),   -- broker requesting intro
-  responder_id UUID REFERENCES users(id),   -- mandate owner
-  requester_company_id UUID REFERENCES companies(id),
-  responder_company_id UUID REFERENCES companies(id),
-  status VARCHAR(20) DEFAULT 'pending',     -- pending, accepted, rejected, withdrawn
-  message TEXT,
-  rejection_reason TEXT,
-  responded_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Deals
-CREATE TABLE deals (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  introduction_id UUID REFERENCES introductions(id),
-  mandate_id UUID REFERENCES mandates(id),
-  title VARCHAR(255),
-  stage VARCHAR(30) DEFAULT 'lead',
-  -- lead, introduction, meeting, site_visit, negotiation, token, agreement, registration, completed
-  property_address TEXT,
-  deal_value BIGINT,
-  brokerage_percentage DECIMAL(5,2),
-  commission_split_broker1 DECIMAL(5,2),   -- % to requester broker
-  commission_split_broker2 DECIMAL(5,2),   -- % to responder broker
-  broker1_id UUID REFERENCES users(id),
-  broker2_id UUID REFERENCES users(id),
-  company1_id UUID REFERENCES companies(id),
-  company2_id UUID REFERENCES companies(id),
-  expected_close_date DATE,
-  actual_close_date DATE,
-  notes TEXT,
-  is_archived BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Deal Stage History
-CREATE TABLE deal_stage_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  deal_id UUID REFERENCES deals(id) ON DELETE CASCADE,
-  from_stage VARCHAR(30),
-  to_stage VARCHAR(30),
-  changed_by UUID REFERENCES users(id),
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Deal Notes
-CREATE TABLE deal_notes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  deal_id UUID REFERENCES deals(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id),
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-```
-
-### 3.4 Communication Tables
+### 3.3 Communication Tables
 
 ```sql
 -- Conversations
 CREATE TABLE conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  type VARCHAR(20) DEFAULT 'direct',   -- direct, company_group, deal_group
+  type VARCHAR(20) DEFAULT 'direct',   -- direct, company_group
   name VARCHAR(255),
-  deal_id UUID REFERENCES deals(id),
   created_by UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT now()
 );
@@ -623,31 +557,7 @@ CREATE TABLE audit_logs (
 | POST | `/:id/images` | Upload mandate images | Yes |
 | POST | `/:id/documents` | Upload mandate documents | Yes |
 
-### 4.5 Introductions (`/api/introductions`)
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/` | List introductions (sent + received) | Yes |
-| POST | `/` | Request introduction | Yes |
-| GET | `/:id` | Get introduction detail | Yes |
-| POST | `/:id/accept` | Accept introduction | Yes |
-| POST | `/:id/reject` | Reject introduction | Yes |
-| POST | `/:id/withdraw` | Withdraw introduction | Yes |
-
-### 4.6 Deals (`/api/deals`)
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/` | List deals | Yes |
-| POST | `/` | Create deal from introduction | Yes |
-| GET | `/:id` | Get deal detail | Yes |
-| PUT | `/:id` | Update deal | Yes |
-| POST | `/:id/stage` | Move deal to next stage | Yes |
-| GET | `/:id/timeline` | Get deal stage history | Yes |
-| POST | `/:id/notes` | Add note to deal | Yes |
-| POST | `/:id/documents` | Upload deal document | Yes |
-
-### 4.7 Chat (`/api/chat`)
+### 4.5 Chat (`/api/chat`)
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
@@ -717,8 +627,6 @@ CREATE TABLE audit_logs (
 | `message_read` | `{ userId, conversationId }` | Messages read by user |
 | `new_notification` | Notification object | New notification |
 | `mandate_update` | Mandate object | Mandate status changed |
-| `deal_update` | Deal object | Deal stage changed |
-| `intro_update` | Introduction object | Intro status changed |
 
 ---
 

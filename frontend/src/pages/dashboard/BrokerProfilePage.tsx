@@ -259,11 +259,10 @@ export default function BrokerProfilePage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-4 pt-4 border-t border-border">
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
                 {[
                   { label: 'Deals', value: profile.totalDeals, icon: <GitBranch className="h-4 w-4 text-brand-gold" /> },
                   { label: 'Mandates', value: profile.totalMandates, icon: <Building2 className="h-4 w-4 text-info" /> },
-                  { label: 'Connections', value: profile.totalConnections, icon: <Users className="h-4 w-4 text-success" /> },
                   { label: 'Reviews', value: profile.totalReviews, icon: <Star className="h-4 w-4 text-warning" /> },
                 ].map((s) => (
                   <div key={s.label} className="text-center">

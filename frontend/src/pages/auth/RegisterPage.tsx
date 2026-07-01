@@ -162,7 +162,6 @@ export default function RegisterPage() {
               'Access to 48,000+ live mandates',
               'RERA verified broker network',
               'Formal co-broking agreements',
-              'Deal pipeline & CRM tools',
               'GST invoice generation',
             ].map((benefit) => (
               <li key={benefit} className="flex items-center gap-3 text-sm text-text-secondary">

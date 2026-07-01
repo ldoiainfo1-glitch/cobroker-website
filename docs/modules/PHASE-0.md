@@ -221,10 +221,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 | edit_mandate | ✅ | ✅ | ✅ | Own | ❌ | ❌ |
 | delete_mandate | ✅ | ✅ | ✅ | Own | ❌ | ❌ |
 | view_marketplace | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| request_introduction | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| accept_introduction | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| create_deal | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| close_deal | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| send_enquiry | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | manage_company_users | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | view_reports | ✅ | ✅ | ✅ | Own | ❌ | ❌ |
 | manage_payments | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |

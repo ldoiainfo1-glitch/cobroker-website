@@ -165,7 +165,6 @@ export default function MandatesPage() {
         {[
           { label: 'Total Mandates', value: mandates.length, color: 'text-text-primary' },
           { label: 'Active', value: counts.active, color: 'text-success' },
-          { label: 'Introductions', value: mandates.reduce((a, m) => a + (m.introCount ?? 0), 0), color: 'text-info' },
           { label: 'Total Views', value: mandates.reduce((a, m) => a + (m.viewsCount ?? 0), 0), color: 'text-brand-gold' },
         ].map((s) => (
           <Card key={s.label}>

@@ -24,7 +24,7 @@ export const MOCK_BROKER_PROFILES: BrokerProfile[] = [
     totalMandates: 34,
     totalReviews: 52,
     avgRating: 4.8,
-    totalConnections: 218,
+
     tier: 'verified_plus',
     completenessScore: 96,
     badges: ['top_closer', 'trusted_broker', 'rera_verified', 'multi_city'],
@@ -53,7 +53,7 @@ export const MOCK_BROKER_PROFILES: BrokerProfile[] = [
     totalMandates: 28,
     totalReviews: 41,
     avgRating: 4.7,
-    totalConnections: 163,
+
     tier: 'pro',
     completenessScore: 88,
     badges: ['trusted_broker', 'rera_verified', 'early_adopter'],
@@ -81,7 +81,7 @@ export const MOCK_BROKER_PROFILES: BrokerProfile[] = [
     totalMandates: 45,
     totalReviews: 68,
     avgRating: 4.9,
-    totalConnections: 347,
+
     tier: 'enterprise',
     completenessScore: 100,
     badges: ['top_closer', 'trusted_broker', 'circle_leader', 'speed_king', 'multi_city', 'rera_verified'],
@@ -109,7 +109,7 @@ export const MOCK_BROKER_PROFILES: BrokerProfile[] = [
     totalMandates: 22,
     totalReviews: 29,
     avgRating: 4.6,
-    totalConnections: 128,
+
     tier: 'pro',
     completenessScore: 78,
     badges: ['rera_verified', 'early_adopter'],
@@ -137,7 +137,7 @@ export const MOCK_BROKER_PROFILES: BrokerProfile[] = [
     totalMandates: 31,
     totalReviews: 38,
     avgRating: 4.5,
-    totalConnections: 194,
+
     tier: 'pro',
     completenessScore: 82,
     badges: ['top_closer', 'rera_verified'],
@@ -169,7 +169,6 @@ export const MY_PROFILE: BrokerProfile = {
   totalMandates: 8,
   totalReviews: 11,
   avgRating: 4.4,
-  totalConnections: 42,
   tier: 'pro',
   completenessScore: 62,
   badges: ['rera_verified'],
@@ -246,18 +245,6 @@ export const MOCK_ENDORSEMENTS: Endorsement[] = [
   { id: 'e4', endorserId: 'b5', endorserName: 'Vijay Kulkarni', endorserCompany: 'Bricks Beyond', endorserAvatarInitial: 'VK', skill: 'Client Management', count: 9, endorsedByMe: false },
   { id: 'e5', endorserId: 'b2', endorserName: 'Priya Nair', endorserCompany: 'Prime Homes', endorserAvatarInitial: 'PN', skill: 'Investment Advisory', count: 7, endorsedByMe: true },
   { id: 'e6', endorserId: 'b3', endorserName: 'Rahul Sharma', endorserCompany: 'Capital Properties', endorserAvatarInitial: 'RS', skill: 'Grade A Office', count: 6, endorsedByMe: false },
-]
-
-// ─── Connections ──────────────────────────────────────────────────────────────
-export const MOCK_CONNECTIONS: Connection[] = [
-  { id: 'c1', brokerId: 'b2', fullName: 'Priya Nair', company: 'Prime Homes', city: 'Mumbai', tier: 'pro', isVerified: true, avgRating: 4.7, mutualDeals: 3, avatarInitial: 'PN', connectedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), isFollowing: true },
-  { id: 'c2', brokerId: 'b4', fullName: 'Sneha Joshi', company: 'Realty Pulse', city: 'Bengaluru', tier: 'pro', isVerified: true, avgRating: 4.6, mutualDeals: 1, avatarInitial: 'SJ', connectedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), isFollowing: true },
-  { id: 'c3', brokerId: 'b5', fullName: 'Vijay Kulkarni', company: 'Bricks Beyond', city: 'Pune', tier: 'pro', isVerified: true, avgRating: 4.5, mutualDeals: 2, avatarInitial: 'VK', connectedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(), isFollowing: false },
-]
-
-export const MOCK_SUGGESTED_CONNECTIONS: Connection[] = [
-  { id: 's1', brokerId: 'b1', fullName: 'Arjun Mehta', company: 'Skyline Realty', city: 'Mumbai', tier: 'verified_plus', isVerified: true, avgRating: 4.8, mutualDeals: 0, avatarInitial: 'AM', connectedAt: '', isFollowing: false },
-  { id: 's2', brokerId: 'b3', fullName: 'Rahul Sharma', company: 'Capital Properties', city: 'Delhi', tier: 'enterprise', isVerified: true, avgRating: 4.9, mutualDeals: 0, avatarInitial: 'RS', connectedAt: '', isFollowing: false },
 ]
 
 // ─── KYC Documents ────────────────────────────────────────────────────────────

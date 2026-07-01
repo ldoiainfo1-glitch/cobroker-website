@@ -98,7 +98,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
 // ─── Messages per conversation ────────────────────────────────────────────────
 export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   c1: [
-    { id: 'm1', conversationId: 'c1', senderId: 'b1', senderName: 'Arjun Mehta', senderInitial: 'AM', type: 'system', systemText: 'Introduction accepted · Deal #104 created', sentAt: days(5), isRead: true, isMine: false },
+    { id: 'm1', conversationId: 'c1', senderId: 'b1', senderName: 'Arjun Mehta', senderInitial: 'AM', type: 'system', systemText: 'Co-broking agreed · Deal in progress', sentAt: days(5), isRead: true, isMine: false },
     { id: 'm2', conversationId: 'c1', senderId: 'b1', senderName: 'Arjun Mehta', senderInitial: 'AM', type: 'text', text: 'Hi! I have a serious buyer for Grade A office in BKC. Budget up to ₹12Cr. Looking for 5,000–8,000 sq ft.', sentAt: days(5), isRead: true, isMine: false },
     { id: 'm3', conversationId: 'c1', senderId: 'me', senderName: 'Me', senderInitial: 'DB', type: 'text', text: 'Great! We have a couple of options. Let me share the best one.', sentAt: days(5), isRead: true, isMine: true },
     { id: 'm4', conversationId: 'c1', senderId: 'me', senderName: 'Me', senderInitial: 'DB', type: 'mandate_share', mandateCard: { id: 'man-01', title: 'Grade A Office Floor in BKC', mandateType: 'sell', budget: '₹9.5Cr – ₹12Cr', city: 'Mumbai', propertyType: 'commercial' }, sentAt: days(4), isRead: true, isMine: true },
@@ -111,14 +111,14 @@ export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
     { id: 'm11', conversationId: 'c1', senderId: 'b1', senderName: 'Arjun Mehta', senderInitial: 'AM', type: 'text', text: 'Also the owner is flexible on possession date — October or November.', sentAt: mins(2), isRead: false, isMine: false },
   ],
   c2: [
-    { id: 'm20', conversationId: 'c2', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'system', systemText: 'Introduction accepted · Bandra West Mandate', sentAt: days(10), isRead: true, isMine: false },
+    { id: 'm20', conversationId: 'c2', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'system', systemText: 'Co-broking agreed · Bandra West Mandate', sentAt: days(10), isRead: true, isMine: false },
     { id: 'm21', conversationId: 'c2', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'text', text: 'Hello! I saw your listing on the platform. My client is looking for exactly this type of property.', sentAt: days(10), isRead: true, isMine: false },
     { id: 'm22', conversationId: 'c2', senderId: 'me', senderName: 'Me', senderInitial: 'DB', type: 'text', text: 'Hi Priya! Yes, the mandate is still active. Client is flexible on possession.', sentAt: days(10), isRead: true, isMine: true },
     { id: 'm23', conversationId: 'c2', senderId: 'me', senderName: 'Me', senderInitial: 'DB', type: 'mandate_share', mandateCard: { id: 'man-02', title: '3BHK Sea View — Bandra West', mandateType: 'sell', budget: '₹2.2Cr – ₹2.5Cr', city: 'Mumbai', propertyType: 'residential' }, sentAt: hrs(2), isRead: true, isMine: true },
     { id: 'm24', conversationId: 'c2', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'text', text: 'Sharing the Bandra West mandate. Budget is flexible up to ₹2.5Cr.', sentAt: hrs(2), isRead: true, isMine: false },
   ],
   c3: [
-    { id: 'm30', conversationId: 'c3', senderId: 'b3', senderName: 'Rahul Sharma', senderInitial: 'RS', type: 'system', systemText: 'Introduction accepted · Industrial Land Deal', sentAt: days(15), isRead: true, isMine: false },
+    { id: 'm30', conversationId: 'c3', senderId: 'b3', senderName: 'Rahul Sharma', senderInitial: 'RS', type: 'system', systemText: 'Co-broking agreed · Industrial Land', sentAt: days(15), isRead: true, isMine: false },
     { id: 'm31', conversationId: 'c3', senderId: 'b3', senderName: 'Rahul Sharma', senderInitial: 'RS', type: 'text', text: 'Rahul here. The industrial land near Bhiwandi — are you still representing the seller?', sentAt: days(15), isRead: true, isMine: false },
     { id: 'm32', conversationId: 'c3', senderId: 'me', senderName: 'Me', senderInitial: 'DB', type: 'text', text: 'Yes, mandate is active until December. 12 acres clear title.', sentAt: days(14), isRead: true, isMine: true },
     { id: 'm33', conversationId: 'c3', senderId: 'b3', senderName: 'Rahul Sharma', senderInitial: 'RS', type: 'text', text: 'My client wants NA conversion documents. Can you arrange?', sentAt: days(14), isRead: true, isMine: false },
@@ -138,7 +138,7 @@ export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   ],
   c6: [
     { id: 'm60', conversationId: 'c6', senderId: 'b1', senderName: 'Arjun Mehta', senderInitial: 'AM', type: 'system', systemText: 'Group created: BKC Circle — Deal Closed 🎉', sentAt: days(4), isRead: true, isMine: false },
-    { id: 'm61', conversationId: 'c6', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'text', text: 'What a deal this was! Took 45 days from intro to registration 💪', sentAt: days(3), isRead: true, isMine: false },
+    { id: 'm61', conversationId: 'c6', senderId: 'b2', senderName: 'Priya Nair', senderInitial: 'PN', type: 'text', text: 'What a deal this was! Took 45 days to registration 💪', sentAt: days(3), isRead: true, isMine: false },
     { id: 'm62', conversationId: 'c6', senderId: 'b3', senderName: 'Rahul Sharma', senderInitial: 'RS', type: 'text', text: 'Congrats to the team! Deal registered. 🥂', sentAt: days(3), isRead: true, isMine: false },
   ],
   c7: [
@@ -150,15 +150,9 @@ export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
 
 // ─── Notifications ────────────────────────────────────────────────────────────
 export const MOCK_NOTIFICATIONS: ChatNotification[] = [
-  { id: 'n1', type: 'new_introduction', title: 'New Introduction Request', body: 'Arjun Mehta (Skyline Realty) requested an introduction to your BKC Office mandate', isRead: false, createdAt: mins(10), actionUrl: '/dashboard/introductions', avatarInitial: 'AM' },
-  { id: 'n2', type: 'deal_stage_update', title: 'Deal Moved to Negotiation', body: 'Deal #98 with Rahul Sharma has been moved to the Negotiation stage', isRead: false, createdAt: hrs(5), actionUrl: '/dashboard/deals', avatarInitial: 'RS' },
   { id: 'n3', type: 'new_message', title: 'New Message from Arjun Mehta', body: '"I can arrange a site visit this Thursday. Does 11am work for your client?"', isRead: false, createdAt: mins(3), actionUrl: '/dashboard/chat', avatarInitial: 'AM' },
-  { id: 'n4', type: 'intro_accepted', title: 'Introduction Accepted', body: 'Priya Nair accepted your introduction request for the Bandra West mandate', isRead: true, createdAt: hrs(2), actionUrl: '/dashboard/introductions', avatarInitial: 'PN' },
   { id: 'n5', type: 'new_mandate', title: 'New Mandate in Your Circle', body: '3 new mandates posted in BKC Circle matching your buyer profile', isRead: true, createdAt: days(1), actionUrl: '/dashboard/circles/bkc', avatarInitial: 'BK' },
   { id: 'n6', type: 'verification_update', title: 'Document Under Review', body: 'Your PAN card has been submitted and is now under review. Expected: 1–2 business days', isRead: true, createdAt: days(2), actionUrl: '/dashboard/kyc', avatarInitial: 'CO' },
-  { id: 'n7', type: 'new_follower', title: 'New Connection Request', body: 'Vijay Kulkarni (Bricks Beyond, Pune) wants to connect with you', isRead: true, createdAt: days(2), actionUrl: '/dashboard/connections', avatarInitial: 'VK' },
-  { id: 'n8', type: 'deal_stage_update', title: 'Deal Closed — Congratulations!', body: 'Deal #87 with Vijay Kulkarni has been marked as Registration. Commission split confirmed.', isRead: true, createdAt: days(3), actionUrl: '/dashboard/deals', avatarInitial: 'VK' },
   { id: 'n9', type: 'mandate_expiring', title: 'Mandate Expiring Soon', body: 'Your Powai Commercial mandate expires in 7 days. Renew to keep it active.', isRead: true, createdAt: days(4), actionUrl: '/dashboard/mandates', avatarInitial: 'CO' },
-  { id: 'n10', type: 'new_introduction', title: 'Introduction Request', body: 'Sneha Joshi (Realty Pulse) requested an introduction to your Andheri Lease mandate', isRead: true, createdAt: days(5), actionUrl: '/dashboard/introductions', avatarInitial: 'SJ' },
 ]
 

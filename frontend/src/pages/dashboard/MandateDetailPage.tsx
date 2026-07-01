@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import {
-  MapPin, Eye, Users, Clock, ArrowLeft, Share2,
-  Bookmark, CheckCircle2, Phone, Building2, Shield,
-  ChevronLeft, ChevronRight, MessageSquare, Send,
+  MapPin, Eye, Clock, ArrowLeft, Share2,
+  Bookmark, CheckCircle2, Shield,
+  ChevronLeft, ChevronRight, Send,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -71,12 +71,7 @@ export default function MandateDetailPage() {
 
   const [currentImg, setCurrentImg] = useState(0)
 
-  // Broker intro modal (authenticated)
-  const [showIntroModal, setShowIntroModal] = useState(false)
-  const [introMessage, setIntroMessage] = useState('')
-  const [introSent, setIntroSent] = useState(false)
-
-  // Public enquiry modal (unauthenticated)
+  // Enquiry modal
   const [showEnquiryModal, setShowEnquiryModal] = useState(false)
   const [enquiryName, setEnquiryName] = useState('')
   const [enquiryEmail, setEnquiryEmail] = useState('')
@@ -90,13 +85,6 @@ export default function MandateDetailPage() {
 
   const prevImg = () => setCurrentImg((p) => (p === 0 ? m.images.length - 1 : p - 1))
   const nextImg = () => setCurrentImg((p) => (p === m.images.length - 1 ? 0 : p + 1))
-
-  const sendIntro = () => {
-    if (!introMessage.trim()) return
-    // TODO: API call
-    setIntroSent(true)
-    setTimeout(() => setShowIntroModal(false), 1500)
-  }
 
   const sendEnquiry = async () => {
     setEnquiryError('')
@@ -196,10 +184,6 @@ export default function MandateDetailPage() {
                   <Eye className="h-4 w-4" />
                   {m.views} views
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" />
-                  {m.intros} introductions
-                </span>
               </div>
             </div>
 
@@ -278,9 +262,9 @@ export default function MandateDetailPage() {
                 </div>
 
                 {isAuthenticated ? (
-                  <Button size="lg" className="w-full mb-3" onClick={() => setShowIntroModal(true)}>
-                    <MessageSquare className="h-4 w-4" />
-                    Request Introduction
+                  <Button size="lg" className="w-full mb-3" onClick={() => setShowEnquiryModal(true)}>
+                    <Send className="h-4 w-4" />
+                    Send Enquiry
                   </Button>
                 ) : (
                   <Button size="lg" className="w-full mb-3" onClick={() => setShowEnquiryModal(true)}>
@@ -298,9 +282,7 @@ export default function MandateDetailPage() {
                 </div>
 
                 <p className="text-xs text-text-muted text-center mt-3">
-                  {isAuthenticated
-                    ? 'Only verified brokers can request introductions'
-                    : 'Your details are shared only with the listing broker'}
+                  Your details are shared only with the listing broker
                 </p>
               </CardContent>
             </Card>
@@ -437,48 +419,6 @@ export default function MandateDetailPage() {
                 <p className="text-xs text-text-muted text-center mt-3">
                   By submitting you agree your details are shared with the listing broker.
                 </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Introduction Request Modal */}
-      {showIntroModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowIntroModal(false)} />
-          <div className="relative bg-surface-1 rounded-2xl border border-border p-6 w-full max-w-md shadow-2xl">
-            {introSent ? (
-              <div className="text-center py-4">
-                <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-text-primary mb-1">Introduction sent!</h3>
-                <p className="text-sm text-text-muted">
-                  {m.broker.name} will be notified. You'll hear back within 24–48 hours.
-                </p>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold text-text-primary mb-1">Request Introduction</h3>
-                <p className="text-sm text-text-muted mb-5">
-                  Write a short message to {m.broker.name} explaining why you'd like to co-broke this mandate.
-                </p>
-                <textarea
-                  value={introMessage}
-                  onChange={(e) => setIntroMessage(e.target.value)}
-                  placeholder="E.g. I have a buyer client who matches this requirement exactly. Looking to co-broke on a 50/50 commission split."
-                  rows={5}
-                  className="w-full rounded-xl bg-surface-2 border border-border px-4 py-3 text-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-brand-gold/50 mb-4"
-                  maxLength={500}
-                />
-                <p className="text-xs text-text-muted mb-4 text-right">{introMessage.length}/500</p>
-                <div className="flex gap-3">
-                  <Button variant="secondary" size="lg" className="flex-1" onClick={() => setShowIntroModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button size="lg" className="flex-1" onClick={sendIntro} disabled={introMessage.trim().length < 20}>
-                    Send Request
-                  </Button>
-                </div>
               </>
             )}
           </div>
