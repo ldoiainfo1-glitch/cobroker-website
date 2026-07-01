@@ -102,61 +102,31 @@ export default function RegisterPage() {
       if (signUpError) throw new Error(signUpError.message)
       if (!authData.user) throw new Error('Sign up failed. Please try again.')
 
-      // 2. Create the company record
+      // 2–4. Create company + update profile + link introducer via a single
+      //      SECURITY DEFINER RPC. This is necessary because signUp() may return
+      //      session=null when email confirmation is enabled, meaning the client
+      //      is still in the anon role and direct table writes would be blocked
+      //      by RLS.
       const baseSlug = data.companyName
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
       const uniqueSlug = `${baseSlug}-${Date.now()}`
 
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
-        .insert({
-          name: data.companyName,
-          slug: uniqueSlug,
-          city: data.companyCity,
-          state: data.companyState,
-          address: data.companyAddress || null,
-          website: data.website || null,
-          verification_status: 'pending',
-        })
-        .select()
-        .single()
+      const { error: rpcError } = await supabase.rpc('complete_registration', {
+        p_user_id:          authData.user.id,
+        p_full_name:        step1Data.fullName,
+        p_phone:            step1Data.phone,
+        p_company_name:     data.companyName,
+        p_company_city:     data.companyCity,
+        p_company_state:    data.companyState,
+        p_company_slug:     uniqueSlug,
+        p_company_address:  data.companyAddress || null,
+        p_company_website:  data.website || null,
+        p_introducer_phone: step1Data.introducerPhone?.trim() || null,
+      })
 
-      if (companyError) throw new Error(companyError.message)
-
-      // 3. Update the auto-created profile with full details
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: step1Data.fullName,
-          phone: step1Data.phone,
-          company_id: company.id,
-          role: 'company_admin',
-        })
-        .eq('id', authData.user.id)
-
-      if (profileError) throw new Error(profileError.message)
-
-      // 4. Link to introducer if a phone number was provided
-      if (step1Data.introducerPhone?.trim()) {
-        try {
-          const { data: introducerProfile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('phone', step1Data.introducerPhone.trim())
-            .maybeSingle()
-
-          if (introducerProfile) {
-            await supabase
-              .from('profiles')
-              .update({ introducer_id: introducerProfile.id })
-              .eq('id', authData.user.id)
-          }
-        } catch (_) {
-          // Non-critical — introducer linking failure should not block registration
-        }
-      }
+      if (rpcError) throw new Error(rpcError.message)
 
       // 5. If user came from a mandate page, submit their enquiry now
       const raw = localStorage.getItem(PENDING_ENQUIRY_KEY)
