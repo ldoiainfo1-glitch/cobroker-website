@@ -37,7 +37,7 @@ const features = [
 ]
 
 const steps = [
-  { num: '01', title: 'Post', desc: 'Pick a side â€” Buy, Sell, Rent or Lease â€” and type your requirement in plain text. No photos, no forms.' },
+  { num: '01', title: 'Post', desc: 'Pick a side — Buy, Sell, Rent or Lease — and type your requirement in plain text. No photos, no forms.' },
   { num: '02', title: 'Broadcast', desc: "Your post instantly reaches every broker in the city and area circles you've joined. Auto-join your city, opt into areas you work." },
   { num: '03', title: 'Co-broke', desc: 'Matching broker taps Chat. You message inside the app. Phone unmasks the moment both of you accept share.' },
 ]
@@ -152,7 +152,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-text-secondary text-base sm:text-lg mb-8 max-w-lg leading-relaxed">
-              From post to close, every broker in your city â€” connected.{' '}
+              From post to close, every broker in your city — connected.{' '}
               <span className="font-semibold text-text-primary">30,000+ Deals Co-Broked &amp; Closed</span>
             </p>
 
@@ -198,7 +198,7 @@ export default function HomePage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Area, locality or landmarkâ€¦"
+                  placeholder="Area, locality or landmark…"
                   className="flex-1 h-11 rounded-xl bg-surface-2 border border-border px-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50 min-w-0"
                 />
                 <button
@@ -419,7 +419,7 @@ export default function HomePage() {
       <section className="py-20 bg-surface-1 border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-bold tracking-[0.25em] uppercase text-brand-gold mb-4">
-            FIND YOUR NEXT HOME â€” VERIFIED, DIRECT, SPAM-FREE
+            FIND YOUR NEXT HOME — VERIFIED, DIRECT, SPAM-FREE
           </p>
           <Link
             to="/register"
