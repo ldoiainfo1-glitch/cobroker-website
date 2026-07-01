@@ -130,6 +130,7 @@ export interface CreateMandatePayload {
   postedBy: string
   companyId: string
   publishNow?: boolean
+  imageUrls?: string[]
 }
 
 // Normalize frontend area-unit display values to DB CHECK constraint values
@@ -171,6 +172,19 @@ export async function createMandate(payload: CreateMandatePayload): Promise<Mand
     .single()
 
   if (error) throw error
+
+  // Insert images into mandate_images (non-critical — don't block on failure)
+  if (payload.imageUrls && payload.imageUrls.length > 0) {
+    await supabase.from('mandate_images').insert(
+      payload.imageUrls.map((url, i) => ({
+        mandate_id: data.id,
+        url,
+        is_primary: i === 0,
+        sort_order: i,
+      }))
+    )
+  }
+
   return mapRow(data)
 }
 

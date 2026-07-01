@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Building2, MapPin, Globe, Phone, Mail, Shield,
   CheckCircle2, Star, Users, FileText, Edit3,
   ExternalLink, Award, Briefcase, Calendar,
-  Download, Upload, File, AlertCircle,
+  Download, Upload, File, AlertCircle, Camera,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { uploadCompanyLogo, uploadCompanyCover } from '@/lib/s3'
+import { supabase } from '@/lib/supabase'
+import { Spinner } from '@/components/ui/spinner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -105,6 +108,40 @@ export default function CompanyProfilePage() {
   const [tab, setTab] = useState<Tab>('overview')
   const isAdmin = user?.role === 'company_admin' || user?.role === 'director'
 
+  // ─── Logo / cover upload ─────────────────────────────────────────────────
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingCover, setUploadingCover] = useState(false)
+  const [logoUrl, setLogoUrl] = useState<string>(user?.company?.logoUrl ?? '')
+  const [coverUrl, setCoverUrl] = useState<string>(user?.company?.coverUrl ?? '')
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user?.companyId) return
+    if (file.size > 5 * 1024 * 1024) { alert('Max 5 MB'); return }
+    setUploadingLogo(true)
+    try {
+      const { publicUrl } = await uploadCompanyLogo(file)
+      await supabase.from('companies').update({ logo_url: publicUrl }).eq('id', user.companyId)
+      setLogoUrl(publicUrl)
+    } catch (err) { console.error('Logo upload failed:', err) }
+    finally { setUploadingLogo(false); if (logoInputRef.current) logoInputRef.current.value = '' }
+  }
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user?.companyId) return
+    if (file.size > 5 * 1024 * 1024) { alert('Max 5 MB'); return }
+    setUploadingCover(true)
+    try {
+      const { publicUrl } = await uploadCompanyCover(file)
+      await supabase.from('companies').update({ cover_url: publicUrl }).eq('id', user.companyId)
+      setCoverUrl(publicUrl)
+    } catch (err) { console.error('Cover upload failed:', err) }
+    finally { setUploadingCover(false); if (coverInputRef.current) coverInputRef.current.value = '' }
+  }
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'team', label: `Team (${MOCK_COMPANY.membersCount})` },
@@ -115,18 +152,30 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="flex-1 overflow-y-auto">
+      {/* Hidden file inputs */}
+      <input ref={logoInputRef}  type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleLogoUpload} />
+      <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverUpload} />
+
       {/* Cover + header */}
       <div className="relative h-48 border-b border-border overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=80"
-          alt="Company cover"
-          className="w-full h-full object-cover"
-        />
+        {coverUrl ? (
+          <img src={coverUrl} alt="Company cover" className="w-full h-full object-cover" />
+        ) : (
+          <img
+            src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=80"
+            alt="Company cover"
+            className="w-full h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-surface-0/80 via-surface-0/30 to-transparent" />
-        {/* Edit button for admins */}
         {isAdmin && (
-          <button className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-0/80 border border-border text-xs text-text-secondary hover:text-text-primary hover:bg-surface-0 transition-all backdrop-blur-sm">
-            <Edit3 className="h-3.5 w-3.5" /> Edit Company
+          <button
+            onClick={() => coverInputRef.current?.click()}
+            disabled={uploadingCover}
+            className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-0/80 border border-border text-xs text-text-secondary hover:text-text-primary hover:bg-surface-0 transition-all backdrop-blur-sm disabled:opacity-50"
+          >
+            {uploadingCover ? <Spinner size="sm" /> : <Camera className="h-3.5 w-3.5" />}
+            {uploadingCover ? 'Uploading…' : 'Change Cover'}
           </button>
         )}
       </div>
@@ -134,8 +183,23 @@ export default function CompanyProfilePage() {
       <div className="max-w-5xl mx-auto px-6">
         {/* Logo + name row */}
         <div className="flex items-end gap-4 -mt-8 mb-5">
-          <div className="w-16 h-16 rounded-2xl bg-surface-0 border-2 border-border shadow-lg flex items-center justify-center shrink-0 relative z-10">
-            <span className="text-xl font-black text-brand-gold">SR</span>
+          <div
+            onClick={() => isAdmin && logoInputRef.current?.click()}
+            className="w-16 h-16 rounded-2xl bg-surface-0 border-2 border-border shadow-lg flex items-center justify-center shrink-0 relative z-10 overflow-hidden group cursor-pointer"
+            title={isAdmin ? 'Change company logo' : undefined}
+          >
+            {logoUrl ? (
+              <img src={logoUrl} alt="Company logo" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xl font-black text-brand-gold">
+                {(user?.company?.name ?? 'C')[0].toUpperCase()}
+              </span>
+            )}
+            {isAdmin && (
+              <div className="absolute inset-0 bg-surface-0/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {uploadingLogo ? <Spinner size="sm" /> : <Camera className="h-4 w-4 text-text-primary" />}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-start justify-between gap-4 mb-6">

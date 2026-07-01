@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   MapPin, Building2, Briefcase, Star, Users, GitBranch,
   Shield, CheckCircle2, Edit3, Plus, Globe,
   Clock, Award, ThumbsUp, ArrowRight, Camera, X, Check,
 } from 'lucide-react'
+import { uploadAvatar } from '@/lib/s3'
+import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/authStore'
+import { Spinner } from '@/components/ui/spinner'
 
 const LinkedinIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -97,10 +101,32 @@ function Stars({ rating }: { rating: number }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
+  const { user, setUser } = useAuthStore()
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'endorsements'>('overview')
   const [editBio, setEditBio] = useState(false)
   const [bioValue, setBioValue] = useState(MY_PROFILE.bio)
   const profile = MY_PROFILE
+
+  // ─── Avatar upload ─────────────────────────────────────────────────────────
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    if (file.size > 5 * 1024 * 1024) { alert('File too large. Max 5 MB.'); return }
+    setUploadingAvatar(true)
+    try {
+      const { publicUrl } = await uploadAvatar(file)
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id)
+      setUser({ ...user, avatarUrl: publicUrl })
+    } catch (err) {
+      console.error('Avatar upload failed:', err)
+    } finally {
+      setUploadingAvatar(false)
+      if (avatarInputRef.current) avatarInputRef.current.value = ''
+    }
+  }
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -129,10 +155,29 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Avatar + ring */}
             <div className="flex flex-col items-center gap-3 shrink-0">
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
               <div className="relative">
-                <CompletenessRing score={profile.completenessScore} />
-                <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-surface-3 border border-border flex items-center justify-center text-text-muted hover:text-text-primary hover:border-brand-gold/40 transition-colors">
-                  <Camera className="h-3.5 w-3.5" />
+                {user?.avatarUrl ? (
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-brand-gold/30">
+                    <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <CompletenessRing score={profile.completenessScore} />
+                )}
+                <button
+                  type="button"
+                  title="Change profile photo"
+                  disabled={uploadingAvatar}
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-surface-3 border border-border flex items-center justify-center text-text-muted hover:text-text-primary hover:border-brand-gold/40 transition-colors disabled:opacity-50"
+                >
+                  {uploadingAvatar ? <Spinner size="sm" /> : <Camera className="h-3.5 w-3.5" />}
                 </button>
               </div>
               <div className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>

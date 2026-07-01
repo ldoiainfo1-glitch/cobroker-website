@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,8 +6,9 @@ import { z } from 'zod'
 import {
   CheckCircle2, ChevronRight, ChevronLeft, Building2,
   IndianRupee, MapPin, Upload, Eye, Home, Briefcase,
-  Warehouse, Leaf, HardHat,
+  Warehouse, Leaf, HardHat, X,
 } from 'lucide-react'
+import { uploadMandateImage } from '@/lib/s3'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -97,6 +98,29 @@ export default function PostMandatePage() {
   const { user } = useAuthStore()
   const { mutateAsync: createMandate } = useCreateMandate()
 
+  // ─── Image upload state ──────────────────────────────────────────────
+  const imgInputRef = useRef<HTMLInputElement>(null)
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [dragging, setDragging] = useState(false)
+
+  const addImages = useCallback((files: File[]) => {
+    setImageFiles((prev) => {
+      const remaining = 10 - prev.length
+      const valid = files
+        .filter((f) => f.type.startsWith('image/'))
+        .filter((f) => f.size <= 5 * 1024 * 1024)
+        .slice(0, remaining)
+      setImagePreviews((p) => [...p, ...valid.map((f) => URL.createObjectURL(f))].slice(0, 10))
+      return [...prev, ...valid].slice(0, 10)
+    })
+  }, [])
+
+  const removeImage = useCallback((idx: number) => {
+    setImagePreviews((prev) => { URL.revokeObjectURL(prev[idx]); return prev.filter((_, i) => i !== idx) })
+    setImageFiles((prev) => prev.filter((_, i) => i !== idx))
+  }, [])
+
   // Step forms
   const form1 = useForm<Step1>({ resolver: zodResolver(step1Schema), defaultValues: data })
   const form2 = useForm<Step2>({ resolver: zodResolver(step2Schema), defaultValues: data })
@@ -135,6 +159,13 @@ export default function PostMandatePage() {
     if (!user?.id || !user.companyId) return
     setIsSubmitting(true)
     try {
+      // Upload images to S3 first
+      const imageUrls: string[] = []
+      for (const file of imageFiles) {
+        const { publicUrl } = await uploadMandateImage(file)
+        imageUrls.push(publicUrl)
+      }
+
       await createMandate({
         mandateType: data.mandateType!,
         title: data.title!,
@@ -153,6 +184,7 @@ export default function PostMandatePage() {
         postedBy: user!.id,
         companyId: user.companyId,
         publishNow,
+        imageUrls,
       })
       navigate('/dashboard/mandates')
     } finally {
@@ -478,16 +510,59 @@ export default function PostMandatePage() {
                 <p className="text-sm text-text-muted">Optional but recommended. Mandates with photos get 3× more enquiries.</p>
               </div>
 
-              <div className="border-2 border-dashed border-border rounded-2xl p-10 flex flex-col items-center justify-center text-center hover:border-brand-gold/40 transition-colors cursor-pointer bg-surface-2">
+              {/* Drop zone */}
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(e) => { e.preventDefault(); setDragging(false); addImages(Array.from(e.dataTransfer.files)) }}
+                onClick={() => imgInputRef.current?.click()}
+                className={cn(
+                  'border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-colors',
+                  dragging ? 'border-brand-gold bg-brand-gold/5' : 'border-border hover:border-brand-gold/40 bg-surface-2',
+                )}
+              >
                 <Upload className="h-10 w-10 text-text-muted mb-3" />
                 <p className="text-sm font-medium text-text-secondary mb-1">Drag & drop photos here</p>
-                <p className="text-xs text-text-muted mb-4">PNG, JPG up to 10MB each · Max 10 photos</p>
+                <p className="text-xs text-text-muted mb-4">PNG, JPG, WEBP · Up to 5 MB each · Max 10 photos</p>
                 <Button variant="secondary" size="sm" type="button">Browse files</Button>
               </div>
+              <input
+                ref={imgInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="hidden"
+                onChange={(e) => { addImages(Array.from(e.target.files ?? [])); e.target.value = '' }}
+              />
 
-              <p className="text-xs text-text-muted">
-                Note: Actual file upload is connected in Phase 3 with cloud storage integration.
-              </p>
+              {/* Previews */}
+              {imageFiles.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                  {imageFiles.map((file, i) => (
+                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-surface-2 border border-border group">
+                      <img src={imagePreviews[i]} alt={file.name} className="w-full h-full object-cover" />
+                      {i === 0 && (
+                        <span className="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 rounded-full bg-brand-gold text-black font-bold">
+                          Primary
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); removeImage(i) }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-surface-0/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3 text-text-primary" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {imageFiles.length > 0 && (
+                <p className="text-xs text-text-muted">
+                  {imageFiles.length}/10 photo{imageFiles.length !== 1 ? 's' : ''} added · First photo is shown as the primary image
+                </p>
+              )}
             </div>
           )}
 
