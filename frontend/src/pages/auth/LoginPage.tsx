@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase, fetchProfile } from '@/lib/supabase'
+import type { User } from '@/types'
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -21,6 +22,46 @@ const stats = [
   { value: '30k+', label: 'Deals Closed' },
   { value: '12.4k+', label: 'Brokers' },
   { value: '30+', label: 'Cities' },
+]
+
+const demoUsers: Array<{ email: string; password: string; user: User }> = [
+  {
+    email: 'demo@cobrokings.com',
+    password: 'demo123',
+    user: {
+      id: 'demo-user',
+      email: 'demo@cobrokings.com',
+      fullName: 'Demo Broker',
+      role: 'company_admin',
+      companyId: 'demo-company',
+      company: {
+        id: 'demo-company',
+        name: 'COBROKINGS Demo Realty',
+        slug: 'cobrokings-demo-realty',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        verificationStatus: 'verified',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      },
+      isVerified: true,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+  },
+  {
+    email: 'admin@cobrokings.com',
+    password: 'admin123',
+    user: {
+      id: 'demo-admin',
+      email: 'admin@cobrokings.com',
+      fullName: 'COBROKINGS Admin',
+      role: 'super_admin',
+      isVerified: true,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+  },
 ]
 
 export default function LoginPage() {
@@ -37,8 +78,19 @@ export default function LoginPage() {
     setError,
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
 
+  const signInDemo = (email: string, password: string) => {
+    const demo = demoUsers.find((account) => account.email === email && account.password === password)
+    if (!demo) return false
+
+    setUser(demo.user)
+    navigate(demo.user.role === 'super_admin' ? '/admin' : from, { replace: true })
+    return true
+  }
+
   const onSubmit = async (data: LoginForm) => {
     try {
+      if (signInDemo(data.email.toLowerCase(), data.password)) return
+
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -187,6 +239,7 @@ export default function LoginPage() {
               <p className="text-xs text-brand-gold font-medium mb-1">Demo credentials</p>
               <p className="text-xs text-text-muted">Email: demo@cobrokings.com</p>
               <p className="text-xs text-text-muted">Password: demo123</p>
+              <p className="text-xs text-text-muted mt-2">Admin: admin@cobrokings.com / admin123</p>
             </div>
           </div>
         </div>

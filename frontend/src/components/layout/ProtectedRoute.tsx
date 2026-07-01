@@ -9,7 +9,7 @@ export function AdminRoute() {
 
   if (isLoading) return <FullPageSpinner />
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
   if (user?.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />
