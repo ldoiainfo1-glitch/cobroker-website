@@ -36,6 +36,7 @@ import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage'
 import AdminPlatformSettingsPage from '@/pages/admin/AdminPlatformSettingsPage'
 import AdminLeadsPage from '@/pages/admin/AdminLeadsPage'
 import AdminNetworkPage from '@/pages/admin/AdminNetworkPage'
+import AdminKYCPage from '@/pages/admin/AdminKYCPage'
 import NetworkPage from '@/pages/dashboard/NetworkPage'
 
 // Placeholder for not-yet-built pages
@@ -108,6 +109,7 @@ export default function App() {
           <Route path="analytics" element={<AdminAnalyticsPage />} />
           <Route path="leads" element={<AdminLeadsPage />} />
           <Route path="network" element={<AdminNetworkPage />} />
+          <Route path="kyc" element={<AdminKYCPage />} />
           <Route path="settings" element={<AdminPlatformSettingsPage />} />
         </Route>
       </Route>

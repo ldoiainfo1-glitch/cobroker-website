@@ -2,14 +2,14 @@ import { useState, useRef, useCallback } from 'react'
 import {
   Shield, CheckCircle2, Clock, XCircle, Upload,
   AlertCircle, FileText, RefreshCw, ChevronDown,
-  X, File, ImageIcon,
+  X, File, ImageIcon, Eye, ExternalLink,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useKycDocs, useSubmitKycDoc } from '@/hooks/useKyc'
-import { uploadKycDocument } from '@/lib/s3'
+import { uploadKycDocument, getSignedDocUrl } from '@/lib/s3'
 import type { KYCDocument, KYCDocStatus } from '@/types'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -141,6 +141,30 @@ function UploadModal({ doc, onClose, onUploaded }: UploadModalProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+// ─── View document button (fetches presigned URL, opens in new tab) ──────────
+function ViewDocButton({ docUrl, label }: { docUrl: string; label: string }) {
+  const [loading, setLoading] = useState(false)
+
+  const handleView = async () => {
+    setLoading(true)
+    try {
+      const signedUrl = await getSignedDocUrl(docUrl)
+      window.open(signedUrl, '_blank', 'noopener,noreferrer')
+    } catch {
+      alert('Could not open document. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Button variant="outline" size="sm" onClick={handleView} disabled={loading}>
+      {loading ? <Spinner size="sm" /> : <Eye className="h-3.5 w-3.5" />}
+      View
+    </Button>
   )
 }
 
@@ -311,6 +335,9 @@ function DocRow({ doc, onUploadClick }: { doc: KYCDocument; onUploadClick: (doc:
             {doc.status === 'under_review' && (
               <p className="text-xs text-info">Document is under review. You will be notified once approved.</p>
             )}
+            {doc.docUrl && doc.status !== 'not_uploaded' && (
+              <ViewDocButton docUrl={doc.docUrl} label={doc.label} />
+            )}
           </div>
         </div>
       )}
@@ -419,6 +446,59 @@ export default function KYCPage() {
           <DocRow key={doc.id} doc={doc} onUploadClick={setUploadTarget} />
         ))}
       </div>
+
+      {/* Uploaded documents table */}
+      {docs.some((d) => d.docUrl) && (
+        <Card className="mb-6">
+          <CardContent className="p-5">
+            <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-brand-gold" />
+              Your uploaded documents
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left text-xs font-semibold text-text-muted pb-2 pr-4">Document</th>
+                    <th className="text-left text-xs font-semibold text-text-muted pb-2 pr-4">Status</th>
+                    <th className="text-left text-xs font-semibold text-text-muted pb-2 pr-4">Uploaded</th>
+                    <th className="text-left text-xs font-semibold text-text-muted pb-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {docs.filter((d) => d.docUrl).map((doc) => {
+                    const cfg = statusConfig[doc.status]
+                    return (
+                      <tr key={doc.id} className="border-b border-border/50 last:border-0">
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-3.5 w-3.5 text-text-muted shrink-0" />
+                            <span className="text-text-primary font-medium">{doc.label}</span>
+                            {doc.required && <span className="text-[10px] text-error font-semibold">Required</span>}
+                          </div>
+                        </td>
+                        <td className="py-3 pr-4">
+                          <span className={cn('flex items-center gap-1.5 text-xs font-medium', cfg.color)}>
+                            {cfg.icon} {cfg.label}
+                          </span>
+                        </td>
+                        <td className="py-3 pr-4 text-xs text-text-muted">
+                          {doc.uploadedAt
+                            ? new Date(doc.uploadedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : '—'}
+                        </td>
+                        <td className="py-3">
+                          <ViewDocButton docUrl={doc.docUrl!} label={doc.label} />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Help */}
       <Card className="border-brand-gold/20 bg-brand-gold/5">

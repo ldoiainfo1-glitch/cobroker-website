@@ -533,7 +533,7 @@ export default function ChatPage() {
                                 isRead: false,
                                 isMine: true,
                                 mandateCard: {
-                                  mandateId: m.id,
+                                  id: m.id,
                                   title: m.title,
                                   mandateType: m.mandateType,
                                   city: m.city,

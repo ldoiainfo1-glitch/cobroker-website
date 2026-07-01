@@ -215,11 +215,11 @@ export default function MandateDetailPage() {
               <CardContent className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-5">
                 <div>
                   <p className="text-xs text-text-muted mb-1">Min Budget</p>
-                  <p className="text-base font-bold text-text-primary">{formatCurrency(m.minBudget)}</p>
+                  <p className="text-base font-bold text-text-primary">{formatCurrency(m.minBudget ?? 0)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-text-muted mb-1">Max Budget</p>
-                  <p className="text-base font-bold text-text-primary">{formatCurrency(m.maxBudget)}</p>
+                  <p className="text-base font-bold text-text-primary">{formatCurrency(m.maxBudget ?? 0)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-text-muted mb-1">Min Area</p>
@@ -245,7 +245,7 @@ export default function MandateDetailPage() {
               <CardContent className="p-5">
                 <h3 className="text-sm font-semibold text-text-primary mb-3">Preferred Locations</h3>
                 <div className="flex flex-wrap gap-2">
-                  {m.locations.map((loc) => (
+                  {(m.locations ?? []).map((loc) => (
                     <span key={loc} className="flex items-center gap-1 px-3 py-1 rounded-full bg-surface-2 border border-border text-xs text-text-secondary">
                       <MapPin className="h-3 w-3" /> {loc}
                     </span>
@@ -255,12 +255,12 @@ export default function MandateDetailPage() {
             </Card>
 
             {/* Tags */}
-            {m.tags?.length > 0 && (
+            {(m.tags?.length ?? 0) > 0 && (
               <Card>
                 <CardContent className="p-5">
                   <h3 className="text-sm font-semibold text-text-primary mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
-                    {m.tags.map((tag) => (
+                    {m.tags!.map((tag) => (
                       <Badge key={tag} variant="gold">{tag}</Badge>
                     ))}
                   </div>
@@ -278,7 +278,7 @@ export default function MandateDetailPage() {
                   <div>
                     <p className="text-xs text-text-muted">Budget range</p>
                     <p className="text-lg font-bold text-text-primary">
-                      {formatCurrency(m.minBudget)} – {formatCurrency(m.maxBudget)}
+                      {formatCurrency(m.minBudget ?? 0)} – {formatCurrency(m.maxBudget ?? 0)}
                     </p>
                   </div>
                   <Badge variant="success" dot>Active</Badge>

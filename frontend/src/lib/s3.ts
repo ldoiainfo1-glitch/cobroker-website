@@ -113,3 +113,20 @@ export const uploadMandateImage = (file: File, onProgress?: (pct: number) => voi
 export const uploadMandateDocument = (file: File) => uploadFile('mandate-documents', file)
 export const uploadKycDocument = (file: File) => uploadFile('kyc-documents', file)
 export const uploadDealDocument = (file: File) => uploadFile('deal-documents', file)
+
+// ─── Presigned GET URL for private documents ─────────────────────────────────
+
+/** Calls the get-download-url edge function to get a short-lived signed URL for private documents. */
+export async function getSignedDocUrl(docUrl: string): Promise<string> {
+  try {
+    const urlObj = new URL(docUrl)
+    const s3Key = urlObj.pathname.slice(1) // strip leading /
+    const { data, error } = await supabase.functions.invoke<{ signedUrl: string }>('get-download-url', {
+      body: { s3Key },
+    })
+    if (error || !data?.signedUrl) throw new Error('Could not generate document URL')
+    return data.signedUrl
+  } catch {
+    return docUrl // fallback to direct URL
+  }
+}

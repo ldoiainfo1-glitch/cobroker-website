@@ -206,7 +206,7 @@ export default function ProfilePage() {
 
               {/* Rating */}
               <div className="flex items-center gap-3 mt-2 mb-3">
-                <Stars rating={profile.avgRating} />
+                <Stars rating={profile.avgRating ?? 0} />
                 <span className="text-sm font-semibold text-text-primary">{profile.avgRating}</span>
                 <span className="text-xs text-text-muted">({profile.totalReviews} reviews)</span>
               </div>
@@ -416,7 +416,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-6">
                 <div className="text-center">
                   <div className="text-5xl font-bold text-text-primary">{profile.avgRating}</div>
-                  <Stars rating={profile.avgRating} />
+                  <Stars rating={profile.avgRating ?? 0} />
                   <div className="text-xs text-text-muted mt-1">{profile.totalReviews} reviews</div>
                 </div>
                 <div className="flex-1">

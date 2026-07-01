@@ -122,6 +122,8 @@ export interface Notification {
 
 export type NotificationType =
   | 'new_mandate' | 'new_message'
+  | 'new_introduction' | 'intro_accepted' | 'intro_rejected'
+  | 'deal_stage_update' | 'new_follower'
   | 'verification_update' | 'payment_success' | 'mandate_expiring'
   | 'system'
 
@@ -237,6 +239,7 @@ export interface BrokerProfile {
   totalDeals: number
   totalMandates: number
   totalReviews: number
+  avgRating?: number
   tier: BrokerTier
   completenessScore: number       // 0–100
   badges: ProfileBadge[]
@@ -313,6 +316,7 @@ export interface KYCDocument {
   required: boolean
   fileName?: string
   fileSize?: string
+  docUrl?: string
   status: KYCDocStatus
   rejectionReason?: string
   uploadedAt?: string

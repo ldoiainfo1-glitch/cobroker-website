@@ -16,6 +16,7 @@ const NAV = [
   { to: '/admin/analytics', label: 'Analytics',  icon: <BarChart3 className="h-4 w-4" /> },
   { to: '/admin/leads',     label: 'Leads',       icon: <Inbox className="h-4 w-4" /> },
   { to: '/admin/network',   label: 'Ref. Network', icon: <GitBranch className="h-4 w-4" /> },
+  { to: '/admin/kyc',       label: 'KYC Docs',     icon: <Shield className="h-4 w-4" /> },
   { to: '/admin/settings',  label: 'Platform Settings', icon: <Settings className="h-4 w-4" /> },
 ]
 
