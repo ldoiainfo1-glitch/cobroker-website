@@ -271,7 +271,7 @@ export default function HomePage() {
           <div className="mb-12">
             <p className="text-xs font-bold tracking-[0.2em] uppercase text-text-muted mb-3">Simple process</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary">
-              Post â†’ Broadcast â†’ Co-broke
+              Post → Broadcast → Co-broke
             </h2>
             <p className="text-text-secondary mt-3 max-w-xl">
               One closed broker network, organised by city and area. Post a buy/sell ask in plain text and reach every broker who can close it.
