@@ -110,10 +110,17 @@ export function mapCompanyRow(row: CompanyRow): Company {
 export async function fetchProfile(userId: string): Promise<User | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*, company:companies(*)')
+    .select('*, company:companies!company_id(*)')
     .eq('id', userId)
     .single()
 
-  if (error || !data) return null
+  if (error) {
+    console.error('[fetchProfile] error:', error.code, error.message, error.details)
+    return null
+  }
+  if (!data) {
+    console.warn('[fetchProfile] no profile row found for', userId)
+    return null
+  }
   return mapProfileToUser(data as ProfileRow)
 }
