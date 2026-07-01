@@ -36,6 +36,14 @@ export interface ProfileRow {
   created_at: string
   updated_at: string
   company?: CompanyRow | null
+  // Extended fields
+  bio: string | null
+  years_of_experience: number
+  specializations: string[]
+  areas: string[]
+  languages: string[]
+  linkedin_url: string | null
+  website_url: string | null
 }
 
 export interface CompanyRow {
@@ -77,6 +85,13 @@ export function mapProfileToUser(profile: ProfileRow): User {
     isActive: profile.is_active,
     lastSeenAt: profile.last_seen_at ?? undefined,
     createdAt: profile.created_at,
+    bio: profile.bio ?? undefined,
+    yearsOfExperience: profile.years_of_experience ?? 0,
+    specializations: profile.specializations ?? [],
+    areas: profile.areas ?? [],
+    languages: profile.languages ?? [],
+    linkedinUrl: profile.linkedin_url ?? undefined,
+    websiteUrl: profile.website_url ?? undefined,
   }
 }
 

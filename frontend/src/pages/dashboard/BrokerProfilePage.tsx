@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   MapPin, Building2, Briefcase, Star, Users, GitBranch,
   Shield, CheckCircle2, Globe, Clock, Award,
-  ThumbsUp, ArrowLeft, UserPlus, UserCheck, MessageSquare,
+  ArrowLeft, MessageSquare,
 } from 'lucide-react'
+import { useAuthStore } from '@/stores/authStore'
 
 const LinkedinIcon = () => (
   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -17,8 +18,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { MOCK_BROKER_PROFILES, MOCK_REVIEWS, MOCK_ENDORSEMENTS } from '@/data/profiles'
+import { MOCK_BROKER_PROFILES, MOCK_REVIEWS } from '@/data/profiles'
 import type { ReviewTag } from '@/types'
+import { useBrokerProfile } from '@/hooks/useProfiles'
+import { Spinner } from '@/components/ui/spinner'
 
 // ─── Reusable sub-components ──────────────────────────────────────────────────
 const tierConfig = {
@@ -144,18 +147,39 @@ function ReviewModal({ onClose, brokerName }: { onClose: () => void; brokerName:
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function BrokerProfilePage() {
   const { id } = useParams<{ id: string }>()
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'endorsements'>('overview')
-  const [isConnected, setIsConnected] = useState(false)
+  const navigate = useNavigate()
+  const { user: currentUser } = useAuthStore()
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>('overview')
   const [showReviewModal, setShowReviewModal] = useState(false)
 
-  const profile = MOCK_BROKER_PROFILES.find((p) => p.id === id || p.userId === id)
-    ?? MOCK_BROKER_PROFILES[0]
+  // Try mock data first (demo profiles); fall back to real Supabase fetch
+  const mockProfile = MOCK_BROKER_PROFILES.find((p) => p.id === id || p.userId === id)
+  const { data: dbProfile, isLoading } = useBrokerProfile(mockProfile ? undefined : id)
+  const profile = mockProfile ?? dbProfile
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'reviews', label: `Reviews (${MOCK_REVIEWS.length})` },
-    { id: 'endorsements', label: `Endorsements (${MOCK_ENDORSEMENTS.length})` },
   ] as const
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-6">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-3">
+        <p className="text-text-muted">Broker profile not found.</p>
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/dashboard"><ArrowLeft className="h-4 w-4" /> Back to Dashboard</Link>
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1 overflow-y-auto p-6">
@@ -174,9 +198,15 @@ export default function BrokerProfilePage() {
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Avatar */}
             <div className="flex flex-col items-center gap-3 shrink-0">
-              <div className="w-20 h-20 rounded-full bg-brand-gold/20 border-2 border-brand-gold/40 flex items-center justify-center text-2xl font-bold text-brand-gold">
-                {profile.avatarInitial}
-              </div>
+              {profile.avatarUrl ? (
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-brand-gold/40 ring-2 ring-brand-gold/20">
+                  <img src={profile.avatarUrl} alt={profile.fullName} className="w-full h-full object-cover object-center" />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-brand-gold/20 border-2 border-brand-gold/40 flex items-center justify-center text-2xl font-bold text-brand-gold select-none">
+                  {profile.avatarInitial}
+                </div>
+              )}
               <div className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
                 {tierConfig[profile.tier].label}
               </div>
@@ -197,24 +227,17 @@ export default function BrokerProfilePage() {
                   </div>
                 </div>
 
-                {/* Action buttons */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Button
-                    variant={isConnected ? 'outline' : 'primary'}
-                    size="sm"
-                    onClick={() => setIsConnected(!isConnected)}
-                  >
-                    {isConnected
-                      ? <><UserCheck className="h-3.5 w-3.5" /> Connected</>
-                      : <><UserPlus className="h-3.5 w-3.5" /> Connect</>}
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MessageSquare className="h-3.5 w-3.5" /> Message
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setShowReviewModal(true)}>
-                    <Star className="h-3.5 w-3.5" /> Review
-                  </Button>
-                </div>
+                {/* Action buttons — hidden when viewing own profile */}
+                {profile.userId !== currentUser?.id && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/chat')}>
+                      <MessageSquare className="h-3.5 w-3.5" /> Message
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setShowReviewModal(true)}>
+                      <Star className="h-3.5 w-3.5" /> Review
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Rating */}
@@ -407,43 +430,7 @@ export default function BrokerProfilePage() {
         </div>
       )}
 
-      {/* Tab: Endorsements */}
-      {activeTab === 'endorsements' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {MOCK_ENDORSEMENTS.map((e) => (
-            <Card key={e.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-surface-3 flex items-center justify-center text-xs font-semibold text-text-secondary">
-                      {e.endorserAvatarInitial}
-                    </div>
-                    <div>
-                      <div className="text-xs font-medium text-text-primary">{e.endorserName}</div>
-                      <div className="text-xs text-text-muted">{e.endorserCompany}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm font-bold text-brand-gold">
-                    <ThumbsUp className="h-3.5 w-3.5" /> {e.count}
-                  </div>
-                </div>
-                <div className="text-sm font-semibold text-text-primary mb-3">{e.skill}</div>
-                <button
-                  onClick={() => {}}
-                  className={cn(
-                    'w-full text-xs py-1.5 rounded-lg border transition-all',
-                    e.endorsedByMe
-                      ? 'bg-brand-gold/10 border-brand-gold/30 text-brand-gold'
-                      : 'border-border text-text-muted hover:border-brand-gold/30 hover:text-brand-gold',
-                  )}
-                >
-                  {e.endorsedByMe ? 'Endorsed ✓' : '+ Endorse'}
-                </button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+
     </div>
   )
 }

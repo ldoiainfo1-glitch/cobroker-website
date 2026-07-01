@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
+import type { User } from '@/types'
 import { Link } from 'react-router-dom'
 import {
   MapPin, Building2, Briefcase, Star, Users, GitBranch,
   Shield, CheckCircle2, Edit3, Plus, Globe,
-  Clock, Award, ThumbsUp, ArrowRight, Camera, X, Check,
+  Clock, Award, ArrowRight, Camera, X, Check,
 } from 'lucide-react'
 import { uploadAvatar } from '@/lib/s3'
 import { supabase } from '@/lib/supabase'
@@ -22,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import {
-  MY_PROFILE, COMPLETENESS_ITEMS, MOCK_REVIEWS, MOCK_ENDORSEMENTS,
+  MY_PROFILE, MOCK_REVIEWS,
 } from '@/data/profiles'
 import type { ReviewTag } from '@/types'
 
@@ -52,6 +53,96 @@ function CompletenessRing({ score }: { score: number }) {
         <div className="text-xl font-bold text-text-primary">{score}%</div>
         <div className="text-xs text-text-muted leading-tight">complete</div>
       </div>
+    </div>
+  )
+}
+
+// ─── Avatar with completeness progress ring ───────────────────────────────────
+// Container 112px — avatar 80px — ring r=52 strokeWidth=3
+// Gap between avatar edge (40px) and ring inner edge (50.5px) = ~10px → clean look
+function AvatarWithRing({
+  avatarUrl, fullName, score, uploading, onCameraClick,
+}: {
+  avatarUrl?: string | null
+  fullName: string
+  score: number
+  uploading: boolean
+  onCameraClick: () => void
+}) {
+  const SIZE = 112           // container px
+  const C    = SIZE / 2      // centre = 56
+  const R    = 50            // ring radius — inner edge 48.5, outer 51.5
+  const SW   = 3             // stroke width (thin & elegant)
+  const circ   = 2 * Math.PI * R
+  const offset = circ - (score / 100) * circ
+  const ringColor = score >= 80 ? '#22c55e' : score >= 50 ? '#D4A017' : '#ef4444'
+  const initials  = fullName.split(' ').map(n => n[0] ?? '').join('').toUpperCase().slice(0, 2) || 'U'
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: SIZE, height: SIZE }}>
+      {/* SVG progress ring — sits outside the avatar with ~8px air gap */}
+      <svg
+        className="absolute inset-0 -rotate-90 pointer-events-none"
+        width={SIZE} height={SIZE}
+        viewBox={`0 0 ${SIZE} ${SIZE}`}
+      >
+        {/* Track — very subtle */}
+        <circle
+          cx={C} cy={C} r={R}
+          fill="none"
+          stroke="rgba(255,255,255,0.07)"
+          strokeWidth={SW}
+        />
+        {/* Progress arc */}
+        <circle
+          cx={C} cy={C} r={R}
+          fill="none"
+          stroke={ringColor}
+          strokeWidth={SW}
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1)' }}
+        />
+      </svg>
+
+      {/* Avatar circle — entire circle is clickable */}
+      <button
+        type="button"
+        title="Change profile photo"
+        disabled={uploading}
+        onClick={onCameraClick}
+        className="relative w-20 h-20 rounded-full z-10 group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 disabled:opacity-50"
+      >
+        {/* Image or initials */}
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={fullName}
+            className="w-full h-full rounded-full object-cover object-center"
+          />
+        ) : (
+          <div className="w-full h-full rounded-full bg-brand-gold/20 flex items-center justify-center text-2xl font-bold text-brand-gold select-none">
+            {initials}
+          </div>
+        )}
+
+        {/* Hover overlay — dark tint + "Change photo" */}
+        <div className="absolute inset-0 rounded-full bg-black/55 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          {uploading
+            ? <Spinner size="sm" />
+            : <>
+                <Camera className="h-5 w-5 text-white" />
+                <span className="text-[10px] text-white font-semibold leading-none">Change</span>
+              </>
+          }
+        </div>
+
+        {/* Always-visible camera badge — tells user this is editable */}
+        <div className="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-surface-2 border-2 border-surface-0 flex items-center justify-center shadow-sm pointer-events-none group-hover:opacity-0 transition-opacity duration-200">
+          <Camera className="h-3 w-3 text-text-muted" />
+        </div>
+      </button>
     </div>
   )
 }
@@ -99,13 +190,285 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
+// ─── Tag Input ───────────────────────────────────────────────────────────────
+function TagInput({
+  tags,
+  onAdd,
+  onRemove,
+  placeholder,
+}: {
+  tags: string[]
+  onAdd: (tag: string) => void
+  onRemove: (tag: string) => void
+  placeholder: string
+}) {
+  const [input, setInput] = useState('')
+  const commit = () => {
+    const val = input.trim()
+    if (val && !tags.includes(val)) { onAdd(val); setInput('') }
+  }
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {tags.map((tag) => (
+          <span key={tag} className="flex items-center gap-1 px-2 py-0.5 bg-surface-3 border border-border rounded-full text-xs text-text-secondary">
+            {tag}
+            <button type="button" onClick={() => onRemove(tag)} className="text-text-muted hover:text-error">
+              <X className="h-3 w-3" />
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commit() } }}
+          placeholder={placeholder}
+          className="flex-1 text-sm bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
+        />
+        <button
+          type="button"
+          onClick={commit}
+          className="px-3 py-1.5 text-xs bg-brand-gold text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Edit Profile Modal ───────────────────────────────────────────────────────
+interface EditProfileData {
+  fullName: string
+  phone: string
+  bio: string
+  yearsOfExperience: number
+  specializations: string[]
+  areas: string[]
+  languages: string[]
+  linkedinUrl: string
+  websiteUrl: string
+}
+
+function EditProfileModal({
+  user,
+  onSave,
+  onClose,
+}: {
+  user: User
+  onSave: (data: EditProfileData) => Promise<void>
+  onClose: () => void
+}) {
+  const [data, setData] = useState<EditProfileData>({
+    fullName: user.fullName,
+    phone: user.phone ?? '',
+    bio: user.bio ?? '',
+    yearsOfExperience: user.yearsOfExperience ?? 0,
+    specializations: user.specializations ?? [],
+    areas: user.areas ?? [],
+    languages: user.languages ?? [],
+    linkedinUrl: user.linkedinUrl ?? '',
+    websiteUrl: user.websiteUrl ?? '',
+  })
+  const [saving, setSaving] = useState(false)
+
+  const field = (
+    label: string,
+    key: keyof EditProfileData,
+    props: React.InputHTMLAttributes<HTMLInputElement> = {},
+  ) => (
+    <div>
+      <label className="block text-sm font-medium text-text-secondary mb-1.5">{label}</label>
+      <input
+        value={data[key] as string | number}
+        onChange={(e) =>
+          setData((d) => ({
+            ...d,
+            [key]: props.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value,
+          }))
+        }
+        className="w-full text-sm bg-surface-2 border border-border rounded-lg px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold/50"
+        {...props}
+      />
+    </div>
+  )
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+      <div className="bg-surface-1 border border-border rounded-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+          <h2 className="text-base font-semibold text-text-primary">Edit Profile</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface-2 text-text-muted hover:text-text-primary transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="overflow-y-auto flex-1 p-5 flex flex-col gap-5">
+          {field('Full Name *', 'fullName', { placeholder: 'Your full name' })}
+          {field('Phone', 'phone', { placeholder: '9876543210' })}
+
+          {/* Bio */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Bio</label>
+            <textarea
+              value={data.bio}
+              onChange={(e) => setData((d) => ({ ...d, bio: e.target.value }))}
+              rows={3}
+              placeholder="Tell other brokers about your expertise, markets and approach..."
+              className="w-full text-sm bg-surface-2 border border-border rounded-lg px-3 py-2 text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-brand-gold/50"
+            />
+          </div>
+
+          {field('Years of Experience', 'yearsOfExperience', { type: 'number', min: 0, max: 60 })}
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Specializations</label>
+            <TagInput
+              tags={data.specializations}
+              onAdd={(t) => setData((d) => ({ ...d, specializations: [...d.specializations, t] }))}
+              onRemove={(t) => setData((d) => ({ ...d, specializations: d.specializations.filter((x) => x !== t) }))}
+              placeholder="e.g. Commercial Leasing"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Service Areas</label>
+            <TagInput
+              tags={data.areas}
+              onAdd={(t) => setData((d) => ({ ...d, areas: [...d.areas, t] }))}
+              onRemove={(t) => setData((d) => ({ ...d, areas: d.areas.filter((x) => x !== t) }))}
+              placeholder="e.g. Bandra West"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Languages</label>
+            <TagInput
+              tags={data.languages}
+              onAdd={(t) => setData((d) => ({ ...d, languages: [...d.languages, t] }))}
+              onRemove={(t) => setData((d) => ({ ...d, languages: d.languages.filter((x) => x !== t) }))}
+              placeholder="e.g. Hindi"
+            />
+          </div>
+
+          {field('LinkedIn URL', 'linkedinUrl', { placeholder: 'https://linkedin.com/in/...' })}
+          {field('Website', 'websiteUrl', { placeholder: 'https://yourwebsite.com' })}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-border shrink-0 flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button
+            className="flex-1"
+            disabled={saving || !data.fullName.trim()}
+            onClick={async () => { setSaving(true); try { await onSave(data) } finally { setSaving(false) } }}
+          >
+            {saving ? <Spinner size="sm" /> : <Check className="h-3.5 w-3.5" />}
+            {saving ? 'Saving…' : 'Save Changes'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
   const { user, setUser } = useAuthStore()
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'endorsements'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>('overview')
   const [editBio, setEditBio] = useState(false)
-  const [bioValue, setBioValue] = useState(MY_PROFILE.bio)
-  const profile = MY_PROFILE
+  const [bioValue, setBioValue] = useState(user?.bio ?? '')
+  const [showEditModal, setShowEditModal] = useState(false)
+
+  // ─── Dynamic completeness items (recomputed on every user change) ──────────
+  const completenessItems = useMemo(() => [
+    { key: 'photo',           label: 'Profile photo',          weight: 10, done: !!user?.avatarUrl },
+    { key: 'bio',             label: 'Bio (50+ chars)',         weight: 15, done: (user?.bio?.length ?? 0) >= 50 },
+    { key: 'phone',           label: 'Phone number',           weight: 10, done: !!user?.phone },
+    { key: 'kyc',             label: 'KYC verified',           weight: 20, done: !!user?.isVerified },
+    { key: 'specializations', label: 'Specializations added',  weight: 10, done: (user?.specializations?.length ?? 0) > 0 },
+    { key: 'areas',           label: 'Service areas set',      weight: 10, done: (user?.areas?.length ?? 0) > 0 },
+    { key: 'languages',       label: 'Languages listed',       weight:  5, done: (user?.languages?.length ?? 0) > 0 },
+    { key: 'experience',      label: 'Years of experience',    weight:  5, done: (user?.yearsOfExperience ?? 0) > 0 },
+    { key: 'social',          label: 'LinkedIn linked',        weight:  5, done: !!user?.linkedinUrl },
+    { key: 'company',         label: 'Company profile',        weight: 10, done: !!user?.company?.name },
+  ], [user])
+
+  const completenessScore = useMemo(
+    () => completenessItems.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0),
+    [completenessItems],
+  )
+
+  // Build profile from real auth-store user, falling back to MY_PROFILE for
+  // display-only fields not yet entered (badges, stats, tier, etc.)
+  const profile = user ? {
+    ...MY_PROFILE,
+    id: user.id,
+    userId: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    avatarInitial: user.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2),
+    company: user.company?.name ?? MY_PROFILE.company,
+    companyId: user.companyId ?? MY_PROFILE.companyId,
+    city: user.company?.city ?? MY_PROFILE.city,
+    state: user.company?.state ?? MY_PROFILE.state,
+    isVerified: user.isVerified,
+    bio: user.bio ?? MY_PROFILE.bio,
+    yearsOfExperience: user.yearsOfExperience ?? MY_PROFILE.yearsOfExperience,
+    specializations: user.specializations?.length ? user.specializations : MY_PROFILE.specializations,
+    areas: user.areas?.length ? user.areas : MY_PROFILE.areas,
+    languages: user.languages?.length ? user.languages : MY_PROFILE.languages,
+    socialLinks: {
+      linkedin: user.linkedinUrl,
+      website: user.websiteUrl,
+    },
+    completenessScore,
+  } : MY_PROFILE
+
+  // ─── Save bio inline ───────────────────────────────────────────────────────
+  const saveBio = async () => {
+    if (!user) return
+    await supabase.from('profiles').update({ bio: bioValue || null }).eq('id', user.id)
+    setUser({ ...user, bio: bioValue || undefined })
+    setEditBio(false)
+  }
+
+  // ─── Save full profile from modal ─────────────────────────────────────────
+  const handleSaveProfile = async (data: EditProfileData) => {
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({
+      full_name: data.fullName,
+      phone: data.phone || null,
+      bio: data.bio || null,
+      years_of_experience: data.yearsOfExperience,
+      specializations: data.specializations,
+      areas: data.areas,
+      languages: data.languages,
+      linkedin_url: data.linkedinUrl || null,
+      website_url: data.websiteUrl || null,
+    }).eq('id', user.id)
+    if (!error) {
+      setUser({
+        ...user,
+        fullName: data.fullName,
+        phone: data.phone || undefined,
+        bio: data.bio || undefined,
+        yearsOfExperience: data.yearsOfExperience,
+        specializations: data.specializations,
+        areas: data.areas,
+        languages: data.languages,
+        linkedinUrl: data.linkedinUrl || undefined,
+        websiteUrl: data.websiteUrl || undefined,
+      })
+      setBioValue(data.bio)
+      setShowEditModal(false)
+    }
+  }
 
   // ─── Avatar upload ─────────────────────────────────────────────────────────
   const avatarInputRef = useRef<HTMLInputElement>(null)
@@ -131,10 +494,10 @@ export default function ProfilePage() {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'reviews', label: `Reviews (${MOCK_REVIEWS.length})` },
-    { id: 'endorsements', label: `Endorsements (${MOCK_ENDORSEMENTS.length})` },
   ] as const
 
   return (
+    <>
     <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -162,24 +525,14 @@ export default function ProfilePage() {
                 className="hidden"
                 onChange={handleAvatarChange}
               />
-              <div className="relative">
-                {user?.avatarUrl ? (
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-brand-gold/30">
-                    <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <CompletenessRing score={profile.completenessScore} />
-                )}
-                <button
-                  type="button"
-                  title="Change profile photo"
-                  disabled={uploadingAvatar}
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-surface-3 border border-border flex items-center justify-center text-text-muted hover:text-text-primary hover:border-brand-gold/40 transition-colors disabled:opacity-50"
-                >
-                  {uploadingAvatar ? <Spinner size="sm" /> : <Camera className="h-3.5 w-3.5" />}
-                </button>
-              </div>
+              {/* Avatar with completeness ring as outer border */}
+              <AvatarWithRing
+                avatarUrl={user?.avatarUrl}
+                fullName={user?.fullName ?? ''}
+                score={profile.completenessScore}
+                uploading={uploadingAvatar}
+                onCameraClick={() => avatarInputRef.current?.click()}
+              />
               <div className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', tierConfig[profile.tier].className)}>
                 {tierConfig[profile.tier].label}
               </div>
@@ -199,7 +552,7 @@ export default function ProfilePage() {
                     <span className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" /> {profile.yearsOfExperience} yrs exp</span>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => setShowEditModal(true)}>
                   <Edit3 className="h-3.5 w-3.5" /> Edit Profile
                 </Button>
               </div>
@@ -223,10 +576,10 @@ export default function ProfilePage() {
                       className="w-full text-sm bg-surface-2 border border-border rounded-lg px-3 py-2 text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-brand-gold/50"
                     />
                     <div className="flex items-center gap-2">
-                      <Button size="sm" onClick={() => setEditBio(false)}>
+                      <Button size="sm" onClick={saveBio}>
                         <Check className="h-3.5 w-3.5" /> Save
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setEditBio(false)}>
+                      <Button variant="ghost" size="sm" onClick={() => { setBioValue(user?.bio ?? ''); setEditBio(false) }}>
                         <X className="h-3.5 w-3.5" /> Cancel
                       </Button>
                     </div>
@@ -300,7 +653,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className="grid grid-cols-2 gap-1.5">
-              {COMPLETENESS_ITEMS.map((item) => (
+              {completenessItems.map((item) => (
                 <div key={item.key} className={cn('flex items-center gap-2 text-xs', item.done ? 'text-text-muted line-through' : 'text-text-secondary')}>
                   {item.done
                     ? <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
@@ -392,14 +745,14 @@ export default function ProfilePage() {
                   {profile.socialLinks.linkedin
                     ? <a href={profile.socialLinks.linkedin} className="text-brand-gold text-xs hover:underline truncate">{profile.socialLinks.linkedin}</a>
                     : <span className="text-xs italic">Not linked</span>}
-                  <button className="ml-auto text-xs text-brand-gold hover:text-brand-gold-light"><Edit3 className="h-3 w-3" /></button>
+                  <button onClick={() => setShowEditModal(true)} className="ml-auto text-xs text-brand-gold hover:text-brand-gold-light"><Edit3 className="h-3 w-3" /></button>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-text-muted">
                   <Globe className="h-4 w-4" />
                   {profile.socialLinks.website
                     ? <a href={profile.socialLinks.website} className="text-brand-gold text-xs hover:underline truncate">{profile.socialLinks.website}</a>
                     : <span className="text-xs italic">Not set</span>}
-                  <button className="ml-auto text-xs text-brand-gold hover:text-brand-gold-light"><Edit3 className="h-3 w-3" /></button>
+                  <button onClick={() => setShowEditModal(true)} className="ml-auto text-xs text-brand-gold hover:text-brand-gold-light"><Edit3 className="h-3 w-3" /></button>
                 </div>
               </div>
             </CardContent>
@@ -476,37 +829,18 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Tab: Endorsements */}
-      {activeTab === 'endorsements' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {MOCK_ENDORSEMENTS.map((e) => (
-            <Card key={e.id} className={cn(e.endorsedByMe && 'border-brand-gold/30')}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-surface-3 flex items-center justify-center text-xs font-semibold text-text-secondary">
-                      {e.endorserAvatarInitial}
-                    </div>
-                    <div>
-                      <div className="text-xs font-medium text-text-primary">{e.endorserName}</div>
-                      <div className="text-xs text-text-muted">{e.endorserCompany}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm font-bold text-brand-gold">
-                    <ThumbsUp className="h-3.5 w-3.5" />
-                    {e.count}
-                  </div>
-                </div>
-                <div className="text-sm font-semibold text-text-primary mb-2">{e.skill}</div>
-                {e.endorsedByMe
-                  ? <Badge variant="outline" className="text-xs border-brand-gold/30 text-brand-gold">You endorsed this</Badge>
-                  : null}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+
     </div>
+
+    {/* Edit Profile Modal */}
+    {showEditModal && user && (
+      <EditProfileModal
+        user={user}
+        onSave={handleSaveProfile}
+        onClose={() => setShowEditModal(false)}
+      />
+    )}
+    </>
   )
 }
 

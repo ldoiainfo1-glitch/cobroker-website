@@ -12,6 +12,14 @@ export interface User {
   isActive: boolean
   lastSeenAt?: string
   createdAt: string
+  // Extended profile fields
+  bio?: string
+  yearsOfExperience?: number
+  specializations?: string[]
+  areas?: string[]
+  languages?: string[]
+  linkedinUrl?: string
+  websiteUrl?: string
 }
 
 export type UserRole = 'super_admin' | 'company_admin' | 'director' | 'broker' | 'employee' | 'viewer'
@@ -227,6 +235,7 @@ export interface BrokerProfile {
   email: string
   phone?: string
   avatarInitial: string
+  avatarUrl?: string
   company: string
   companyId: string
   city: string
