@@ -132,6 +132,17 @@ export interface CreateMandatePayload {
   publishNow?: boolean
 }
 
+// Normalize frontend area-unit display values to DB CHECK constraint values
+const AREA_UNIT_DB: Record<string, string> = {
+  'sq.ft': 'sqft', 'sqft': 'sqft',
+  'sq.m': 'sqm',   'sqm': 'sqm',
+  'sq.yd': 'sqft', // approximate
+  'acre': 'acre',
+  'gunta': 'gunta',
+  'hectare': 'sqm', // approximate
+  'cents': 'cents',
+}
+
 export async function createMandate(payload: CreateMandatePayload): Promise<Mandate> {
   const { data, error } = await supabase
     .from('mandates')
@@ -147,7 +158,7 @@ export async function createMandate(payload: CreateMandatePayload): Promise<Mand
       max_budget: payload.maxBudget,
       min_area: payload.minArea ?? null,
       max_area: payload.maxArea ?? null,
-      area_unit: payload.areaUnit ?? 'sqft',
+      area_unit: AREA_UNIT_DB[payload.areaUnit ?? ''] ?? 'sqft',
       commission_pct: payload.commissionPercent ? parseFloat(payload.commissionPercent) : null,
       city: payload.city,
       state: payload.state,

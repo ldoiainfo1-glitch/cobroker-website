@@ -6,7 +6,7 @@ import { z } from 'zod'
 import {
   CheckCircle2, ChevronRight, ChevronLeft, Building2,
   IndianRupee, MapPin, Upload, Eye, Home, Briefcase,
-  Warehouse, Leaf, Hotel, HardHat,
+  Warehouse, Leaf, HardHat,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -69,8 +69,7 @@ const PROPERTY_CATEGORIES = [
   { icon: <Briefcase className="h-5 w-5" />, label: 'Commercial' },
   { icon: <Warehouse className="h-5 w-5" />, label: 'Industrial' },
   { icon: <Leaf className="h-5 w-5" />, label: 'Land' },
-  { icon: <Hotel className="h-5 w-5" />, label: 'Hospitality' },
-  { icon: <HardHat className="h-5 w-5" />, label: 'Under Construction' },
+  { icon: <HardHat className="h-5 w-5" />, label: 'Agricultural' },
 ]
 
 const STEPS = [
