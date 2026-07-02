@@ -272,8 +272,6 @@ export default function DashboardHome() {
               </CardContent>
             </Card>
           )}
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
