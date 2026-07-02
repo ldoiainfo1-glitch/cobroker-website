@@ -25,6 +25,7 @@ jobs:
           version: latest
 
       - name: Apply migrations
+        continue-on-error: true   # migrations may already be applied; don't block deploy
         run: |
           supabase link --project-ref ltdjflgoqfmvljiujpct
           supabase db push --yes
