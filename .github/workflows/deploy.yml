@@ -79,7 +79,8 @@ jobs:
             npm ci --omit=dev
 
             # Create log directory if it doesn't exist
-            mkdir -p /var/log/cobrokings
+            sudo mkdir -p /var/log/cobrokings
+            sudo chown $USER:$USER /var/log/cobrokings
 
             # Reload (zero-downtime) or start fresh
             if pm2 list | grep -q cobrokings-api; then
