@@ -238,16 +238,11 @@ export async function deleteMandate(id: string): Promise<void> {
 }
 
 export async function fetchDashboardStats(userId: string) {
-  const [mandatesRes, viewsRes, notifRes] = await Promise.all([
+  const [mandatesRes, notifRes] = await Promise.all([
     supabase
       .from('mandates')
       .select('id, status, views_count, intro_count')
       .eq('posted_by', userId),
-    supabase
-      .from('mandates')
-      .select('views_count.sum()')
-      .eq('posted_by', userId)
-      .eq('status', 'active'),
     supabase
       .from('notifications')
       .select('id')

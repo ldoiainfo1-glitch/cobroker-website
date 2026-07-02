@@ -173,7 +173,7 @@ function ConvItem({ conv, isActive, onClick }: { conv: Conversation; isActive: b
             </span>
           )}
         </div>
-        {conv.type === 'direct' && (
+        {conv.type === 'direct' && participant?.company && (
           <p className="text-xs text-text-muted truncate mt-0.5">{participant.company}</p>
         )}
       </div>

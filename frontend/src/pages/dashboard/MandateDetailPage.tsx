@@ -156,11 +156,13 @@ export default function MandateDetailPage() {
 
             {/* Image gallery */}
             <div className="relative rounded-2xl overflow-hidden bg-surface-2 aspect-video">
-              <img
-                src={m.images[currentImg]?.url ?? ''}
-                alt={m.title}
-                className="w-full h-full object-cover"
-              />
+              {m.images[currentImg]?.url && (
+                <img
+                  src={m.images[currentImg].url}
+                  alt={m.title}
+                  className="w-full h-full object-cover"
+                />
+              )}
               {m.images.length > 1 && (
                 <>
                   <button onClick={prevImg} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors">
