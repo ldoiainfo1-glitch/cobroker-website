@@ -250,7 +250,7 @@ export async function fetchDashboardStats(userId: string) {
       .eq('status', 'active'),
     supabase
       .from('notifications')
-      .select('id', { count: 'exact', head: true })
+      .select('id')
       .eq('user_id', userId)
       .eq('is_read', false),
   ])
@@ -259,7 +259,7 @@ export async function fetchDashboardStats(userId: string) {
   const active = mandates.filter((m) => m.status === 'active').length
   const totalViews = mandates.reduce((sum, m) => sum + (m.views_count ?? 0), 0)
   const totalIntros = mandates.reduce((sum, m) => sum + (m.intro_count ?? 0), 0)
-  const unreadNotifs = notifRes.count ?? 0
+  const unreadNotifs = (notifRes.data ?? []).length
 
   return { active, totalViews, totalIntros, unreadNotifs, totalMandates: mandates.length }
 }

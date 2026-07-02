@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import {
-  Building2, GitBranch, Users, TrendingUp, Plus, ArrowRight,
+  Building2, GitBranch, TrendingUp, Plus, ArrowRight,
   Eye, Star, Clock, CheckCircle2, Radio, MapPin, Bell,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuthStore } from '@/stores/authStore'
 import { formatCurrency, timeAgo } from '@/lib/utils'
-import { useDashboardStats } from '@/hooks/useMandates'
+import { useDashboardStats, useMyMandates } from '@/hooks/useMandates'
 import { useCircles } from '@/hooks/useCircles'
 import { useNotifications } from '@/hooks/useNotifications'
 
@@ -27,7 +27,9 @@ export default function DashboardHome() {
   const { data: statsData } = useDashboardStats()
   const { data: circles = [] } = useCircles()
   const { data: notifications = [] } = useNotifications()
+  const { data: myMandates = [] } = useMyMandates()
   const recentActivity = notifications.slice(0, 5)
+  const topMandate = myMandates.find((m) => m.status === 'active') ?? myMandates[0] ?? null
 
   const joined = circles.filter((c) => c.isJoined)
   const suggested = circles.filter((c) => !c.isJoined && c.scope === 'area').slice(0, 6)
@@ -191,22 +193,24 @@ export default function DashboardHome() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-text-primary">Active Circles</h3>
-                <Badge variant="warning" dot>3 new</Badge>
               </div>
               <div className="flex flex-col gap-3">
-                {['BKC Commercial', 'South Mumbai Resi', 'Pune IT Corridor'].map((name) => (
-                  <div key={name} className="flex items-center justify-between">
+                {circles.slice(0, 3).map((c) => (
+                  <div key={c.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-surface-3 flex items-center justify-center text-xs text-text-secondary font-medium">
-                        {name[0]}
+                        {c.name[0]}
                       </div>
-                      <span className="text-sm text-text-primary">{name}</span>
+                      <span className="text-sm text-text-primary">{c.name}</span>
                     </div>
-                    <Link to="/dashboard/circles" className="text-xs text-brand-gold hover:text-brand-gold-light">
+                    <Link to={`/dashboard/circles/${c.id}`} className="text-xs text-brand-gold hover:text-brand-gold-light">
                       View →
                     </Link>
                   </div>
                 ))}
+                {circles.length === 0 && (
+                  <p className="text-xs text-text-muted text-center py-2">No circles available yet.</p>
+                )}
               </div>
               <Button variant="outline" size="sm" className="w-full mt-4" asChild>
                 <Link to="/dashboard/circles">View all circles</Link>
@@ -215,35 +219,59 @@ export default function DashboardHome() {
           </Card>
 
           {/* Verification status */}
-          <Card className="border-success/30 bg-success/5">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle2 className="h-4 w-4 text-success" />
-                <span className="text-sm font-semibold text-success">Company Verified</span>
-              </div>
-              <p className="text-xs text-text-muted">
-                Your RERA and GST documents are verified. You have full marketplace access.
-              </p>
-            </CardContent>
-          </Card>
+          {user?.company?.verificationStatus === 'verified' ? (
+            <Card className="border-success/30 bg-success/5">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="h-4 w-4 text-success" />
+                  <span className="text-sm font-semibold text-success">Company Verified</span>
+                </div>
+                <p className="text-xs text-text-muted">
+                  Your RERA and GST documents are verified. You have full marketplace access.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-warning/30 bg-warning/5">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="h-4 w-4 text-warning" />
+                  <span className="text-sm font-semibold text-warning">Verification Pending</span>
+                </div>
+                <p className="text-xs text-text-muted mb-3">
+                  Complete KYC to unlock full marketplace access and get your verified badge.
+                </p>
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link to="/dashboard/kyc">Complete KYC →</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Top mandate */}
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-text-primary">Top Mandate</h3>
-                <Star className="h-4 w-4 text-brand-gold" />
-              </div>
-              <Badge variant="buy" className="mb-2">Buy</Badge>
-              <p className="text-sm text-text-primary font-medium mb-1">
-                3BHK in Bandra West, Mumbai
-              </p>
-              <p className="text-xs text-text-secondary mb-3">
-                {formatCurrency(15000000)} – {formatCurrency(22000000)}
-              </p>
-              <div className="flex items-center gap-4 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> 420 views</span>
-              </div>
+          {topMandate && (
+            <Card>
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-text-primary">Top Mandate</h3>
+                  <Star className="h-4 w-4 text-brand-gold" />
+                </div>
+                <Badge variant={topMandate.mandateType as any} className="mb-2 capitalize">{topMandate.mandateType}</Badge>
+                <p className="text-sm text-text-primary font-medium mb-1">
+                  {topMandate.title}
+                </p>
+                {(topMandate.minBudget || topMandate.maxBudget) && (
+                  <p className="text-xs text-text-secondary mb-3">
+                    {topMandate.minBudget ? formatCurrency(topMandate.minBudget) : '–'}{' '}
+                    {topMandate.maxBudget ? `– ${formatCurrency(topMandate.maxBudget)}` : ''}
+                  </p>
+                )}
+                <div className="flex items-center gap-4 text-xs text-text-muted">
+                  <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {topMandate.viewsCount ?? 0} views</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
             </CardContent>
           </Card>
         </div>

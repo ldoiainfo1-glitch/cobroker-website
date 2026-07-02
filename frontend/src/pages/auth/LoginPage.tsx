@@ -186,8 +186,8 @@ export default function LoginPage() {
             <div className="mt-6 p-4 rounded-lg bg-brand-gold/5 border border-brand-gold/20">
               <p className="text-xs text-brand-gold font-medium mb-1">Test credentials</p>
               <p className="text-xs text-text-muted">Email: demo@cobrokings.com</p>
-              <p className="text-xs text-text-muted">Password: demo123</p>
-              <p className="text-xs text-text-muted mt-2">Admin: admin@cobrokings.com / admin123</p>
+              <p className="text-xs text-text-muted">Password: demo@123</p>
+              <p className="text-xs text-text-muted mt-2">Admin: admin@cobrokings.com / admin@123</p>
             </div>
           </div>
         </div>

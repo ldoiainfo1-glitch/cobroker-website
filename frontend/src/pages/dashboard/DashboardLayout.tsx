@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { getInitials, cn, timeAgo } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useNotifications, useMarkRead, useMarkAllRead } from '@/hooks/useNotifications'
+import { useConversations } from '@/hooks/useChat'
 import type { NotificationType } from '@/types'
 
 type NavLink = { to: string; icon: React.ReactNode; label: string; badge?: number }
@@ -148,49 +149,56 @@ function BellDropdown() {
   )
 }
 
-const navSections: { title: string; links: NavLink[] }[] = [
-  {
-    title: 'Main',
-    links: [
-      { to: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard' },
-      { to: '/dashboard/mandates', icon: <Building2 className="h-4 w-4" />, label: 'My Mandates' },
-      { to: '/dashboard/marketplace', icon: <Search className="h-4 w-4" />, label: 'Marketplace' },
-    ],
-  },
-  {
-    title: 'Co-Broking',
-    links: [
-      { to: '/dashboard/circles', icon: <Radio className="h-4 w-4" />, label: 'Circles', badge: 3 },
-    ],
-  },
-  {
-    title: 'Communication',
-    links: [
-      { to: '/dashboard/chat', icon: <MessageSquare className="h-4 w-4" />, label: 'Messages', badge: 5 },
-      { to: '/dashboard/notifications', icon: <Bell className="h-4 w-4" />, label: 'Notifications', badge: 2 },
-    ],
-  },
-  {
-    title: 'Trust & Network',
-    links: [
-      { to: '/dashboard/profile', icon: <UserCircle className="h-4 w-4" />, label: 'My Profile' },
-      { to: '/dashboard/kyc', icon: <Shield className="h-4 w-4" />, label: 'KYC & Verification' },
-      { to: '/dashboard/network', icon: <GitBranch className="h-4 w-4" />, label: 'My Network' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { to: '/dashboard/company', icon: <Building2 className="h-4 w-4" />, label: 'Company Profile' },
-      { to: '/dashboard/analytics', icon: <BarChart3 className="h-4 w-4" />, label: 'Analytics' },
-      { to: '/dashboard/settings', icon: <Settings className="h-4 w-4" />, label: 'Settings' },
-    ],
-  },
-]
+function buildNavSections(unreadNotifs: number, unreadMsgs: number): { title: string; links: NavLink[] }[] {
+  return [
+    {
+      title: 'Main',
+      links: [
+        { to: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard' },
+        { to: '/dashboard/mandates', icon: <Building2 className="h-4 w-4" />, label: 'My Mandates' },
+        { to: '/dashboard/marketplace', icon: <Search className="h-4 w-4" />, label: 'Marketplace' },
+      ],
+    },
+    {
+      title: 'Co-Broking',
+      links: [
+        { to: '/dashboard/circles', icon: <Radio className="h-4 w-4" />, label: 'Circles' },
+      ],
+    },
+    {
+      title: 'Communication',
+      links: [
+        { to: '/dashboard/chat', icon: <MessageSquare className="h-4 w-4" />, label: 'Messages', badge: unreadMsgs > 0 ? unreadMsgs : undefined },
+        { to: '/dashboard/notifications', icon: <Bell className="h-4 w-4" />, label: 'Notifications', badge: unreadNotifs > 0 ? unreadNotifs : undefined },
+      ],
+    },
+    {
+      title: 'Trust & Network',
+      links: [
+        { to: '/dashboard/profile', icon: <UserCircle className="h-4 w-4" />, label: 'My Profile' },
+        { to: '/dashboard/kyc', icon: <Shield className="h-4 w-4" />, label: 'KYC & Verification' },
+        { to: '/dashboard/network', icon: <GitBranch className="h-4 w-4" />, label: 'My Network' },
+      ],
+    },
+    {
+      title: 'Company',
+      links: [
+        { to: '/dashboard/company', icon: <Building2 className="h-4 w-4" />, label: 'Company Profile' },
+        { to: '/dashboard/analytics', icon: <BarChart3 className="h-4 w-4" />, label: 'Analytics' },
+        { to: '/dashboard/settings', icon: <Settings className="h-4 w-4" />, label: 'Settings' },
+      ],
+    },
+  ]
+}
 
 export default function DashboardLayout() {
   const [collapsed, setCollapsed] = useState(false)
   const { user, logout } = useAuthStore()
+  const { data: notifications = [] } = useNotifications()
+  const { data: conversations = [] } = useConversations()
+  const unreadNotifCount = notifications.filter((n) => !n.isRead).length
+  const unreadMsgCount = conversations.reduce((sum, c) => sum + c.unreadCount, 0)
+  const navSections = buildNavSections(unreadNotifCount, unreadMsgCount)
 
   return (
     <div className="flex h-screen bg-surface-0 overflow-hidden">
